@@ -26,10 +26,22 @@ const ACTIVITY_CATS: ActivityCategory[] = [
   ...new Set(WORLD_ACTIVITIES.map(a => a.category)),
 ] as ActivityCategory[];
 
-// Target 4 columns. If the grid ever grows past 8 categories, widen to 5.
-const ACT_GRID_COLS = ACTIVITY_CATS.length > 8 ? 5 : 4;
+// Automatically pick the column count (3, 4, or 5) that leaves the fewest
+// orphan items in the last row. On a tie, prefers 4 columns as the most
+// readable width for phone-sized screens. Re-evaluated whenever ACTIVITY_CATS
+// changes, so adding or removing a category never needs a manual update here.
+function deriveGridCols(n: number, candidates = [3, 4, 5]): number {
+  return candidates.reduce((best, cols) => {
+    const orphans = n % cols;      // 0 = perfect full rows
+    const bestOrphans = n % best;
+    if (orphans < bestOrphans) return cols;
+    if (orphans === bestOrphans && cols === 4) return cols; // tie-break: prefer 4
+    return best;
+  }, 4 /* start with 4 */);
+}
+const ACT_GRID_COLS = deriveGridCols(ACTIVITY_CATS.length);
 // Width as a percentage that leaves room for the inter-item gaps.
-// Formula: floor(100/cols) - 2  →  23% for 4-col, 18% for 5-col
+// Formula: floor(100/cols) - 2  →  31% for 3-col, 23% for 4-col, 18% for 5-col
 const ACT_GRID_ITEM_WIDTH = `${Math.floor(100 / ACT_GRID_COLS) - 2}%` as const;
 
 export default function DashboardScreen() {
