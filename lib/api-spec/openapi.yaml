@@ -10,7 +10,30 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: reports
+    description: Issue report operations
 paths:
+  /reports:
+    post:
+      operationId: submitReport
+      tags: [reports]
+      summary: Submit an issue report
+      description: Submit a report about incorrect or missing content
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReportRequest"
+      responses:
+        "201":
+          description: Report submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReportRecord"
+        "400":
+          description: Invalid input
   /healthz:
     get:
       operationId: healthCheck
@@ -33,4 +56,37 @@ components:
           type: string
       required:
         - status
+    ReportCategory:
+      type: string
+      enum:
+        - wrong_info
+        - missing_item
+        - other
+    ReportRequest:
+      type: object
+      properties:
+        category:
+          $ref: "#/components/schemas/ReportCategory"
+        note:
+          type: string
+          nullable: true
+      required:
+        - category
+    ReportRecord:
+      type: object
+      properties:
+        id:
+          type: integer
+        category:
+          $ref: "#/components/schemas/ReportCategory"
+        note:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - category
+        - createdAt
 

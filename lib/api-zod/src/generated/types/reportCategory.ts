@@ -5,9 +5,6 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
-export interface HealthStatus {
-  status: string;
-}
 
 export type ReportCategory = typeof ReportCategory[keyof typeof ReportCategory];
 
@@ -17,16 +14,3 @@ export const ReportCategory = {
   missing_item: 'missing_item',
   other: 'other',
 } as const;
-
-export interface ReportRequest {
-  category: ReportCategory;
-  note?: string | null;
-}
-
-export interface ReportRecord {
-  id: number;
-  category: ReportCategory;
-  note?: string | null;
-  createdAt: string;
-}
-

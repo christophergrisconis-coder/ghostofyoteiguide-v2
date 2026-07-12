@@ -15,6 +15,7 @@ import * as Haptics from 'expo-haptics';
 import Constants from 'expo-constants';
 import { useColors } from '@/hooks/useColors';
 import { useProgress } from '@/context/ProgressContext';
+import { ReportIssueModal } from '@/components/ReportIssueModal';
 
 function formatBackupTime(iso: string | null): string {
   if (!iso) return 'Never';
@@ -111,6 +112,7 @@ export default function SettingsScreen() {
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [isBacking, setIsBacking] = useState(false);
+  const [reportModalVisible, setReportModalVisible] = useState(false);
 
   const handleExport = async () => {
     setIsExporting(true);
@@ -400,7 +402,21 @@ export default function SettingsScreen() {
             your data on first launch.
           </Text>
         )}
+        <SettingRow
+          icon="flag-outline"
+          label="Report an issue"
+          sublabel="Flag incorrect or missing content"
+          onPress={() => {
+            Haptics.selectionAsync();
+            setReportModalVisible(true);
+          }}
+        />
       </View>
+
+      <ReportIssueModal
+        visible={reportModalVisible}
+        onClose={() => setReportModalVisible(false)}
+      />
     </ScrollView>
   );
 }
