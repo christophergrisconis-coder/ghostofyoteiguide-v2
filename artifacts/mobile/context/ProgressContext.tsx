@@ -58,6 +58,8 @@ export interface CompletionStats {
   completedCollectibles: number;
   totalTrophies: number;
   completedTrophies: number;
+  totalActivities: number;
+  completedActivities: number;
   overallPercentage: number;
   categoryStats: Record<string, CategoryStats>;
   trophyStats: TrophyStats;
@@ -146,8 +148,13 @@ function computeStats(state: ProgressState): CompletionStats {
     byTier: trophyByTier,
   };
 
-  const totalItems = totalQuests + totalCollectibles + totalTrophies;
-  const completedItems = completedQuests + completedCollectibles + completedTrophies;
+  const totalActivities = ACTIVITY_IDS.size;
+  const completedActivities = Object.entries(state.collectibleCompletion).filter(
+    ([id, done]) => done && ACTIVITY_IDS.has(id),
+  ).length;
+
+  const totalItems = totalQuests + totalCollectibles + totalTrophies + totalActivities;
+  const completedItems = completedQuests + completedCollectibles + completedTrophies + completedActivities;
   const overallPercentage = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
 
   return {
@@ -158,6 +165,8 @@ function computeStats(state: ProgressState): CompletionStats {
     completedCollectibles,
     totalTrophies,
     completedTrophies,
+    totalActivities,
+    completedActivities,
     overallPercentage,
     categoryStats,
     trophyStats,
