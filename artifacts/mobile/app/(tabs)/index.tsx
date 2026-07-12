@@ -253,6 +253,26 @@ export default function DashboardScreen() {
             {stats.trophyStats.percentage}% unlocked
           </Text>
         </View>
+
+        <View
+          style={[
+            styles.bannerCard,
+            { backgroundColor: colors.card, borderColor: colors.border },
+          ]}
+        >
+          <Text style={[styles.bannerLabel, { color: colors.mutedForeground }]}>
+            ACTIVITIES
+          </Text>
+          <Text style={[styles.bannerCount, { color: '#4A9B8E' }]}>
+            {stats.completedActivities}
+            <Text style={[styles.bannerTotal, { color: colors.mutedForeground }]}>
+              /{stats.totalActivities}
+            </Text>
+          </Text>
+          <Text style={[styles.bannerSub, { color: colors.mutedForeground }]}>
+            {stats.totalActivities - stats.completedActivities} left
+          </Text>
+        </View>
       </View>
 
       {/* ── Activities summary card ──────────────────────────── */}
