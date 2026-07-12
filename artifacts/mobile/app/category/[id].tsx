@@ -66,7 +66,7 @@ export default function CategoryDetailScreen() {
         return (
           quest.title.toLowerCase().includes(q) ||
           quest.region.toLowerCase().includes(q) ||
-          quest.walkthrough.toLowerCase().includes(q)
+          quest.overview.toLowerCase().includes(q)
         );
       }
       return true;

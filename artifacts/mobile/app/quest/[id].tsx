@@ -14,8 +14,9 @@ import { useColors } from '@/hooks/useColors';
 import { useProgress } from '@/context/ProgressContext';
 import { getQuestById, QUESTS } from '@/data/quests';
 import { getCategoryById } from '@/data/categories';
-import { ChecklistItem } from '@/components/ChecklistItem';
 import { ProgressBar } from '@/components/ProgressBar';
+import { StepCard } from '@/components/StepCard';
+import { BossInfoCard } from '@/components/BossInfoCard';
 
 export default function QuestDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -28,11 +29,7 @@ export default function QuestDetailScreen() {
     return (
       <View style={[styles.notFound, { backgroundColor: colors.background }]}>
         <Stack.Screen options={{ title: 'Quest Detail' }} />
-        <Ionicons
-          name="alert-circle-outline"
-          size={48}
-          color={colors.mutedForeground}
-        />
+        <Ionicons name="alert-circle-outline" size={48} color={colors.mutedForeground} />
         <Text style={[styles.notFoundText, { color: colors.mutedForeground }]}>
           Quest not found
         </Text>
@@ -43,9 +40,9 @@ export default function QuestDetailScreen() {
   const category = getCategoryById(quest.category);
   const isComplete = state.questCompletion[quest.id] === true;
   const taskState = state.taskCompletion[quest.id] ?? {};
-  const completedTasks = quest.tasks.filter((_, i) => !!taskState[i]).length;
-  const taskProgress =
-    quest.tasks.length > 0 ? (completedTasks / quest.tasks.length) * 100 : 0;
+  const completedSteps = quest.steps.filter((_, i) => !!taskState[i]).length;
+  const stepProgress =
+    quest.steps.length > 0 ? (completedSteps / quest.steps.length) * 100 : 0;
   const playerNotes = state.playerNotes[quest.id] ?? '';
 
   const relatedQuests = quest.relatedQuests
@@ -57,7 +54,6 @@ export default function QuestDetailScreen() {
     toggleQuest(quest.id);
   };
 
-  const headerBg = colors.card;
   const accentColor = category?.color ?? colors.primary;
 
   return (
@@ -65,7 +61,7 @@ export default function QuestDetailScreen() {
       <Stack.Screen
         options={{
           title: quest.title,
-          headerStyle: { backgroundColor: headerBg },
+          headerStyle: { backgroundColor: colors.card },
           headerTintColor: colors.foreground,
           headerShadowVisible: false,
           headerBackTitle: 'Back',
@@ -76,7 +72,7 @@ export default function QuestDetailScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        {/* ── Quest header card ─────────────────────────── */}
+        {/* ── 1. Header card ───────────────────────────────── */}
         <View
           style={[
             styles.headerCard,
@@ -88,33 +84,9 @@ export default function QuestDetailScreen() {
             },
           ]}
         >
-          {/* Missable warning */}
-          {quest.missable && (
-            <View
-              style={[
-                styles.missableRow,
-                { backgroundColor: '#FF6B3518', borderColor: '#FF6B35' },
-              ]}
-            >
-              <Ionicons
-                name="warning-outline"
-                size={15}
-                color="#FF6B35"
-              />
-              <Text style={styles.missableText}>
-                MISSABLE — may be permanently unavailable
-              </Text>
-            </View>
-          )}
-
           {/* Category badge + act */}
           <View style={styles.badgeRow}>
-            <View
-              style={[
-                styles.catBadge,
-                { backgroundColor: accentColor + '20' },
-              ]}
-            >
+            <View style={[styles.catBadge, { backgroundColor: accentColor + '20' }]}>
               <Ionicons
                 name={(category?.icon ?? 'bookmark-outline') as any}
                 size={13}
@@ -129,114 +101,124 @@ export default function QuestDetailScreen() {
             </Text>
           </View>
 
-          {/* Meta row */}
-          <View style={styles.metaRow}>
+          {/* Meta grid */}
+          <View style={styles.metaGrid}>
             <View style={styles.metaItem}>
-              <Ionicons
-                name="location-outline"
-                size={13}
-                color={colors.mutedForeground}
-              />
-              <Text
-                style={[styles.metaLabel, { color: colors.mutedForeground }]}
-              >
-                Region
-              </Text>
-              <Text
-                style={[styles.metaValue, { color: colors.foreground }]}
-                numberOfLines={1}
-              >
+              <Ionicons name="location-outline" size={13} color={colors.mutedForeground} />
+              <Text style={[styles.metaLabel, { color: colors.mutedForeground }]}>Region</Text>
+              <Text style={[styles.metaValue, { color: colors.foreground }]} numberOfLines={1}>
                 {quest.region}
               </Text>
             </View>
             <View style={styles.metaItem}>
-              <Ionicons
-                name="time-outline"
-                size={13}
-                color={colors.mutedForeground}
-              />
-              <Text
-                style={[styles.metaLabel, { color: colors.mutedForeground }]}
-              >
-                Est. time
-              </Text>
+              <Ionicons name="time-outline" size={13} color={colors.mutedForeground} />
+              <Text style={[styles.metaLabel, { color: colors.mutedForeground }]}>Est. time</Text>
               <Text style={[styles.metaValue, { color: colors.foreground }]}>
                 {quest.estimatedTime}
               </Text>
             </View>
           </View>
 
+          {/* Unlock requirements */}
+          {quest.unlockRequirements && (
+            <View style={styles.prereqRow}>
+              <Ionicons name="lock-open-outline" size={13} color={colors.mutedForeground} />
+              <Text style={[styles.prereqLabel, { color: colors.mutedForeground }]}>
+                Unlock:
+              </Text>
+              <Text style={[styles.prereqVal, { color: colors.foreground }]} numberOfLines={2}>
+                {quest.unlockRequirements}
+              </Text>
+            </View>
+          )}
+
           {/* Prerequisites */}
           {quest.prerequisites.length > 0 && (
             <View style={styles.prereqRow}>
-              <Text
-                style={[
-                  styles.prereqLabel,
-                  { color: colors.mutedForeground },
-                ]}
-              >
+              <Ionicons name="git-merge-outline" size={13} color={colors.mutedForeground} />
+              <Text style={[styles.prereqLabel, { color: colors.mutedForeground }]}>
                 Requires:
               </Text>
-              <Text
-                style={[styles.prereqVal, { color: colors.foreground }]}
-                numberOfLines={2}
-              >
+              <Text style={[styles.prereqVal, { color: colors.foreground }]} numberOfLines={2}>
                 {quest.prerequisites.join(' · ')}
               </Text>
             </View>
           )}
-
-          {/* Rewards */}
-          {quest.rewards.length > 0 && (
-            <View style={styles.rewardsWrap}>
-              <Text
-                style={[
-                  styles.rewardsTitle,
-                  { color: colors.mutedForeground },
-                ]}
-              >
-                REWARDS
-              </Text>
-              <View style={styles.rewardsList}>
-                {quest.rewards.map((r, i) => (
-                  <View
-                    key={i}
-                    style={[
-                      styles.rewardBadge,
-                      {
-                        backgroundColor: colors.secondary,
-                        borderColor: colors.border,
-                      },
-                    ]}
-                  >
-                    <Ionicons
-                      name="gift-outline"
-                      size={11}
-                      color={colors.primary}
-                    />
-                    <Text
-                      style={[
-                        styles.rewardText,
-                        { color: colors.foreground },
-                      ]}
-                    >
-                      {r}
-                    </Text>
-                  </View>
-                ))}
-              </View>
-            </View>
-          )}
         </View>
 
-        {/* ── Overall completion toggle ─────────────────── */}
+        {/* ── 2. Overview ───────────────────────────────────── */}
+        {!!quest.overview && (
+          <View
+            style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}
+          >
+            <View style={styles.sectionHeader}>
+              <Ionicons name="book-outline" size={15} color={colors.primary} />
+              <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Overview</Text>
+            </View>
+            <Text style={[styles.overviewText, { color: colors.foreground }]}>
+              {quest.overview}
+            </Text>
+          </View>
+        )}
+
+        {/* ── 3. Rewards ────────────────────────────────────── */}
+        {quest.rewards.length > 0 && (
+          <View
+            style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}
+          >
+            <Text style={[styles.sectionLabelSmall, { color: colors.mutedForeground }]}>
+              REWARDS
+            </Text>
+            <View style={styles.rewardsList}>
+              {quest.rewards.map((r, i) => (
+                <View
+                  key={i}
+                  style={[
+                    styles.rewardBadge,
+                    { backgroundColor: '#C9A84C14', borderColor: '#C9A84C40' },
+                  ]}
+                >
+                  <Ionicons name="gift-outline" size={11} color="#C9A84C" />
+                  <Text style={[styles.rewardText, { color: colors.foreground }]}>{r}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
+
+        {/* ── 4. Missable warning ───────────────────────────── */}
+        {quest.missable && (
+          <View
+            style={[
+              styles.alertBox,
+              { backgroundColor: '#FF6B3514', borderColor: '#FF6B3560' },
+            ]}
+          >
+            <Ionicons name="warning" size={16} color="#FF6B35" />
+            <View style={{ flex: 1, gap: 2 }}>
+              <Text style={styles.alertTitle}>MISSABLE CONTENT</Text>
+              {quest.missableNote ? (
+                <Text style={[styles.alertBody, { color: colors.foreground }]}>
+                  {quest.missableNote}
+                </Text>
+              ) : (
+                <Text style={[styles.alertBody, { color: colors.foreground }]}>
+                  This content may be permanently unavailable if certain conditions are not met.
+                </Text>
+              )}
+            </View>
+          </View>
+        )}
+
+        {/* ── 5. Boss info card ─────────────────────────────── */}
+        {quest.bossInfo && <BossInfoCard bossInfo={quest.bossInfo} />}
+
+        {/* ── 6. Step progress + overall toggle ────────────── */}
         <TouchableOpacity
           style={[
             styles.completionBtn,
             {
-              backgroundColor: isComplete
-                ? colors.primary + '18'
-                : colors.card,
+              backgroundColor: isComplete ? colors.primary + '18' : colors.card,
               borderColor: isComplete ? colors.primary : colors.border,
             },
           ]}
@@ -253,133 +235,84 @@ export default function QuestDetailScreen() {
             ]}
           >
             {isComplete && (
-              <Ionicons
-                name="checkmark"
-                size={17}
-                color={colors.primaryForeground}
-              />
+              <Ionicons name="checkmark" size={17} color={colors.primaryForeground} />
             )}
           </View>
           <View style={styles.completionText}>
             <Text
               style={[
                 styles.completionTitle,
-                {
-                  color: isComplete ? colors.primary : colors.foreground,
-                },
+                { color: isComplete ? colors.primary : colors.foreground },
               ]}
             >
               {isComplete ? 'Quest Complete' : 'Mark Quest Complete'}
             </Text>
-            {!isComplete && quest.tasks.length > 0 && (
-              <Text
-                style={[styles.completionSub, { color: colors.mutedForeground }]}
-              >
-                {completedTasks}/{quest.tasks.length} tasks done
+            {!isComplete && quest.steps.length > 0 && (
+              <Text style={[styles.completionSub, { color: colors.mutedForeground }]}>
+                {completedSteps}/{quest.steps.length} steps done
               </Text>
             )}
           </View>
-          {!isComplete && quest.tasks.length > 0 && (
+          {!isComplete && quest.steps.length > 0 && (
             <View style={{ width: 56 }}>
-              <ProgressBar percentage={taskProgress} height={4} />
+              <ProgressBar percentage={stepProgress} height={4} />
             </View>
           )}
         </TouchableOpacity>
 
-        {/* ── Task checklist ────────────────────────────── */}
-        {quest.tasks.length > 0 && (
-          <View
-            style={[
-              styles.section,
-              { backgroundColor: colors.card, borderColor: colors.border },
-            ]}
-          >
-            <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
-              Checklist
-            </Text>
-            {quest.tasks.map((task, i) => (
-              <ChecklistItem
-                key={i}
-                label={task.description}
-                checked={!!taskState[i]}
-                onToggle={() => toggleTask(quest.id, i)}
-                number={i + 1}
-              />
-            ))}
-          </View>
-        )}
-
-        {/* ── Walkthrough ───────────────────────────────── */}
-        <View
-          style={[
-            styles.section,
-            { backgroundColor: colors.card, borderColor: colors.border },
-          ]}
-        >
-          <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
-            Walkthrough
-          </Text>
-          <Text style={[styles.walkthrough, { color: colors.foreground }]}>
-            {quest.walkthrough}
-          </Text>
-        </View>
-
-        {/* ── Tips ─────────────────────────────────────── */}
-        {quest.tips.length > 0 && (
-          <View
-            style={[
-              styles.section,
-              { backgroundColor: colors.card, borderColor: colors.border },
-            ]}
-          >
-            <View style={styles.tipsHeader}>
-              <Ionicons
-                name="bulb-outline"
-                size={16}
-                color={colors.primary}
-              />
+        {/* ── 7. Step cards ─────────────────────────────────── */}
+        {quest.steps.length > 0 && (
+          <View style={styles.stepsContainer}>
+            <View style={styles.sectionHeader}>
+              <Ionicons name="list-outline" size={15} color={colors.primary} />
               <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
-                Tips
+                Walkthrough Steps
+              </Text>
+              <Text style={[styles.stepCount, { color: colors.mutedForeground }]}>
+                {completedSteps}/{quest.steps.length}
               </Text>
             </View>
-            {quest.tips.map((tip, i) => (
-              <View key={i} style={styles.tipRow}>
-                <View
-                  style={[
-                    styles.tipDot,
-                    { backgroundColor: colors.primary },
-                  ]}
-                />
-                <Text
-                  style={[styles.tipText, { color: colors.foreground }]}
-                >
-                  {tip}
-                </Text>
-              </View>
+            {quest.steps.map((step, i) => (
+              <StepCard
+                key={step.id}
+                step={step}
+                index={i}
+                checked={!!taskState[i]}
+                onToggle={() => toggleTask(quest.id, i)}
+              />
             ))}
           </View>
         )}
 
-        {/* ── Related quests ────────────────────────────── */}
+        {/* ── 8. Cleanup notes ──────────────────────────────── */}
+        {quest.cleanupNotes && (
+          <View
+            style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}
+          >
+            <View style={styles.sectionHeader}>
+              <Ionicons name="checkmark-done-outline" size={15} color="#66BB6A" />
+              <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
+                Tips & Cleanup
+              </Text>
+            </View>
+            <Text style={[styles.cleanupText, { color: colors.foreground }]}>
+              {quest.cleanupNotes}
+            </Text>
+          </View>
+        )}
+
+        {/* ── 9. Related quests ─────────────────────────────── */}
         {relatedQuests.length > 0 && (
           <View
-            style={[
-              styles.section,
-              { backgroundColor: colors.card, borderColor: colors.border },
-            ]}
+            style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}
           >
-            <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
-              Related
-            </Text>
+            <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Related</Text>
             {relatedQuests.map(rq => {
               const rCat = getCategoryById(rq.category);
               return (
                 <TouchableOpacity
                   key={rq.id}
-                  style={[
-                    styles.relatedRow,
-                    { borderBottomColor: colors.border },
-                  ]}
+                  style={[styles.relatedRow, { borderBottomColor: colors.border }]}
                   onPress={() => router.push(`/quest/${rq.id}`)}
                 >
                   <View
@@ -389,41 +322,25 @@ export default function QuestDetailScreen() {
                     ]}
                   />
                   <Text
-                    style={[
-                      styles.relatedTitle,
-                      { color: colors.foreground },
-                    ]}
+                    style={[styles.relatedTitle, { color: colors.foreground }]}
                     numberOfLines={1}
                   >
                     {rq.title}
                   </Text>
-                  <Ionicons
-                    name="chevron-forward"
-                    size={14}
-                    color={colors.mutedForeground}
-                  />
+                  <Ionicons name="chevron-forward" size={14} color={colors.mutedForeground} />
                 </TouchableOpacity>
               );
             })}
           </View>
         )}
 
-        {/* ── Player notes ─────────────────────────────── */}
+        {/* ── 10. Player notes ─────────────────────────────── */}
         <View
-          style={[
-            styles.section,
-            { backgroundColor: colors.card, borderColor: colors.border },
-          ]}
+          style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}
         >
-          <View style={styles.notesHeader}>
-            <Ionicons
-              name="create-outline"
-              size={16}
-              color={colors.mutedForeground}
-            />
-            <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
-              My Notes
-            </Text>
+          <View style={styles.sectionHeader}>
+            <Ionicons name="create-outline" size={15} color={colors.mutedForeground} />
+            <Text style={[styles.sectionTitle, { color: colors.foreground }]}>My Notes</Text>
           </View>
           <TextInput
             style={[
@@ -465,25 +382,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Inter_400Regular',
   },
+  // Header card
   headerCard: {
     borderRadius: 12,
     borderWidth: 1,
     padding: 16,
     gap: 12,
-  },
-  missableRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 7,
-    padding: 10,
-    borderRadius: 8,
-    borderWidth: 1,
-  },
-  missableText: {
-    fontSize: 11,
-    fontFamily: 'Inter_600SemiBold',
-    color: '#FF6B35',
-    letterSpacing: 0.3,
   },
   badgeRow: {
     flexDirection: 'row',
@@ -507,7 +411,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter_400Regular',
     letterSpacing: 0.3,
   },
-  metaRow: {
+  metaGrid: {
     flexDirection: 'row',
     gap: 16,
     flexWrap: 'wrap',
@@ -543,12 +447,43 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter_400Regular',
     flex: 1,
   },
-  rewardsWrap: { gap: 8 },
-  rewardsTitle: {
+  // Sections
+  section: {
+    borderRadius: 12,
+    borderWidth: 1,
+    padding: 16,
+    gap: 10,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  sectionTitle: {
+    fontSize: 15,
+    fontFamily: 'Inter_600SemiBold',
+    flex: 1,
+  },
+  sectionLabelSmall: {
     fontSize: 10,
     fontFamily: 'Inter_600SemiBold',
     letterSpacing: 1.5,
   },
+  stepCount: {
+    fontSize: 12,
+    fontFamily: 'Inter_400Regular',
+  },
+  overviewText: {
+    fontSize: 14,
+    fontFamily: 'Inter_400Regular',
+    lineHeight: 22,
+  },
+  cleanupText: {
+    fontSize: 14,
+    fontFamily: 'Inter_400Regular',
+    lineHeight: 22,
+  },
+  // Rewards
   rewardsList: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -567,6 +502,27 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: 'Inter_400Regular',
   },
+  // Alert box (missable)
+  alertBox: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+    padding: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  alertTitle: {
+    fontSize: 10,
+    fontFamily: 'Inter_700Bold',
+    color: '#FF6B35',
+    letterSpacing: 1.2,
+  },
+  alertBody: {
+    fontSize: 13,
+    fontFamily: 'Inter_400Regular',
+    lineHeight: 19,
+  },
+  // Completion toggle
   completionBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -595,44 +551,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: 'Inter_400Regular',
   },
-  section: {
-    borderRadius: 12,
-    borderWidth: 1,
-    padding: 16,
-    gap: 10,
+  // Steps
+  stepsContainer: {
+    gap: 0,
   },
-  sectionTitle: {
-    fontSize: 15,
-    fontFamily: 'Inter_600SemiBold',
-  },
-  walkthrough: {
-    fontSize: 14,
-    fontFamily: 'Inter_400Regular',
-    lineHeight: 22,
-  },
-  tipsHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  tipRow: {
-    flexDirection: 'row',
-    gap: 10,
-    alignItems: 'flex-start',
-  },
-  tipDot: {
-    width: 5,
-    height: 5,
-    borderRadius: 3,
-    marginTop: 7,
-    flexShrink: 0,
-  },
-  tipText: {
-    flex: 1,
-    fontSize: 14,
-    fontFamily: 'Inter_400Regular',
-    lineHeight: 20,
-  },
+  // Related
   relatedRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -650,11 +573,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Inter_400Regular',
   },
-  notesHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
+  // Notes
   notesInput: {
     borderWidth: 1,
     borderRadius: 10,
