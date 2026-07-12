@@ -384,8 +384,8 @@ export default function SettingsScreen() {
             { color: colors.mutedForeground, marginTop: 8 },
           ]}
         >
-          Content references are based on pre-release information and may be
-          updated after the game launches.
+          Content is verified against the released game. If you spot anything
+          missing or incorrect, updates are pushed automatically.
         </Text>
         {showAutoBackup && (
           <Text
