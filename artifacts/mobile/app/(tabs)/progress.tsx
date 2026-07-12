@@ -7,17 +7,29 @@ import {
   Platform,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '@/hooks/useColors';
 import { useProgress } from '@/context/ProgressContext';
 import { CATEGORIES } from '@/data/categories';
 import { TROPHY_TIER_COLORS, TROPHY_TIER_LABELS, TROPHY_TIER_ORDER } from '@/data/trophies';
+import {
+  WORLD_ACTIVITIES,
+  ACTIVITY_CATEGORY_LABELS,
+  ACTIVITY_CATEGORY_ICONS,
+  ACTIVITY_CATEGORY_COLORS,
+  type ActivityCategory,
+} from '@/data/activities';
 import { ProgressBar } from '@/components/ProgressBar';
 import { CompletionRing } from '@/components/CompletionRing';
+import { ChecklistItem } from '@/components/ChecklistItem';
+
+// Group activities by category for the checklist section
+const ACTIVITY_CATEGORIES: ActivityCategory[] = ['liberation', 'duel', 'haiku', 'vanity'];
 
 export default function ProgressScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { stats } = useProgress();
+  const { stats, state, toggleCollectible } = useProgress();
 
   const questPct =
     stats.totalQuests > 0
@@ -174,6 +186,69 @@ export default function ProgressScreen() {
           );
         })}
       </View>
+
+      {/* ── World Activities ─────────────────────────────── */}
+      {ACTIVITY_CATEGORIES.map(catId => {
+        const items = WORLD_ACTIVITIES.filter(a => a.category === catId);
+        if (items.length === 0) return null;
+        const completed = items.filter(
+          a => state.collectibleCompletion[a.id],
+        ).length;
+        const pct = items.length > 0 ? Math.round((completed / items.length) * 100) : 0;
+        const catColor = ACTIVITY_CATEGORY_COLORS[catId];
+        const catIcon = ACTIVITY_CATEGORY_ICONS[catId];
+        const catLabel = ACTIVITY_CATEGORY_LABELS[catId];
+
+        return (
+          <View
+            key={catId}
+            style={[
+              styles.actCard,
+              { backgroundColor: colors.card, borderColor: colors.border },
+            ]}
+          >
+            {/* Header */}
+            <View style={styles.actHeader}>
+              <View
+                style={[styles.actIconWrap, { backgroundColor: catColor + '20' }]}
+              >
+                <Ionicons name={catIcon as any} size={16} color={catColor} />
+              </View>
+              <View style={styles.actHeaderText}>
+                <Text style={[styles.cardTitle, { color: colors.foreground }]}>
+                  {catLabel}
+                </Text>
+                <Text style={[styles.actCount, { color: colors.mutedForeground }]}>
+                  {completed}/{items.length}
+                </Text>
+              </View>
+              <Text style={[styles.actPct, { color: catColor }]}>{pct}%</Text>
+            </View>
+            <ProgressBar percentage={pct} height={3} color={catColor} />
+
+            {/* Checklist */}
+            <View style={styles.actList}>
+              {items.map(activity => (
+                <View
+                  key={activity.id}
+                  style={[
+                    styles.actItem,
+                    { borderTopColor: colors.border },
+                  ]}
+                >
+                  <ChecklistItem
+                    label={activity.name}
+                    subtitle={activity.region}
+                    hint={activity.description}
+                    checked={!!state.collectibleCompletion[activity.id]}
+                    onToggle={() => toggleCollectible(activity.id)}
+                  />
+                </View>
+              ))}
+            </View>
+          </View>
+        );
+      })}
     </ScrollView>
   );
 }
@@ -266,5 +341,43 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter_400Regular',
     width: 36,
     textAlign: 'right',
+  },
+  // World activities
+  actCard: {
+    borderRadius: 14,
+    borderWidth: 1,
+    padding: 18,
+    gap: 10,
+  },
+  actHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  actIconWrap: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  actHeaderText: {
+    flex: 1,
+    gap: 1,
+  },
+  actCount: {
+    fontSize: 11,
+    fontFamily: 'Inter_400Regular',
+  },
+  actPct: {
+    fontSize: 14,
+    fontFamily: 'Inter_700Bold',
+  },
+  actList: {
+    gap: 0,
+  },
+  actItem: {
+    borderTopWidth: StyleSheet.hairlineWidth,
   },
 });

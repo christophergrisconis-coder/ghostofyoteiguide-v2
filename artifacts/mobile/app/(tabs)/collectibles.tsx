@@ -32,14 +32,8 @@ type Section = {
   data: (typeof COLLECTIBLES)[number][];
 };
 
-const ALL_REGIONS = [
-  'Yotei Grasslands',
-  'Ishikari Plain',
-  'Teshio Ridge',
-  'Tokachi Range',
-  'Nayoro Wilds',
-  'Oshima Coast',
-];
+// Derive region list from actual collectible data so it stays in sync automatically
+const ALL_REGIONS = [...new Set(COLLECTIBLES.map(c => c.region))].sort();
 
 export default function CollectiblesScreen() {
   const colors = useColors();

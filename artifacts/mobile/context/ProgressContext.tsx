@@ -6,6 +6,7 @@ import * as DocumentPicker from 'expo-document-picker';
 import { Platform } from 'react-native';
 import { QUESTS } from '@/data/quests';
 import { COLLECTIBLE_IDS, COLLECTIBLE_GROUPS } from '@/data/collectibles';
+import { ACTIVITY_IDS } from '@/data/activities';
 import { TROPHIES } from '@/data/trophies';
 
 const STORAGE_KEY = '@ghost_yotei_v1';
@@ -87,6 +88,9 @@ const ProgressContext = createContext<ProgressContextType | undefined>(undefined
 const VALID_QUEST_IDS = new Set(QUESTS.map(q => q.id));
 const VALID_TROPHY_IDS = new Set(TROPHIES.map(t => t.id));
 const TOTAL_COLLECTIBLES = COLLECTIBLE_GROUPS.reduce((sum, g) => sum + g.total, 0);
+// Activity IDs share the collectibleCompletion store (same toggle/storage path)
+// but are excluded from the collectibles count — stats filter by COLLECTIBLE_IDS.
+const VALID_COLLECTIBLE_OR_ACTIVITY_IDS = new Set([...COLLECTIBLE_IDS, ...ACTIVITY_IDS]);
 
 function computeStats(state: ProgressState): CompletionStats {
   const totalQuests = QUESTS.length;
@@ -262,7 +266,7 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
   }, [scheduleBackup]);
 
   const toggleCollectible = useCallback((collectibleId: string) => {
-    if (!COLLECTIBLE_IDS.has(collectibleId)) return;
+    if (!VALID_COLLECTIBLE_OR_ACTIVITY_IDS.has(collectibleId)) return;
     setState(prev => {
       const next: ProgressState = {
         ...prev,

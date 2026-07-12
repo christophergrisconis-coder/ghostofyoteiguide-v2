@@ -35,6 +35,10 @@ function NativeTabLayout() {
         <Icon sf={{ default: 'chart.bar', selected: 'chart.bar.fill' }} />
         <Label>Progress</Label>
       </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="upgrades">
+        <Icon sf={{ default: 'wrench.and.screwdriver', selected: 'wrench.and.screwdriver.fill' }} />
+        <Label>Upgrades</Label>
+      </NativeTabs.Trigger>
       <NativeTabs.Trigger name="settings">
         <Icon sf={{ default: 'gearshape', selected: 'gearshape.fill' }} />
         <Label>Settings</Label>
@@ -138,6 +142,18 @@ function ClassicTabLayout() {
               <SymbolView name="chart.bar" tintColor={color} size={24} />
             ) : (
               <Feather name="bar-chart-2" size={22} color={color} />
+            ),
+        }}
+      />
+      <Tabs.Screen
+        name="upgrades"
+        options={{
+          title: 'Upgrades',
+          tabBarIcon: ({ color }) =>
+            isIOS ? (
+              <SymbolView name="wrench.and.screwdriver" tintColor={color} size={24} />
+            ) : (
+              <Feather name="tool" size={22} color={color} />
             ),
         }}
       />

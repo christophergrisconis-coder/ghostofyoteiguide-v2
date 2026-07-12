@@ -74,7 +74,7 @@ export default function DashboardScreen() {
               100% Guide
             </Text>
             <Text style={[styles.heroDesc, { color: colors.mutedForeground }]}>
-              119 quests · 319 collectibles{'\n'}54 trophies · 0 missable
+              {stats.totalQuests} quests · {stats.totalCollectibles} collectibles{'\n'}{stats.totalTrophies} trophies · {QUESTS.filter(q => q.missable).length} missable
             </Text>
           </View>
           <CompletionRing percentage={stats.overallPercentage} size={128} />
@@ -328,7 +328,7 @@ export default function DashboardScreen() {
               Begin Your Journey
             </Text>
             <Text style={[styles.emptyBody, { color: colors.mutedForeground }]}>
-              119 quests, 319 collectibles and 54 trophies await.{'\n'}
+              {stats.totalQuests} quests, {stats.totalCollectibles} collectibles and {stats.totalTrophies} trophies await.{'\n'}
               Navigate to Quests to start tracking.
             </Text>
           </View>

@@ -284,9 +284,14 @@ export const TROPHIES: Trophy[] = [
     tips: 'The first and largest region. Complete all quests, collectibles, and locations to earn this.',
     category: 'Exploration',
   },
+  // verification needed: brnz_24–brnz_28 use trophy-screen region names that differ from
+  // quest/collectible data region names. Trophy names: "Ishikari Valley", "Shiretoko Peaks",
+  // "Tokachi Wilds", "Hidaka Mountains", "Nemuro Coast". Quest/collectible data uses:
+  // "Ishikari Plain", "Teshio Ridge", "Tokachi Range", "Nayoro Wilds", "Oshima Coast".
+  // Confirm official region names when the final game ships and update both files together.
   {
     id: 'brnz_24',
-    name: 'Ishikari Valley Cleared',
+    name: 'Ishikari Valley Cleared', // verification needed: may be "Ishikari Plain" in final game
     tier: 'bronze',
     description: 'Complete all activities in the Ishikari Valley.',
     tips: 'The Ishikari Valley is accessible from Chapter 1. Many Sensei Tales are centered here.',
@@ -294,7 +299,7 @@ export const TROPHIES: Trophy[] = [
   },
   {
     id: 'brnz_25',
-    name: 'Shiretoko Peaks Cleared',
+    name: 'Shiretoko Peaks Cleared', // verification needed: may be "Teshio Ridge" in final game
     tier: 'bronze',
     description: 'Complete all activities in the Shiretoko Peaks.',
     tips: 'A cold, mountainous region with many Mythic Tale locations. Bring Cold Resistance charms.',
@@ -302,7 +307,7 @@ export const TROPHIES: Trophy[] = [
   },
   {
     id: 'brnz_26',
-    name: 'Tokachi Wilds Cleared',
+    name: 'Tokachi Wilds Cleared', // verification needed: may be "Tokachi Range" in final game
     tier: 'bronze',
     description: 'Complete all activities in the Tokachi Wilds.',
     tips: 'Open plains filled with enemy patrols. Bounty targets frequently appear in this region.',
@@ -310,7 +315,7 @@ export const TROPHIES: Trophy[] = [
   },
   {
     id: 'brnz_27',
-    name: 'Hidaka Mountains Cleared',
+    name: 'Hidaka Mountains Cleared', // verification needed: may be "Nayoro Wilds" in final game
     tier: 'bronze',
     description: 'Complete all activities in the Hidaka Mountains.',
     tips: 'Remote and isolated. Sensei Tales and Ainu Sacred Sites are concentrated here.',
@@ -318,7 +323,7 @@ export const TROPHIES: Trophy[] = [
   },
   {
     id: 'brnz_28',
-    name: 'Nemuro Coast Cleared',
+    name: 'Nemuro Coast Cleared', // verification needed: may be "Oshima Coast" in final game
     tier: 'bronze',
     description: 'Complete all activities in the Nemuro Coast.',
     tips: 'The final region, unlocked in Chapter 3. Contains the endgame content and the climax of several questlines.',

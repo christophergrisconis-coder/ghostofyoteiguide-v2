@@ -1,0 +1,189 @@
+Now do a SECOND-STAGE VERIFICATION PASS for this Ghost of Yotei 100% Completion Guide.
+
+This pass is NOT for cosmetic improvements.
+This pass is for strict completeness verification, missing-content detection, and source-confidence checking.
+
+PRIMARY PURPOSE:
+I want you to prove whether this guide is actually complete for 100% completion coverage, and identify anything still missing, weak, generic, unverified, or under-detailed.
+
+DO NOT assume the project is done.
+Treat the current build as potentially incomplete until every area has been checked.
+
+REFERENCE PRIORITY:
+Use the most trustworthy structure available, prioritizing:
+1. IGN Ghost of Yotei Guide hub
+2. IGN main Walkthrough
+3. IGN mission walkthrough pages
+4. IGN completion checklist pages
+5. IGN interactive map / collectibles / merchants / locations pages
+6. IGN New Game Plus guide
+7. Other trustworthy sources only to confirm gaps — never to invent content
+
+STRICT RULES:
+- Do not hallucinate.
+- Do not fill gaps with guesses.
+- Do not convert uncertainty into fake certainty.
+- If something cannot be verified safely, mark it clearly as unverified.
+- Use real quest names, real mission names, real regions, real locations, real characters, real activities, and real systems only when verified.
+- If the project is missing something, say so explicitly.
+- If the project is shallow in a section, say so explicitly.
+- If a walkthrough is too generic, flag it even if it technically exists.
+
+MISSION FOR THIS PASS:
+Create a COMPLETE VERIFICATION REPORT that checks whether the guide fully covers the game for true 100% completion.
+
+STEP 1 — CREATE A MASTER COVERAGE CHECKLIST
+Build an internal checklist of all major completion domains that the guide should cover, including:
+- main story missions
+- chapter/prologue progression
+- key branch or optional progression paths if applicable
+- side quests
+- character / mythic / special questlines
+- activities
+- collectibles
+- map-related content
+- armor / weapons / charms / cosmetics / upgrades
+- merchants / unlock systems if relevant
+- missables
+- cleanup tasks
+- postgame / New Game Plus if applicable
+- progress tracking systems inside the app / deck itself
+
+STEP 2 — VERIFY CATEGORY COVERAGE
+For each major category in the project, determine one of these statuses:
+- COMPLETE
+- PARTIALLY COMPLETE
+- PRESENT BUT TOO GENERIC
+- MISSING
+- PRESENT BUT UNVERIFIED
+
+For every category, explain why it received that status.
+
+STEP 3 — VERIFY QUEST COVERAGE
+Review all quest entries currently included in the guide and determine:
+- which verified quests are present
+- which verified quests appear to be missing
+- which quests have only shallow summaries
+- which quests lack task-level checklists
+- which quests lack enclosed step-by-step walkthroughs
+- which quests use generic wording instead of real specifics
+- which quests mention names, places, or rewards that still need verification
+
+STEP 4 — WALKTHROUGH QUALITY TEST
+For each quest currently included, test whether the walkthrough actually contains:
+- start trigger
+- real quest giver or start condition
+- real location / region
+- ordered objectives
+- actual traversal or route guidance
+- enemy / encounter notes
+- reward info
+- missable notes if relevant
+- next-step / unlock follow-up
+- practical detail beyond a generic summary
+
+If a quest fails any of these, flag it.
+
+STEP 5 — COLLECTIBLES / ACTIVITIES / CLEANUP TEST
+Check whether the guide fully addresses 100% completion support for:
+- collectible tracking
+- region cleanup
+- activities
+- shrines / hot springs / bamboo strikes / shamisen songs / sumi-e / altars / weapon kits / pillars / camps / similar systems if verified
+- checklist-driven cleanup support
+- map / location support
+- endgame cleanup strategy
+- New Game Plus or postgame guidance if applicable
+
+If any of these exist in the game reference structure but are not properly reflected in the guide, mark them as missing or underdeveloped.
+
+STEP 6 — REALITY CHECK
+Search for all remaining generic phrases in the project, including wording like:
+- “a village”
+- “an ally”
+- “a target”
+- “an area”
+- “collect an item”
+- “defeat enemies”
+- “special quest”
+- “valuable reward”
+- “go to the location”
+
+Replace these only if they can be verified with real specifics.
+If not verifiable, flag them for review rather than inventing details.
+
+STEP 7 — FEATURE VERIFICATION
+Check whether the project’s claimed features truly work:
+- individual quest checkboxes
+- task-level checkboxes
+- category progress
+- total completion %
+- filters
+- search
+- expand / collapse
+- dashboard summary
+- persistence
+- reset or clear functions
+
+For each feature, mark:
+- WORKING
+- PARTIALLY WORKING
+- VISUAL ONLY / NOT FUNCTIONAL
+- MISSING
+
+STEP 8 — IMAGE / AUTHENTICITY VERIFICATION
+Verify that visual backgrounds and supporting images are:
+- real Ghost of Yotei gameplay images
+- official screenshots
+- IGN / official-source derived
+- not AI-generated
+- not fake samurai art
+- not unrelated placeholder images
+
+Flag any slide or screen that violates this.
+
+STEP 9 — PRODUCE A MISSING-CONTENT REPORT
+Before changing any code, produce a structured internal report with these sections:
+
+A. VERIFIED COMPLETE
+List what is definitely complete and sufficiently detailed.
+
+B. INCOMPLETE OR TOO SHALLOW
+List all sections that exist but are not deep enough.
+
+C. MISSING VERIFIED CONTENT
+List categories, quest types, systems, or coverage areas that appear to be missing based on trustworthy reference structure.
+
+D. UNVERIFIED DETAILS
+List any names, places, rewards, tasks, or quest details currently included that should not be trusted until verified.
+
+E. FUNCTIONALITY GAPS
+List features that are supposed to work but are incomplete or broken.
+
+F. FINAL REQUIRED FIXES
+List the exact fixes required before this can honestly be called a 100% completion guide.
+
+STEP 10 — APPLY ONLY SAFE FIXES
+After the report, apply only the fixes that can be safely made from verified information.
+Do NOT make up missing quest content just to make the report look cleaner.
+
+FINAL OUTPUT REQUIREMENTS:
+When finished, return:
+1. the corrected project code
+2. a concise completion summary
+3. a clear list of anything still needing verification
+
+MANDATORY FINAL STANDARD:
+Do not label the project as “100% complete” unless:
+- all major completion categories are represented
+- no major verified category is missing
+- quests are not generic
+- enclosed walkthroughs are detailed
+- progress tracking is functional
+- fake content has not been introduced
+- remaining uncertainty is clearly labeled
+
+IMPORTANT QUALITY BAR:
+I do NOT want reassurance.
+I want a ruthless verification pass.
+If something is missing, weak, generic, or unverified, say so and fix it only if it can be fixed safely.
