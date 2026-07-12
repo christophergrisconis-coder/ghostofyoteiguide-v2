@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   ScrollView,
   StyleSheet,
   Platform,
+  TouchableOpacity,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -23,14 +24,18 @@ import { ProgressBar } from '@/components/ProgressBar';
 import { CompletionRing } from '@/components/CompletionRing';
 import { ChecklistItem } from '@/components/ChecklistItem';
 import { PreReleaseNotice } from '@/components/PreReleaseNotice';
+import { CLEANUP_ROADMAP, NG_PLUS_INFO } from '@/data/endgame';
 
 // Group activities by category for the checklist section
 const ACTIVITY_CATEGORIES: ActivityCategory[] = ['liberation', 'duel', 'haiku', 'vanity'];
+
+const ROADMAP_PREVIEW = 4; // steps shown before "Show all"
 
 export default function ProgressScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { stats, state, toggleCollectible } = useProgress();
+  const [roadmapExpanded, setRoadmapExpanded] = useState(false);
 
   const questPct =
     stats.totalQuests > 0
@@ -188,6 +193,140 @@ export default function ProgressScreen() {
         })}
       </View>
 
+      {/* ── Cleanup Roadmap ──────────────────────────────── */}
+      <View
+        style={[
+          styles.endgameCard,
+          { backgroundColor: colors.card, borderColor: colors.border },
+        ]}
+      >
+        <View style={styles.endgameHeader}>
+          <View style={[styles.endgameIconWrap, { backgroundColor: '#9B59B620' }]}>
+            <Ionicons name="list-outline" size={16} color="#9B59B6" />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={[styles.cardTitle, { color: colors.foreground }]}>
+              100% Cleanup Roadmap
+            </Text>
+            <Text style={[styles.endgameSub, { color: colors.mutedForeground }]}>
+              Recommended completion order
+            </Text>
+          </View>
+        </View>
+
+        {(roadmapExpanded ? CLEANUP_ROADMAP : CLEANUP_ROADMAP.slice(0, ROADMAP_PREVIEW)).map(step => (
+          <View key={step.order} style={[styles.roadmapStep, { borderTopColor: colors.border }]}>
+            <View style={[styles.roadmapNum, { backgroundColor: '#9B59B620' }]}>
+              <Text style={[styles.roadmapNumText, { color: '#9B59B6' }]}>
+                {step.order}
+              </Text>
+            </View>
+            <View style={{ flex: 1, gap: 3 }}>
+              <View style={styles.roadmapTitleRow}>
+                <Text style={[styles.roadmapTitle, { color: colors.foreground }]} numberOfLines={2}>
+                  {step.title}
+                </Text>
+                <Text style={[styles.roadmapEffort, { color: colors.mutedForeground }]}>
+                  {step.effort}
+                </Text>
+              </View>
+              <Text style={[styles.roadmapDesc, { color: colors.mutedForeground }]}>
+                {step.description}
+              </Text>
+              {step.warning && (
+                <View style={styles.roadmapWarningRow}>
+                  <Ionicons name="warning-outline" size={11} color="#C9A84C" />
+                  <Text style={[styles.roadmapWarning, { color: '#C9A84C' }]}>
+                    {step.warning}
+                  </Text>
+                </View>
+              )}
+            </View>
+          </View>
+        ))}
+
+        <TouchableOpacity
+          style={[styles.roadmapToggle, { borderTopColor: colors.border }]}
+          onPress={() => setRoadmapExpanded(e => !e)}
+          activeOpacity={0.7}
+        >
+          <Text style={[styles.roadmapToggleText, { color: '#9B59B6' }]}>
+            {roadmapExpanded
+              ? 'Show less'
+              : `Show all ${CLEANUP_ROADMAP.length} steps`}
+          </Text>
+          <Ionicons
+            name={roadmapExpanded ? 'chevron-up' : 'chevron-down'}
+            size={14}
+            color="#9B59B6"
+          />
+        </TouchableOpacity>
+      </View>
+
+      {/* ── New Game Plus Overview ────────────────────────── */}
+      <View
+        style={[
+          styles.endgameCard,
+          { backgroundColor: colors.card, borderColor: colors.border },
+        ]}
+      >
+        <View style={styles.endgameHeader}>
+          <View style={[styles.endgameIconWrap, { backgroundColor: '#9B59B620' }]}>
+            <Ionicons name="refresh-outline" size={16} color="#9B59B6" />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={[styles.cardTitle, { color: colors.foreground }]}>
+              New Game Plus
+            </Text>
+            <Text style={[styles.endgameSub, { color: colors.mutedForeground }]}>
+              Expected based on franchise pattern
+            </Text>
+          </View>
+        </View>
+
+        <PreReleaseNotice message="NG+ has not been confirmed for Ghost of Yōtei. All details below are estimates based on Ghost of Tsushima." />
+
+        {/* Carries over */}
+        <Text style={[styles.ngPlusSection, { color: colors.foreground }]}>
+          Likely carries over
+        </Text>
+        {NG_PLUS_INFO.carriesOver.map(item => (
+          <View key={item.label} style={styles.ngPlusRow}>
+            <Ionicons name="checkmark-circle-outline" size={14} color={colors.success ?? '#4A9B8E'} />
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.ngPlusLabel, { color: colors.foreground }]}>
+                {item.label}
+              </Text>
+              {item.detail && (
+                <Text style={[styles.ngPlusDetail, { color: colors.mutedForeground }]}>
+                  {item.detail}
+                </Text>
+              )}
+            </View>
+          </View>
+        ))}
+
+        {/* Resets */}
+        <Text style={[styles.ngPlusSection, { color: colors.foreground, marginTop: 10 }]}>
+          Likely resets
+        </Text>
+        {NG_PLUS_INFO.resets.map(item => (
+          <View key={item.label} style={styles.ngPlusRow}>
+            <Ionicons name="close-circle-outline" size={14} color={colors.warning ?? '#C9A84C'} />
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.ngPlusLabel, { color: colors.foreground }]}>
+                {item.label}
+              </Text>
+              {item.detail && (
+                <Text style={[styles.ngPlusDetail, { color: colors.mutedForeground }]}>
+                  {item.detail}
+                </Text>
+              )}
+            </View>
+          </View>
+        ))}
+      </View>
+
       {/* ── World Activities ─────────────────────────────── */}
       <PreReleaseNotice message="World activity names and locations are pre-release estimates — counts and names will be verified once the game ships." />
       {ACTIVITY_CATEGORIES.map(catId => {
@@ -343,6 +482,122 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter_400Regular',
     width: 36,
     textAlign: 'right',
+  },
+  // Endgame / NG+
+  endgameCard: {
+    borderRadius: 14,
+    borderWidth: 1,
+    padding: 18,
+    gap: 0,
+  },
+  endgameHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 14,
+  },
+  endgameIconWrap: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  endgameSub: {
+    fontSize: 11,
+    fontFamily: 'Inter_400Regular',
+    marginTop: 1,
+  },
+  // Roadmap
+  roadmapStep: {
+    flexDirection: 'row',
+    gap: 12,
+    paddingVertical: 12,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    alignItems: 'flex-start',
+  },
+  roadmapNum: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+    marginTop: 1,
+  },
+  roadmapNumText: {
+    fontSize: 11,
+    fontFamily: 'Inter_700Bold',
+  },
+  roadmapTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+  },
+  roadmapTitle: {
+    flex: 1,
+    fontSize: 13,
+    fontFamily: 'Inter_600SemiBold',
+    lineHeight: 18,
+  },
+  roadmapEffort: {
+    fontSize: 11,
+    fontFamily: 'Inter_400Regular',
+    flexShrink: 0,
+  },
+  roadmapDesc: {
+    fontSize: 12,
+    fontFamily: 'Inter_400Regular',
+    lineHeight: 17,
+  },
+  roadmapWarningRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 4,
+    marginTop: 2,
+  },
+  roadmapWarning: {
+    flex: 1,
+    fontSize: 11,
+    fontFamily: 'Inter_400Regular',
+    lineHeight: 16,
+  },
+  roadmapToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 5,
+    paddingTop: 12,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    marginTop: 2,
+  },
+  roadmapToggleText: {
+    fontSize: 13,
+    fontFamily: 'Inter_600SemiBold',
+  },
+  // NG+
+  ngPlusSection: {
+    fontSize: 12,
+    fontFamily: 'Inter_600SemiBold',
+    letterSpacing: 0.3,
+    marginBottom: 6,
+  },
+  ngPlusRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+    marginBottom: 8,
+  },
+  ngPlusLabel: {
+    fontSize: 13,
+    fontFamily: 'Inter_500Medium',
+    lineHeight: 18,
+  },
+  ngPlusDetail: {
+    fontSize: 11,
+    fontFamily: 'Inter_400Regular',
+    lineHeight: 16,
   },
   // World activities
   actCard: {
