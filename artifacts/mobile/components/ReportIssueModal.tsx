@@ -15,6 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useColors } from '@/hooks/useColors';
 import { getApiUrl } from '@/lib/api';
+import { enqueueReport } from '@/lib/reportQueue';
 
 type Category = 'wrong_info' | 'missing_item' | 'other';
 
@@ -44,7 +45,7 @@ interface Props {
   onClose: () => void;
 }
 
-type SubmitState = 'idle' | 'submitting' | 'success' | 'error';
+type SubmitState = 'idle' | 'submitting' | 'success' | 'queued' | 'error';
 
 export function ReportIssueModal({ visible, onClose }: Props) {
   const colors = useColors();
@@ -82,8 +83,25 @@ export function ReportIssueModal({ visible, onClose }: Props) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       setSubmitState('success');
     } catch (err) {
-      setSubmitState('error');
-      setErrorMsg('Could not send your report. Please try again.');
+      // Check whether this looks like a network error (no response from server).
+      const isNetworkError =
+        err instanceof TypeError &&
+        (err.message.includes('Network request failed') ||
+          err.message.includes('Failed to fetch') ||
+          err.message.includes('fetch'));
+      if (isNetworkError) {
+        try {
+          await enqueueReport(category, note.trim() || null);
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+          setSubmitState('queued');
+        } catch {
+          setSubmitState('error');
+          setErrorMsg('Could not save your report. Please try again.');
+        }
+      } else {
+        setSubmitState('error');
+        setErrorMsg('Could not send your report. Please try again.');
+      }
     }
   };
 
@@ -134,6 +152,36 @@ export function ReportIssueModal({ visible, onClose }: Props) {
                 style={[styles.successSub, { color: colors.mutedForeground }]}
               >
                 Thanks for helping keep the guide accurate. We'll look into it.
+              </Text>
+              <TouchableOpacity
+                style={[styles.doneBtn, { backgroundColor: colors.primary }]}
+                onPress={handleClose}
+                activeOpacity={0.8}
+              >
+                <Text style={[styles.doneBtnText, { color: '#fff' }]}>Done</Text>
+              </TouchableOpacity>
+            </View>
+          ) : submitState === 'queued' ? (
+            <View style={styles.successContainer}>
+              <View
+                style={[
+                  styles.successIcon,
+                  { backgroundColor: colors.mutedForeground + '20' },
+                ]}
+              >
+                <Ionicons
+                  name="cloud-offline-outline"
+                  size={48}
+                  color={colors.mutedForeground}
+                />
+              </View>
+              <Text style={[styles.successTitle, { color: colors.foreground }]}>
+                Saved for later
+              </Text>
+              <Text
+                style={[styles.successSub, { color: colors.mutedForeground }]}
+              >
+                No connection right now — your report has been saved and will be sent automatically when you're back online.
               </Text>
               <TouchableOpacity
                 style={[styles.doneBtn, { backgroundColor: colors.primary }]}
