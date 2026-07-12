@@ -326,14 +326,14 @@ const WOLF_DENS: WorldActivity[] = [
     name: 'Tangled Root Wolf Den',
     category: 'wolf_den',
     region: 'Nayoro Wilds',
-    description: 'In the western part of Nayoro Wilds, among the dense forest undergrowth. Find the mound of earth with a tree on top surrounded by enemy corpses. Examine the body to trigger the wolf, then follow it to the Trapper camp.',
+    description: 'In the western Nayoro Wilds, in a clearing amid dense ancient forest near a forested ravine. The mound of earth with a tree on top is surrounded by enemy corpses — examine them to trigger the wolf, then follow it west to the Trapper camp.',
   },
   {
     id: 'act_wolf_08',
     name: 'Bitter Cold Wolf Den',
     category: 'wolf_den',
     region: 'Nayoro Wilds',
-    description: 'In the northeastern reaches of Nayoro Wilds, near the exposed ridgeline. Look for the mound of earth with a tree on top surrounded by enemy corpses. Examine the corpses to make the wolf appear, then follow it to the Trapper camp.',
+    description: 'On an exposed snowy ridge in the northeastern Nayoro Wilds, above the treeline. The mound of earth with a tree on top is visible from the ridge path — examine the corpses to make the wolf appear, then follow it down to the Trapper camp below.',
   },
 
   // ── Teshio Ridge (1) ─────────────────────────────────────────────────────
