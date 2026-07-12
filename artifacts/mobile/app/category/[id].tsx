@@ -32,6 +32,9 @@ export default function CategoryDetailScreen() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<FilterType>('all');
   const [regionFilter, setRegionFilter] = useState<string>('');
+  const [actFilter, setActFilter] = useState<string>('');
+  const [bossFilter, setBossFilter] = useState(false);
+  const [missableFilter, setMissableFilter] = useState(false);
 
   const category = getCategoryById(id ?? '');
   const allQuests = useMemo(
@@ -45,7 +48,17 @@ export default function CategoryDetailScreen() {
     return Array.from(set).sort();
   }, [allQuests]);
 
+  // Derive sorted unique acts from this category's quests
+  const acts = useMemo(() => {
+    const set = new Set(allQuests.map(q => q.act));
+    return Array.from(set).sort();
+  }, [allQuests]);
+
   const showRegionFilter = regions.length > 1;
+  const showActFilter = acts.length > 1;
+  // Whether any quests in this category have bossInfo or are missable
+  const hasBossQuests = allQuests.some(q => q.bossInfo);
+  const hasMissableQuests = allQuests.some(q => q.missable);
 
   const quests = useMemo(() => {
     return allQuests.filter(quest => {
@@ -60,6 +73,9 @@ export default function CategoryDetailScreen() {
         return false;
 
       if (regionFilter && quest.region !== regionFilter) return false;
+      if (actFilter && quest.act !== actFilter) return false;
+      if (bossFilter && !quest.bossInfo) return false;
+      if (missableFilter && !quest.missable) return false;
 
       if (search.trim()) {
         const q = search.toLowerCase();
@@ -71,10 +87,25 @@ export default function CategoryDetailScreen() {
       }
       return true;
     });
-  }, [allQuests, state, statusFilter, regionFilter, search]);
+  }, [allQuests, state, statusFilter, regionFilter, actFilter, bossFilter, missableFilter, search]);
 
   const activeFilterCount =
-    (statusFilter !== 'all' ? 1 : 0) + (regionFilter ? 1 : 0);
+    (statusFilter !== 'all' ? 1 : 0) +
+    (regionFilter ? 1 : 0) +
+    (actFilter ? 1 : 0) +
+    (bossFilter ? 1 : 0) +
+    (missableFilter ? 1 : 0);
+
+  const clearAllFilters = () => {
+    setStatusFilter('all');
+    setRegionFilter('');
+    setActFilter('');
+    setBossFilter(false);
+    setMissableFilter(false);
+    setSearch('');
+  };
+
+  const accentColor = category?.color ?? colors.primary;
 
   return (
     <>
@@ -104,7 +135,7 @@ export default function CategoryDetailScreen() {
             {/* Status filter */}
             <View style={styles.filterSection}>
               <Text style={[styles.filterLabel, { color: colors.mutedForeground }]}>
-                Status
+                STATUS
               </Text>
               <ScrollView
                 horizontal
@@ -119,8 +150,8 @@ export default function CategoryDetailScreen() {
                       style={[
                         styles.pill,
                         {
-                          backgroundColor: active ? colors.primary : colors.card,
-                          borderColor: active ? colors.primary : colors.border,
+                          backgroundColor: active ? accentColor : colors.card,
+                          borderColor: active ? accentColor : colors.border,
                         },
                       ]}
                       onPress={() => setStatusFilter(f.id)}
@@ -144,24 +175,23 @@ export default function CategoryDetailScreen() {
               </ScrollView>
             </View>
 
-            {/* Region filter — only shown when the category spans multiple regions */}
+            {/* Region filter */}
             {showRegionFilter && (
               <View style={styles.filterSection}>
                 <Text style={[styles.filterLabel, { color: colors.mutedForeground }]}>
-                  Region
+                  REGION
                 </Text>
                 <ScrollView
                   horizontal
                   showsHorizontalScrollIndicator={false}
                   contentContainerStyle={styles.chipRow}
                 >
-                  {/* "All regions" chip */}
                   <TouchableOpacity
                     style={[
                       styles.pill,
                       {
-                        backgroundColor: !regionFilter ? colors.primary : colors.card,
-                        borderColor: !regionFilter ? colors.primary : colors.border,
+                        backgroundColor: !regionFilter ? accentColor : colors.card,
+                        borderColor: !regionFilter ? accentColor : colors.border,
                       },
                     ]}
                     onPress={() => setRegionFilter('')}
@@ -189,13 +219,11 @@ export default function CategoryDetailScreen() {
                         style={[
                           styles.pill,
                           {
-                            backgroundColor: active ? colors.primary : colors.card,
-                            borderColor: active ? colors.primary : colors.border,
+                            backgroundColor: active ? accentColor : colors.card,
+                            borderColor: active ? accentColor : colors.border,
                           },
                         ]}
-                        onPress={() =>
-                          setRegionFilter(active ? '' : region)
-                        }
+                        onPress={() => setRegionFilter(active ? '' : region)}
                         activeOpacity={0.75}
                       >
                         <Text
@@ -218,14 +246,161 @@ export default function CategoryDetailScreen() {
               </View>
             )}
 
+            {/* Act filter */}
+            {showActFilter && (
+              <View style={styles.filterSection}>
+                <Text style={[styles.filterLabel, { color: colors.mutedForeground }]}>
+                  ACT / CHAPTER
+                </Text>
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.chipRow}
+                >
+                  <TouchableOpacity
+                    style={[
+                      styles.pill,
+                      {
+                        backgroundColor: !actFilter ? accentColor : colors.card,
+                        borderColor: !actFilter ? accentColor : colors.border,
+                      },
+                    ]}
+                    onPress={() => setActFilter('')}
+                    activeOpacity={0.75}
+                  >
+                    <Text
+                      style={[
+                        styles.pillText,
+                        {
+                          color: !actFilter
+                            ? colors.primaryForeground
+                            : colors.mutedForeground,
+                        },
+                      ]}
+                    >
+                      All
+                    </Text>
+                  </TouchableOpacity>
+
+                  {acts.map(act => {
+                    const active = actFilter === act;
+                    // Shorten act labels for chips
+                    const shortAct = act
+                      .replace('Prologue: ', '')
+                      .replace('Chapter 1: ', 'Ch1 ')
+                      .replace('Chapter 2: ', 'Ch2 ')
+                      .replace('Chapter 3: ', 'Ch3 ')
+                      .replace('Available from ', '')
+                      .replace('Post-Story', 'Post-Story');
+                    return (
+                      <TouchableOpacity
+                        key={act}
+                        style={[
+                          styles.pill,
+                          {
+                            backgroundColor: active ? accentColor : colors.card,
+                            borderColor: active ? accentColor : colors.border,
+                          },
+                        ]}
+                        onPress={() => setActFilter(active ? '' : act)}
+                        activeOpacity={0.75}
+                      >
+                        <Text
+                          style={[
+                            styles.pillText,
+                            {
+                              color: active
+                                ? colors.primaryForeground
+                                : colors.mutedForeground,
+                            },
+                          ]}
+                          numberOfLines={1}
+                        >
+                          {shortAct}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </ScrollView>
+              </View>
+            )}
+
+            {/* Boss + Missable toggle row */}
+            {(hasBossQuests || hasMissableQuests) && (
+              <View style={styles.toggleRow}>
+                {hasBossQuests && (
+                  <TouchableOpacity
+                    style={[
+                      styles.toggleChip,
+                      {
+                        backgroundColor: bossFilter ? '#C0392B20' : colors.card,
+                        borderColor: bossFilter ? '#C0392B80' : colors.border,
+                      },
+                    ]}
+                    onPress={() => setBossFilter(v => !v)}
+                    activeOpacity={0.75}
+                  >
+                    <Ionicons
+                      name="skull-outline"
+                      size={13}
+                      color={bossFilter ? '#C0392B' : colors.mutedForeground}
+                    />
+                    <Text
+                      style={[
+                        styles.toggleText,
+                        { color: bossFilter ? '#C0392B' : colors.mutedForeground },
+                      ]}
+                    >
+                      Boss Quests
+                    </Text>
+                    {bossFilter && (
+                      <View style={styles.toggleActive}>
+                        <Text style={styles.toggleActiveText}>ON</Text>
+                      </View>
+                    )}
+                  </TouchableOpacity>
+                )}
+
+                {hasMissableQuests && (
+                  <TouchableOpacity
+                    style={[
+                      styles.toggleChip,
+                      {
+                        backgroundColor: missableFilter ? '#FF6B3520' : colors.card,
+                        borderColor: missableFilter ? '#FF6B3580' : colors.border,
+                      },
+                    ]}
+                    onPress={() => setMissableFilter(v => !v)}
+                    activeOpacity={0.75}
+                  >
+                    <Ionicons
+                      name="warning-outline"
+                      size={13}
+                      color={missableFilter ? '#FF6B35' : colors.mutedForeground}
+                    />
+                    <Text
+                      style={[
+                        styles.toggleText,
+                        { color: missableFilter ? '#FF6B35' : colors.mutedForeground },
+                      ]}
+                    >
+                      Missable Only
+                    </Text>
+                    {missableFilter && (
+                      <View style={[styles.toggleActive, { backgroundColor: '#FF6B35' }]}>
+                        <Text style={styles.toggleActiveText}>ON</Text>
+                      </View>
+                    )}
+                  </TouchableOpacity>
+                )}
+              </View>
+            )}
+
             {/* Active filter summary */}
             {activeFilterCount > 0 && (
               <TouchableOpacity
                 style={styles.clearRow}
-                onPress={() => {
-                  setStatusFilter('all');
-                  setRegionFilter('');
-                }}
+                onPress={clearAllFilters}
                 activeOpacity={0.7}
               >
                 <Ionicons name="close-circle" size={14} color={colors.mutedForeground} />
@@ -269,14 +444,7 @@ export default function CategoryDetailScreen() {
               No quests match your filters
             </Text>
             {(activeFilterCount > 0 || search.trim()) && (
-              <TouchableOpacity
-                onPress={() => {
-                  setStatusFilter('all');
-                  setRegionFilter('');
-                  setSearch('');
-                }}
-                activeOpacity={0.7}
-              >
+              <TouchableOpacity onPress={clearAllFilters} activeOpacity={0.7}>
                 <Text style={[styles.emptyLink, { color: colors.primary }]}>
                   Clear all filters
                 </Text>
@@ -302,10 +470,9 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   filterLabel: {
-    fontSize: 11,
+    fontSize: 10,
     fontFamily: 'Inter_500Medium',
-    textTransform: 'uppercase',
-    letterSpacing: 0.8,
+    letterSpacing: 1.2,
   },
   chipRow: {
     flexDirection: 'row',
@@ -321,6 +488,37 @@ const styles = StyleSheet.create({
   pillText: {
     fontSize: 13,
     fontFamily: 'Inter_500Medium',
+  },
+  // Toggle chips (boss / missable)
+  toggleRow: {
+    flexDirection: 'row',
+    gap: 8,
+    flexWrap: 'wrap',
+  },
+  toggleChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 20,
+    borderWidth: 1,
+  },
+  toggleText: {
+    fontSize: 13,
+    fontFamily: 'Inter_500Medium',
+  },
+  toggleActive: {
+    backgroundColor: '#C0392B',
+    borderRadius: 4,
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+  },
+  toggleActiveText: {
+    fontSize: 9,
+    fontFamily: 'Inter_700Bold',
+    color: '#fff',
+    letterSpacing: 0.5,
   },
   clearRow: {
     flexDirection: 'row',

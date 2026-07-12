@@ -1,0 +1,138 @@
+Build me a complete interactive HTML slide deck / presentation app for “Ghost of Yotei 100% Completion Guide”.
+
+IMPORTANT:
+- I want a real working presentation, not a mockup.
+- I want this to look premium and polished.
+- I want EVERY slide to use REAL Ghost of Yotei gameplay or official screenshot backgrounds.
+- DO NOT generate AI art.
+- DO NOT use illustrated placeholders.
+- DO NOT use fake samurai wallpapers.
+- Use only real gameplay images, official screenshots, or official promotional images from trusted sources like:
+  - IGN Ghost of Yotei videos / guide pages
+  - official Ghost of Yotei media / official trailers / official screenshots
+- If a reliable real image cannot be confirmed for a slide, reuse another real Ghost of Yotei gameplay image instead of inventing one.
+
+Image rules:
+- Every slide must have a full-screen background image.
+- Background images must be real Ghost of Yotei gameplay or official screenshots.
+- Add a dark overlay / gradient overlay on top of each image so text stays readable.
+- Use different real images across the deck where possible.
+- Prioritize scenes showing:
+  - exploration
+  - combat
+  - landscapes
+  - Atsu
+  - menus / map / traversal if needed
+- Do not use AI-generated images under any circumstance.
+
+Presentation purpose:
+Create a Japanese-themed, interactive 100% completion guide presentation for Ghost of Yotei with progress tracking, quest categories, and checklist-style structure.
+
+Style direction:
+- Japanese-inspired premium UI
+- elegant feudal Japan mood
+- parchment / ink / dark indigo / muted gold / crimson accents
+- cinematic presentation style
+- refined, not flashy neon
+- readable typography over dramatic gameplay backgrounds
+- smooth slide transitions
+- premium hover animations and reveal animations
+
+Reference structure:
+Use IGN’s Ghost of Yotei guide structure as the organizational inspiration:
+- Ghost of Yotei Guide hub
+- Walkthrough
+- How-To Guides
+- Completion Checklists
+
+Content requirements:
+Create slides for:
+1. Title slide
+2. Overview / how to use this guide
+3. Main story quest categories
+4. Side quests
+5. Special / mythic / character questlines
+6. Collectibles
+7. Activities and world content
+8. Weapons / armor / upgrades
+9. Missables / endgame cleanup
+10. Progress tracking summary
+11. Completion dashboard
+12. Closing / final 100% strategy
+
+Quest structure requirements:
+For EACH individual quest shown in the deck, include:
+- quest title
+- category
+- region
+- prerequisites
+- rewards
+- estimated time
+- individual task checklist
+- descriptive walkthrough
+- useful tips
+- missable warning if relevant
+
+Checklist requirements:
+- Add visible checkbox-style task lists for quests
+- Add progress bars for categories
+- Add a total completion progress section
+- Add per-quest completion indicators
+- Add “completed / incomplete” visual states
+- Add collapsible or expandable content where appropriate
+- Add a dashboard slide showing summary completion metrics
+
+Interactivity requirements:
+- keyboard arrow navigation
+- clickable navigation dots
+- smooth slide transitions
+- animated reveal of slide content
+- hover effects on cards
+- progress UI elements that feel interactive
+- expandable quest sections or detail panels if feasible
+- no dead buttons
+
+Build requirements:
+- single-file HTML if possible
+- inline CSS and JS preferred
+- no build step required
+- should run directly in Replit
+- fully responsive
+- presentation should fill the viewport
+- no slide should scroll vertically
+- split content into more slides if needed rather than overcrowding slides
+
+Critical design requirements:
+- every slide background must be a real Ghost of Yotei image
+- each background image must have strong readability overlay
+- use high contrast text
+- use elegant section dividers
+- use cinematic title slide
+- keep layout varied from slide to slide
+- avoid generic AI-presentation layouts
+- no placeholder text
+- no fake data
+- no dummy lorem ipsum
+- no repeated identical card design on every slide
+
+Source handling:
+- First gather and verify real Ghost of Yotei image URLs from IGN or official media pages.
+- Use those verified real image URLs directly in the slide backgrounds.
+- Prefer official gameplay deep-dive / trailer screenshots and IGN-hosted media when available.
+- If needed, include comments in the code marking the source URL used for each slide background.
+
+What I want as output:
+- full complete code
+- final HTML/CSS/JS
+- no partial snippets
+- no vague explanation
+- make it ready to run immediately
+
+Before finalizing:
+- verify all slides render
+- verify every slide has a real image background
+- verify no AI-generated images are used
+- verify navigation works
+- verify overlays keep text readable
+- verify content is not overflowing
+- verify the deck feels premium and polished

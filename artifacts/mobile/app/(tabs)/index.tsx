@@ -1,16 +1,18 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, FlatList, Platform } from 'react-native';
+import React, { useMemo } from 'react';
+import { View, Text, StyleSheet, ScrollView, FlatList, Platform, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '@/hooks/useColors';
 import { useProgress } from '@/context/ProgressContext';
-import { CATEGORIES } from '@/data/categories';
-import { getQuestById } from '@/data/quests';
+import { CATEGORIES, getCategoryById } from '@/data/categories';
+import { QUESTS, getQuestById } from '@/data/quests';
 import { CompletionRing } from '@/components/CompletionRing';
 import { StatCard } from '@/components/StatCard';
 import { CategoryCard } from '@/components/CategoryCard';
 import { QuestCard } from '@/components/QuestCard';
+import { ProgressBar } from '@/components/ProgressBar';
 
 export default function DashboardScreen() {
   const colors = useColors();
@@ -20,12 +22,36 @@ export default function DashboardScreen() {
   const notStarted =
     stats.totalQuests - stats.completedQuests - stats.inProgressQuests;
 
+  // ── Next Up: lowest-order incomplete main story quest, fallback to first side tale ──
+  const nextQuest = useMemo(() => {
+    const mainStory = QUESTS
+      .filter(q => q.category === 'main_story')
+      .sort((a, b) => a.order - b.order);
+    const nextMain = mainStory.find(q => !state.questCompletion[q.id]);
+    if (nextMain) return nextMain;
+
+    const sideTales = QUESTS
+      .filter(q => q.category === 'side_tales')
+      .sort((a, b) => a.order - b.order);
+    return sideTales.find(q => !state.questCompletion[q.id]) ?? null;
+  }, [state.questCompletion]);
+
+  // ── In Progress: quests with ≥1 step checked but not fully marked complete ──
+  const inProgressQuests = useMemo(() => {
+    return QUESTS
+      .filter(q => {
+        if (state.questCompletion[q.id]) return false;
+        const taskState = state.taskCompletion[q.id] ?? {};
+        return Object.values(taskState).some(Boolean);
+      })
+      .slice(0, 3);
+  }, [state]);
+
   const recentQuests = state.recentlyUpdated
     .map(id => getQuestById(id))
     .filter(Boolean) as NonNullable<ReturnType<typeof getQuestById>>[];
 
-  const topPadding =
-    insets.top + (Platform.OS === 'web' ? 67 : 16);
+  const topPadding = insets.top + (Platform.OS === 'web' ? 67 : 16);
 
   return (
     <ScrollView
@@ -33,7 +59,7 @@ export default function DashboardScreen() {
       contentContainerStyle={{ paddingBottom: Platform.OS === 'web' ? 118 : 100 }}
       showsVerticalScrollIndicator={false}
     >
-      {/* ── Hero Section ─────────────────────────────────────── */}
+      {/* ── Hero ─────────────────────────────────────────────── */}
       <LinearGradient
         colors={['#1A0800', '#0D0A20', colors.background as string]}
         locations={[0, 0.5, 1]}
@@ -77,8 +103,74 @@ export default function DashboardScreen() {
         />
       </View>
 
-      {/* ── Collectibles + Trophies Banner row ───────────────── */}
-      <View style={styles.bannerRow}>
+      {/* ── Next Up card ─────────────────────────────────────── */}
+      {nextQuest && (
+        <View style={[styles.section, { marginTop: 16 }]}>
+          <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
+            Next Up
+          </Text>
+          <TouchableOpacity
+            style={[
+              styles.nextUpCard,
+              { backgroundColor: colors.card, borderColor: colors.primary + '40' },
+            ]}
+            onPress={() => router.push(`/quest/${nextQuest.id}`)}
+            activeOpacity={0.8}
+          >
+            <View style={[styles.nextUpAccent, { backgroundColor: colors.primary }]} />
+            <View style={styles.nextUpBody}>
+              {/* Category chip */}
+              {(() => {
+                const cat = getCategoryById(nextQuest.category);
+                return (
+                  <View style={[styles.nextUpChip, { backgroundColor: (cat?.color ?? colors.primary) + '20' }]}>
+                    <Ionicons
+                      name={(cat?.icon ?? 'bookmark-outline') as any}
+                      size={10}
+                      color={cat?.color ?? colors.primary}
+                    />
+                    <Text style={[styles.nextUpChipText, { color: cat?.color ?? colors.primary }]}>
+                      {cat?.label ?? nextQuest.category}
+                    </Text>
+                  </View>
+                );
+              })()}
+              <Text style={[styles.nextUpTitle, { color: colors.foreground }]} numberOfLines={2}>
+                {nextQuest.title}
+              </Text>
+              <Text style={[styles.nextUpMeta, { color: colors.mutedForeground }]} numberOfLines={1}>
+                {nextQuest.act} · {nextQuest.region}
+              </Text>
+            </View>
+            <View style={styles.nextUpArrow}>
+              <Ionicons name="chevron-forward" size={18} color={colors.primary} />
+            </View>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {/* ── Collectibles + Trophies ───────────────────────────── */}
+      <View style={[styles.bannerRow, { marginTop: nextQuest ? 8 : 16 }]}>
+        <View
+          style={[
+            styles.bannerCard,
+            { backgroundColor: colors.card, borderColor: colors.border },
+          ]}
+        >
+          <Text style={[styles.bannerLabel, { color: colors.mutedForeground }]}>
+            QUESTS
+          </Text>
+          <Text style={[styles.bannerCount, { color: colors.primary }]}>
+            {stats.completedQuests}
+            <Text style={[styles.bannerTotal, { color: colors.mutedForeground }]}>
+              /{stats.totalQuests}
+            </Text>
+          </Text>
+          <Text style={[styles.bannerSub, { color: colors.mutedForeground }]}>
+            {stats.totalQuests - stats.completedQuests} remaining
+          </Text>
+        </View>
+
         <View
           style={[
             styles.bannerCard,
@@ -88,7 +180,7 @@ export default function DashboardScreen() {
           <Text style={[styles.bannerLabel, { color: colors.mutedForeground }]}>
             COLLECTIBLES
           </Text>
-          <Text style={[styles.bannerCount, { color: colors.primary }]}>
+          <Text style={[styles.bannerCount, { color: '#4A9B8E' }]}>
             {stats.completedCollectibles}
             <Text style={[styles.bannerTotal, { color: colors.mutedForeground }]}>
               /{stats.totalCollectibles}
@@ -120,7 +212,58 @@ export default function DashboardScreen() {
         </View>
       </View>
 
-      {/* ── Category Cards (horizontal) ──────────────────────── */}
+      {/* ── In Progress quests ───────────────────────────────── */}
+      {inProgressQuests.length > 0 && (
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
+            In Progress
+          </Text>
+          {inProgressQuests.map(quest => {
+            const taskState = state.taskCompletion[quest.id] ?? {};
+            const completedSteps = quest.steps.filter((_, i) => !!taskState[i]).length;
+            const stepProgress = quest.steps.length > 0
+              ? (completedSteps / quest.steps.length) * 100
+              : 0;
+            const cat = getCategoryById(quest.category);
+            return (
+              <TouchableOpacity
+                key={quest.id}
+                style={[
+                  styles.inProgressCard,
+                  { backgroundColor: colors.card, borderColor: colors.border },
+                ]}
+                onPress={() => router.push(`/quest/${quest.id}`)}
+                activeOpacity={0.8}
+              >
+                <View style={styles.inProgressRow}>
+                  <View style={styles.inProgressLeft}>
+                    <View style={[styles.inProgressDot, { backgroundColor: cat?.color ?? colors.warning }]} />
+                    <View style={styles.inProgressText}>
+                      <Text
+                        style={[styles.inProgressTitle, { color: colors.foreground }]}
+                        numberOfLines={1}
+                      >
+                        {quest.title}
+                      </Text>
+                      <Text style={[styles.inProgressMeta, { color: colors.mutedForeground }]}>
+                        {completedSteps}/{quest.steps.length} steps · {quest.region}
+                      </Text>
+                    </View>
+                  </View>
+                  <Ionicons name="chevron-forward" size={14} color={colors.mutedForeground} />
+                </View>
+                {quest.steps.length > 0 && (
+                  <View style={styles.inProgressBarWrap}>
+                    <ProgressBar percentage={stepProgress} height={3} color={cat?.color ?? colors.warning} />
+                  </View>
+                )}
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      )}
+
+      {/* ── Category Cards ────────────────────────────────────── */}
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
           Categories
@@ -148,8 +291,8 @@ export default function DashboardScreen() {
         />
       </View>
 
-      {/* ── Recently Updated ─────────────────────────────────── */}
-      {recentQuests.length > 0 && (
+      {/* ── Recently Updated ──────────────────────────────────── */}
+      {recentQuests.length > 0 && inProgressQuests.length === 0 && (
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
             Recently Updated
@@ -172,8 +315,8 @@ export default function DashboardScreen() {
         </View>
       )}
 
-      {/* ── Empty State ──────────────────────────────────────── */}
-      {recentQuests.length === 0 && (
+      {/* ── Empty State ───────────────────────────────────────── */}
+      {recentQuests.length === 0 && inProgressQuests.length === 0 && !nextQuest && (
         <View style={styles.section}>
           <View
             style={[
@@ -229,37 +372,121 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginTop: 16,
   },
+  // Next Up
+  nextUpCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 12,
+    borderWidth: 1,
+    overflow: 'hidden',
+  },
+  nextUpAccent: {
+    width: 3,
+    alignSelf: 'stretch',
+  },
+  nextUpBody: {
+    flex: 1,
+    padding: 14,
+    gap: 5,
+  },
+  nextUpChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    alignSelf: 'flex-start',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 20,
+  },
+  nextUpChipText: {
+    fontSize: 10,
+    fontFamily: 'Inter_600SemiBold',
+    letterSpacing: 0.5,
+  },
+  nextUpTitle: {
+    fontSize: 15,
+    fontFamily: 'Inter_600SemiBold',
+    lineHeight: 20,
+  },
+  nextUpMeta: {
+    fontSize: 12,
+    fontFamily: 'Inter_400Regular',
+  },
+  nextUpArrow: {
+    paddingRight: 14,
+  },
+  // Banner row
   bannerRow: {
     flexDirection: 'row',
-    gap: 10,
+    gap: 8,
     marginHorizontal: 20,
-    marginTop: 12,
   },
   bannerCard: {
     flex: 1,
-    padding: 14,
+    padding: 12,
     borderRadius: 12,
     borderWidth: 1,
-    gap: 2,
+    gap: 1,
   },
   bannerLabel: {
-    fontSize: 9,
+    fontSize: 8,
     fontFamily: 'Inter_600SemiBold',
-    letterSpacing: 2,
+    letterSpacing: 1.5,
   },
   bannerCount: {
-    fontSize: 22,
+    fontSize: 18,
     fontFamily: 'Inter_700Bold',
     letterSpacing: -0.5,
   },
   bannerTotal: {
-    fontSize: 13,
-    fontFamily: 'Inter_400Regular',
-  },
-  bannerSub: {
     fontSize: 11,
     fontFamily: 'Inter_400Regular',
   },
+  bannerSub: {
+    fontSize: 9,
+    fontFamily: 'Inter_400Regular',
+  },
+  // In Progress
+  inProgressCard: {
+    borderRadius: 10,
+    borderWidth: 1,
+    overflow: 'hidden',
+  },
+  inProgressRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    gap: 8,
+  },
+  inProgressLeft: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  inProgressDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    flexShrink: 0,
+  },
+  inProgressText: {
+    flex: 1,
+    gap: 2,
+  },
+  inProgressTitle: {
+    fontSize: 14,
+    fontFamily: 'Inter_600SemiBold',
+  },
+  inProgressMeta: {
+    fontSize: 11,
+    fontFamily: 'Inter_400Regular',
+  },
+  inProgressBarWrap: {
+    paddingHorizontal: 12,
+    paddingBottom: 10,
+  },
+  // Section
   section: {
     marginTop: 24,
     paddingHorizontal: 20,

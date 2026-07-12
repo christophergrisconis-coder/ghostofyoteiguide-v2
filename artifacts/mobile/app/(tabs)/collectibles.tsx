@@ -6,6 +6,8 @@ import {
   SectionList,
   Platform,
   TextInput,
+  TouchableOpacity,
+  ScrollView,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -30,11 +32,21 @@ type Section = {
   data: (typeof COLLECTIBLES)[number][];
 };
 
+const ALL_REGIONS = [
+  'Yotei Grasslands',
+  'Ishikari Plain',
+  'Teshio Ridge',
+  'Tokachi Range',
+  'Nayoro Wilds',
+  'Oshima Coast',
+];
+
 export default function CollectiblesScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { state, toggleCollectible } = useProgress();
   const [query, setQuery] = useState('');
+  const [regionFilter, setRegionFilter] = useState('');
 
   const sections: Section[] = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -43,13 +55,19 @@ export default function CollectiblesScreen() {
       const completed = allItems.filter(
         c => state.collectibleCompletion[c.id],
       ).length;
-      const items = q
-        ? allItems.filter(
-            c =>
-              c.name.toLowerCase().includes(q) ||
-              c.region.toLowerCase().includes(q),
-          )
-        : allItems;
+
+      let items = allItems;
+      if (regionFilter) {
+        items = items.filter(c => c.region === regionFilter);
+      }
+      if (q) {
+        items = items.filter(
+          c =>
+            c.name.toLowerCase().includes(q) ||
+            c.region.toLowerCase().includes(q) ||
+            c.hint.toLowerCase().includes(q),
+        );
+      }
       return {
         groupId: group.id,
         label: group.label,
@@ -61,9 +79,9 @@ export default function CollectiblesScreen() {
         data: items,
       };
     }).filter(s => s.data.length > 0);
-  }, [state.collectibleCompletion, query]);
+  }, [state.collectibleCompletion, query, regionFilter]);
 
-  const isFiltering = query.trim().length > 0;
+  const isFiltering = query.trim().length > 0 || !!regionFilter;
 
   return (
     <SectionList
@@ -81,13 +99,12 @@ export default function CollectiblesScreen() {
           <Text style={[styles.heading, { color: colors.foreground }]}>
             Collectibles
           </Text>
+
+          {/* Search */}
           <View
             style={[
               styles.searchBar,
-              {
-                backgroundColor: colors.card,
-                borderColor: colors.border,
-              },
+              { backgroundColor: colors.card, borderColor: colors.border },
             ]}
           >
             <Ionicons
@@ -98,7 +115,7 @@ export default function CollectiblesScreen() {
             />
             <TextInput
               style={[styles.searchInput, { color: colors.foreground }]}
-              placeholder="Search by name or region…"
+              placeholder="Search by name, region, or location…"
               placeholderTextColor={colors.mutedForeground}
               value={query}
               onChangeText={setQuery}
@@ -108,9 +125,97 @@ export default function CollectiblesScreen() {
               autoCapitalize="none"
             />
           </View>
+
+          {/* Region filter */}
+          <View style={styles.filterSection}>
+            <Text style={[styles.filterLabel, { color: colors.mutedForeground }]}>
+              REGION
+            </Text>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.chipRow}
+            >
+              {/* All */}
+              <TouchableOpacity
+                style={[
+                  styles.pill,
+                  {
+                    backgroundColor: !regionFilter ? colors.primary : colors.card,
+                    borderColor: !regionFilter ? colors.primary : colors.border,
+                  },
+                ]}
+                onPress={() => setRegionFilter('')}
+                activeOpacity={0.75}
+              >
+                <Text
+                  style={[
+                    styles.pillText,
+                    {
+                      color: !regionFilter
+                        ? colors.primaryForeground
+                        : colors.mutedForeground,
+                    },
+                  ]}
+                >
+                  All
+                </Text>
+              </TouchableOpacity>
+
+              {ALL_REGIONS.map(region => {
+                const active = regionFilter === region;
+                return (
+                  <TouchableOpacity
+                    key={region}
+                    style={[
+                      styles.pill,
+                      {
+                        backgroundColor: active ? colors.primary : colors.card,
+                        borderColor: active ? colors.primary : colors.border,
+                      },
+                    ]}
+                    onPress={() => setRegionFilter(active ? '' : region)}
+                    activeOpacity={0.75}
+                  >
+                    <Text
+                      style={[
+                        styles.pillText,
+                        {
+                          color: active
+                            ? colors.primaryForeground
+                            : colors.mutedForeground,
+                        },
+                      ]}
+                      numberOfLines={1}
+                    >
+                      {region.replace(' Plain', '').replace(' Grasslands', '').replace(' Range', '').replace(' Wilds', '').replace(' Ridge', '').replace(' Coast', '')}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+          </View>
+
+          {/* Clear / count summary */}
+          {isFiltering && (
+            <TouchableOpacity
+              style={styles.clearRow}
+              onPress={() => {
+                setQuery('');
+                setRegionFilter('');
+              }}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="close-circle" size={14} color={colors.mutedForeground} />
+              <Text style={[styles.clearText, { color: colors.mutedForeground }]}>
+                Clear filters · {sections.reduce((n, s) => n + s.data.length, 0)} shown
+              </Text>
+            </TouchableOpacity>
+          )}
+
           {isFiltering && sections.length === 0 && (
             <Text style={[styles.emptyText, { color: colors.mutedForeground }]}>
-              No collectibles match "{query}"
+              No collectibles match your filters
             </Text>
           )}
         </View>
@@ -185,6 +290,14 @@ export default function CollectiblesScreen() {
             checked={!!state.collectibleCompletion[item.id]}
             onToggle={() => toggleCollectible(item.id)}
           />
+          {item.mapNote && (
+            <View style={[styles.mapNote, { borderTopColor: colors.border }]}>
+              <Ionicons name="navigate-outline" size={11} color={colors.mutedForeground} />
+              <Text style={[styles.mapNoteText, { color: colors.mutedForeground }]}>
+                {item.mapNote}
+              </Text>
+            </View>
+          )}
         </View>
       )}
       showsVerticalScrollIndicator={false}
@@ -206,7 +319,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingHorizontal: 10,
     height: 40,
-    marginBottom: 4,
+    marginBottom: 12,
   },
   searchIcon: {
     marginRight: 6,
@@ -216,6 +329,41 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Inter_400Regular',
     paddingVertical: 0,
+  },
+  filterSection: {
+    gap: 6,
+    marginBottom: 8,
+  },
+  filterLabel: {
+    fontSize: 10,
+    fontFamily: 'Inter_600SemiBold',
+    letterSpacing: 1.5,
+  },
+  chipRow: {
+    flexDirection: 'row',
+    gap: 8,
+    paddingRight: 4,
+  },
+  pill: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    borderWidth: 1,
+  },
+  pillText: {
+    fontSize: 12,
+    fontFamily: 'Inter_500Medium',
+  },
+  clearRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingTop: 4,
+    marginBottom: 4,
+  },
+  clearText: {
+    fontSize: 12,
+    fontFamily: 'Inter_400Regular',
   },
   emptyText: {
     fontSize: 14,
@@ -257,9 +405,23 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter_700Bold',
   },
   itemWrap: {
-    paddingHorizontal: 14,
     borderRadius: 10,
     borderWidth: 1,
     marginBottom: 6,
+    overflow: 'hidden',
+  },
+  mapNote: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 5,
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderTopWidth: StyleSheet.hairlineWidth,
+  },
+  mapNoteText: {
+    fontSize: 11,
+    fontFamily: 'Inter_400Regular',
+    lineHeight: 16,
+    flex: 1,
   },
 });
