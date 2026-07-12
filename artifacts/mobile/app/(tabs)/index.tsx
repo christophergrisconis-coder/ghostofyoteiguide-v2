@@ -254,11 +254,13 @@ export default function DashboardScreen() {
           </Text>
         </View>
 
-        <View
+        <TouchableOpacity
           style={[
             styles.bannerCard,
             { backgroundColor: colors.card, borderColor: colors.border },
           ]}
+          onPress={() => router.push('/(tabs)/activities')}
+          activeOpacity={0.8}
         >
           <Text style={[styles.bannerLabel, { color: colors.mutedForeground }]}>
             ACTIVITIES
@@ -272,7 +274,7 @@ export default function DashboardScreen() {
           <Text style={[styles.bannerSub, { color: colors.mutedForeground }]}>
             {stats.totalActivities - stats.completedActivities} left
           </Text>
-        </View>
+        </TouchableOpacity>
       </View>
 
       {/* ── Activities summary card ──────────────────────────── */}
