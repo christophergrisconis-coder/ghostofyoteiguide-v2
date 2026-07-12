@@ -629,6 +629,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 6,
+    justifyContent: 'center',
   },
   actGridItem: {
     // width is applied inline, derived from ACT_GRID_ITEM_WIDTH, so new
