@@ -1,0 +1,211 @@
+Now perform a FULL TOP-TO-BOTTOM AUDIT AND CORRECTION PASS on this Ghost of Yotei 100% Completion Guide project.
+
+This is NOT a redesign request.
+This is a thorough verification, gap-finding, correction, and completion pass.
+
+PRIMARY GOAL:
+Make sure the entire guide is fully completed exactly as instructed, with no missing quest details, no vague text, no placeholder content, and no generic references.
+
+CRITICAL RULES:
+- Do a credit-friendly audit first before rewriting anything major.
+- Preserve working structure and code where possible.
+- Fix only what is incomplete, inaccurate, vague, generic, placeholder-based, or not fully implemented.
+- Do not replace good working sections unnecessarily.
+- Do not invent content.
+- Do not use AI-generated lore, fake quests, fake locations, fake NPCs, fake collectibles, or fake mechanics.
+- Use REAL Ghost of Yotei information only.
+- Use real character names, real region names, real mission names, real targets, real places, and real gameplay systems.
+- If a fact cannot be verified from a real source structure, flag it clearly for review instead of hallucinating.
+
+REFERENCE PRIORITY:
+Use these as the structural verification references:
+1. IGN Ghost of Yotei Guide hub
+2. IGN Walkthrough pages
+3. IGN Prologue Walkthrough
+4. IGN The Old Inn Walkthrough
+5. IGN Completion Checklists
+6. Other trustworthy walkthrough/reference sources only if needed to fill VERIFIED gaps
+
+AUDIT PROCESS:
+Work through this EXACT checklist in order.
+
+STEP 1 — GLOBAL AUDIT
+Review the whole project and identify:
+- incomplete screens
+- vague sections
+- missing categories
+- placeholder text
+- dead buttons
+- fake or generic quest text
+- missing progress logic
+- missing checklist logic
+- missing detailed walkthroughs
+- repeated filler text
+- sections that mention a feature but do not actually implement it
+- any place where the guide is not clearly 100% completion focused
+
+STEP 2 — STRUCTURE AUDIT
+Verify that all major guide sections exist and are complete:
+- Main Story Quests
+- Side Quests
+- Special / Mythic / Character Questlines
+- Collectibles
+- Activities / World Content
+- Armor / Weapons / Charms / Upgrades
+- Missables / Endgame Cleanup
+- Completion Dashboard
+- Progress Tracking
+- Settings / Reset / Persistence if included
+
+If any of these sections are missing, incomplete, shallow, or not properly connected, fix them.
+
+STEP 3 — QUEST DATA AUDIT
+Audit every individual quest entry and make sure each includes:
+- real quest title
+- real category
+- real region or location
+- real related characters
+- prerequisites
+- rewards
+- estimated completion time
+- missable warning if relevant
+- individual task checklist
+- detailed descriptive walkthrough enclosed inside the quest entry
+- useful strategy / combat / traversal tips
+- follow-up quest or unlock notes if applicable
+
+Do not allow any quest to remain as:
+- short summary only
+- vague one-liner
+- “go here and fight enemies” generic text
+- placeholder wording
+- generic samurai-game references
+- made-up names
+
+STEP 4 — WALKTHROUGH DEPTH AUDIT
+For EVERY quest, expand the walkthrough into a proper step-by-step structure.
+
+Each individual quest must contain:
+1. Where to start the quest
+2. Who gives the quest or what triggers it
+3. Exact region / place involved
+4. Travel directions or route context
+5. Step-by-step objectives in order
+6. Encounter details
+7. Enemy or boss notes if relevant
+8. Puzzle / clue / exploration notes if relevant
+9. Important loot / rewards / unlocks
+10. Missable warnings
+11. What this quest unlocks next
+
+The walkthrough text must feel like a real guide.
+It must use real names and real places.
+It must be specific, practical, and useful.
+Do NOT leave any quest with shallow text.
+
+STEP 5 — 100% COMPLETION AUDIT
+Verify the guide is truly aimed at 100% completion, not just story completion.
+
+Make sure the guide accounts for:
+- story progression
+- side content
+- optional content
+- collectibles
+- upgrades
+- world activities
+- missables
+- cleanup tasks
+- endgame / postgame / New Game Plus if applicable
+
+If any area of 100% completion coverage is missing, add it in the correct category.
+
+STEP 6 — UI / FEATURE AUDIT
+Verify that the following actually work if they are present:
+- checkboxes
+- per-task completion
+- per-quest completion
+- category completion bars
+- total completion %
+- search
+- filters
+- collapse / expand
+- dashboard summary
+- progress persistence
+- reset / clear progress actions
+
+If a feature exists visually but is not functionally implemented, implement it properly.
+
+STEP 7 — REALITY / ACCURACY AUDIT
+Replace all generic references with real specifics wherever verifiable.
+Examples of what must be corrected:
+- “a village” → actual named place
+- “an ally” → actual named character
+- “a target” → actual named enemy / target
+- “collect item” → actual collectible / reward / clue name if verified
+- “special quest” → actual quest name if verified
+
+No vague filler.
+No broad fantasy wording.
+No generic revenge-game language.
+Everything must feel tied to the real game.
+
+STEP 8 — IMAGE / PRESENTATION AUDIT
+Verify all backgrounds and visual references use real Ghost of Yotei gameplay images or official screenshots.
+- no AI images
+- no fake backgrounds
+- no unrelated samurai imagery
+- no placeholder art
+If any slide or section uses a bad image, replace it with a verified real Ghost of Yotei image.
+
+STEP 9 — GAP REPORT THEN FIX
+Before making final output, generate an internal checklist of:
+- what was missing
+- what was vague
+- what was corrected
+- what was newly added
+- what still could not be verified safely
+
+Then fix all verifiable problems.
+
+CONTENT WRITING STANDARD:
+All quest walkthroughs must be:
+- detailed
+- specific
+- step-by-step
+- practical
+- enclosed inside each individual quest entry
+- built around real names, places, and progression
+- written like a real premium strategy guide
+- clearly more detailed than a summary
+
+STRICT PROHIBITIONS:
+- no hallucinated quests
+- no fake NPC names
+- no fake places
+- no generic placeholders
+- no lorem ipsum
+- no “insert quest here”
+- no “TBD”
+- no “example data”
+- no repeating the same walkthrough template with only names swapped
+- no removing detail to save space
+- no saying “100% guide” unless every section has been checked for completeness
+
+OUTPUT REQUIREMENTS:
+- return the corrected final project code
+- preserve the working app / deck structure
+- include all repairs and completions
+- ensure the final result is clearly more complete, more accurate, and more specific
+- prioritize quality and correctness over speed
+
+FINAL VERIFICATION BEFORE YOU STOP:
+Confirm all of the following:
+- every major category exists
+- every quest has real naming where verified
+- every quest has individual tasks
+- every quest has a detailed enclosed walkthrough
+- no generic references remain where real specifics should exist
+- all progress tracking works
+- the guide is aimed at full 100% completion
+- no fake content was inserted
+- no major completion category is missing

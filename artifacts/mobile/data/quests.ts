@@ -20,6 +20,8 @@ export interface BossPhase {
 export interface BossInfo {
   name: string;
   description: string;
+  weakness?: string;
+  recommendedStance?: string;
   phases?: BossPhase[];
 }
 
@@ -101,10 +103,18 @@ export const QUESTS: Quest[] = [
     recommendedTiming: 'Prologue — forced first mission.',
     bossInfo: {
       name: 'The Snake',
-      description: 'The leader of the Yotei Six and Atsu\'s primary antagonist. The prologue duel introduces Ghost of Yotei\'s parry and counter system. Do not expect a short fight — after the duel, a long return-home sequence follows.',
+      recommendedStance: 'Stone Stance',
+      weakness: 'Parry — every Phase 1 attack has a clean parry window; Phase 2 lunges are dodge-only',
+      description: 'The leader of the Yotei Six. The prologue duel is designed as a parry tutorial — most attacks carry a generous parry window. Do not rush counters; wait for his animation to fully resolve before striking.',
       phases: [
-        { phase: 'Phase 1', description: 'Standard sword exchanges at measured pace. Learn to read his stance and time your parries.' },
-        { phase: 'Phase 2', description: 'Adds lunging thrust attacks that cannot be parried — dodge to either side when he draws back.' },
+        {
+          phase: 'Phase 1 — Iron Stance',
+          description: 'Cycles three named attacks: Iron Overhead (slow high-damage slam — parry on the drop, counter twice), Cross-step Riposte (two-hit sequence — parry the first hit to open a counter window on the second), Lunge Feint (he pauses visibly before committing — wait for his lead foot to push off before parrying). Each successful parry staggers him for exactly two free strikes. Phase ends when he taunts, briefly sheathes, and his stance visually shifts.',
+        },
+        {
+          phase: 'Phase 2 — Aggression Mode',
+          description: 'Adds an unparryable forward lunge after every third attack — his lead foot stamps audibly before the lunge, which is the dodge cue. Dodge left or right, never backward. The Iron Overhead speeds up but retains the same parry window. At 25% health he adds a Shield Rush shoulder charge — step sideways, not backward. Phase ends via cutscene once his health bar is fully depleted.',
+        },
       ],
     },
     cleanupNotes: tips(
@@ -176,10 +186,18 @@ export const QUESTS: Quest[] = [
     recommendedTiming: 'Available after The Yotei Six (ms_06). Complete before Chapter 2 opens.',
     bossInfo: {
       name: 'The Oni',
-      description: 'A massive warrior armed with a tetsubo (iron club). Slow, powerful attacks that will break your guard if you try to parry — dodge instead, then counter in the recovery window. Stone Stance is ideal.',
+      recommendedStance: 'Stone Stance',
+      weakness: 'Recovery window after each Overhead Slam — two free strikes every time; never attempt to block or parry',
+      description: 'A massive warrior armed with a tetsubo (iron club). All attacks break guard — dodge backward instead of parrying. Stone Stance pressure between combos chips his posture down rapidly.',
       phases: [
-        { phase: 'Phase 1', description: 'Overhead slams and wide horizontal sweeps. Roll backwards on the overhead — not sideways. Strike twice in the recovery window after each slam.' },
-        { phase: 'Phase 2', description: 'At 50% health, enters a rage state with faster attacks and a new spinning combo that covers 360°. Maintain distance until the spin finishes, then counterattack.' },
+        {
+          phase: 'Phase 1 — Measured Assault',
+          description: 'Three-attack cycle: Tetsubo Overhead (raises both hands high then slams — roll backward, strike twice in the skid recovery), Horizontal Crush (wide side-sweep — roll backward into his flank, strike twice), Stomp Shockwave (foot stamp creating a ground shockwave — jump or roll backward to clear it). Never parry or block any of these. Phase ends when his first health bar empties and a rage cutscene plays.',
+        },
+        {
+          phase: 'Phase 2 — Berserker Rage',
+          description: 'All Phase 1 attacks speed up and he gains two new moves: Berserker Rush (running charge across the full arena — dodge at 45° to one side at the last moment, not straight sideways) and 360° Windmill (tetsubo spinning covering all directions — maintain maximum distance until the spin completes at least three full rotations before approaching). The Windmill is his most dangerous attack; one hit at close range staggers Atsu into a second. Phase ends on full second health bar depletion.',
+        },
       ],
     },
     cleanupNotes: tips(
@@ -296,10 +314,18 @@ export const QUESTS: Quest[] = [
     recommendedTiming: 'Can be done before or after The Oni. Both must be complete before Chapter 2.',
     bossInfo: {
       name: 'The Kitsune',
-      description: 'A dual-blade assassin who fights using smoke bombs and illusions to mask her position. Focused Hearing is essential — activate it the moment smoke appears and do not stop tracking her silhouette.',
+      recommendedStance: 'Wind Stance',
+      weakness: 'The pause between combo strings — dodge through all hits then strike once in the gap before her next sequence begins',
+      description: 'A dual-blade assassin who controls the fight through smoke and repositioning. Her attacks cannot be parried — dodge through each full sequence. Focused Hearing is essential in both phases to track her silhouette through smoke.',
       phases: [
-        { phase: 'Phase 1', description: 'Rapid dual-blade combos that cannot be parried — dodge left or right through each attack sequence. Strike in the gap between combos.' },
-        { phase: 'Phase 2', description: 'At 50% health she retreats to a second position and floods the arena with smoke. Activate Focused Hearing immediately and track her silhouette. She is vulnerable for a window just before she attacks.' },
+        {
+          phase: 'Phase 1 — Shadow Step',
+          description: 'Cycles three patterns: Shadow Step Combo (three rapid slashes from a forward dash — dodge left on the first hit to slip through all three), Smoke Feint (deploys smoke and repositions — activate Focused Hearing immediately and face her silhouette direction before her attack lands), Twin Blade Flurry (six rapid hits ending with a knockback kick — dodge backward on hits 4–5 to avoid the kick). Phase ends at 50% health with a repositioning retreat cutscene.',
+        },
+        {
+          phase: 'Phase 2 — Mirror Ground',
+          description: 'She floods the eastern clearing with persistent smoke and uses Mirror Image — two silhouettes appear simultaneously. In Focused Hearing, only the real silhouette has a slightly brighter outline; attack the brighter one. She adds Running Ambush that activates if she sees Atsu standing still — keep moving at all times. Between Mirror Image events her Phase 1 patterns return but faster. Phase ends on full health depletion.',
+        },
       ],
     },
     cleanupNotes: tips(
@@ -333,10 +359,18 @@ export const QUESTS: Quest[] = [
     recommendedTiming: 'Opens Chapter 2. Complete after both The Oni and The Kitsune.',
     bossInfo: {
       name: 'The Saito Brothers',
-      description: 'A two-phase encounter against two distinctly different fighters. The Elder wields a naginata with massive reach; the Younger relies on archery at distance before switching to sword.',
+      recommendedStance: 'Water Stance (Elder) / close-range aggression (Younger)',
+      weakness: 'Elder: long recovery after Spinning Death — backstep twice then counter. Younger: vulnerable at melee range — close immediately after the chase',
+      description: 'Two consecutive encounters with contrasting styles. Do not exhaust healing on the Elder — the horseback chase and Younger\'s cliff duel begin immediately after without a break.',
       phases: [
-        { phase: 'Elder Saito', description: 'Naginata with sweeping reach. Use Water Stance to deflect. His spinning naginata attack has long reach — backstep twice, then counterattack during recovery.' },
-        { phase: 'Younger Saito', description: 'Mount your horse immediately when he flees — you have approximately 60 seconds. At the cliff he opens with bow shots at range, then switches to sword when cornered.' },
+        {
+          phase: 'Elder Saito — Naginata',
+          description: 'Three techniques: Naginata Sweep (horizontal arc — backstep once then counter twice), Spinning Death (full-spin covering 1.5× normal naginata reach — backstep TWICE before countering; one backstep clips the follow-through), Spear Thrust (forward lunge — dodge 45° left or right, never straight back). Water Stance deflects the Sweep and Thrust efficiently. Phase ends with a death cutscene — the Younger flees immediately, sprint to your horse.',
+        },
+        {
+          phase: 'Younger Saito — Bow to Sword',
+          description: 'Horseback: sprint to close distance — he fires three-arrow volleys and veers left before the cliff. Cliff duel opens with bow fire from 20m — rush him immediately, he switches to sword within 5 seconds of you closing to melee. Desperate Sword form: wide horizontal slash (parry for full counter chain) and short overhead (dodge sideways then counter). He is significantly weaker in sword than the Elder. Phase ends on full health depletion.',
+        },
       ],
     },
     cleanupNotes: tips(
@@ -370,10 +404,18 @@ export const QUESTS: Quest[] = [
     recommendedTiming: 'Complete immediately after The Saito Brothers — required to open The Reckoning.',
     bossInfo: {
       name: 'Ryuhei the Enforcer',
-      description: 'A versatile fighter who switches between all four combat stances mid-combo. Watch his weapon grip and stance animation to predict the switch — your counter stance must match his current one.',
+      recommendedStance: 'All four stances — must match his current stance each exchange',
+      weakness: 'The 0.5-second grip-shift animation between stances — wrong stance match deals only 25% damage; correct match deals full damage plus a posture stagger',
+      description: 'The most mechanically demanding boss of Chapter 2. Ryuhei cycles through all four stances mid-combo; attacks bounce off if your stance does not match his current one. His weapon grip changes half a second before each stance switch — that grip animation is the tell.',
       phases: [
-        { phase: 'Phase 1', description: 'Cycles through two stances. Match your stance to counter his current one. He transitions after every third hit.' },
-        { phase: 'Phase 2', description: 'Begins collapsing floors in the ruins for environmental pressure. Bait him toward structurally weak sections — he can be knocked through collapse floors for bonus damage.' },
+        {
+          phase: 'Phase 1 — Two-Stance Cycle',
+          description: 'Cycles between Stone and Wind Stance only. His pattern is always: three hits → grip shift → three hits → grip shift. Watch his right hand: thumb inward = Stone (match Stone to counter), thumb outward = Wind (match Wind to counter). Correct stance match deals full damage and triggers a posture stagger. Phase ends at 50% health with a brief taunt animation.',
+        },
+        {
+          phase: 'Phase 2 — All Four Stances + Titan Slam',
+          description: 'Expands to all four stances in random order — the two-stance prediction no longer applies. He adds Titan Slam: raises both arms then slams a cracked floor tile, collapsing it into a hazard pit. Bait him toward cracked stone tiles by briefly standing on one then stepping off — he will slam it, taking heavy posture damage from the edge collapse. The grip-shift read is now your only reliable cue. Phase ends on full health depletion.',
+        },
       ],
     },
     cleanupNotes: tips(
@@ -407,11 +449,22 @@ export const QUESTS: Quest[] = [
     recommendedTiming: 'Complete all companion Sensei Tales (Jubei, Kei, Tomoe, Riku) before starting for maximum ally support.',
     bossInfo: {
       name: 'The Dragon',
-      description: 'The hidden leader of the Yotei Six. A three-phase climactic encounter that demands mastery of every mechanic learned across the game. Stock all consumables before entering.',
+      recommendedStance: 'All four stances (Phase 1) — Ghost Stance (Phases 2 & 3)',
+      weakness: 'Phase 2 spirit form: Heavenly Strike only. Phases 1 & 3: parry vulnerable with correct stance match',
+      description: 'The final boss demands mastery of every mechanic learned across the game. Enter with full consumables — no checkpoints. Build Ghost Stance meter in the hallway fights before this room; you want it full entering Phase 1.',
       phases: [
-        { phase: 'Phase 1 — Sword', description: 'Powerful sword techniques that test all four stances. Use Ghost finishers to build momentum. He is weakest in this phase.' },
-        { phase: 'Phase 2 — Spirit Form', description: 'Becomes partially incorporeal. Only Heavenly Strike can interrupt spirit form attacks — save it for these moments and strike immediately after.' },
-        { phase: 'Phase 3 — Final Stand', description: 'Time pressure intensifies. Play aggressively — defensive play will lose this phase. Ghost Stance\'s finisher resets between each elimination.' },
+        {
+          phase: 'Phase 1 — Dragon Kata',
+          description: 'He announces his stance before each attack via a distinct hand gesture: crossed forearms = Stone, open palm sweep = Water, two fingers extended = Wind, inverted grip = Moon. Match your stance to counter each sequence for full damage and a stagger. He activates his own Ghost Stance when Atsu is at low health — dodge sideways immediately. Build your Ghost Stance meter via finishers here; Phase 1 is the safest accumulation window. Phase ends at 67% health.',
+        },
+        {
+          phase: 'Phase 2 — Spirit Veil',
+          description: 'Becomes translucent during Spirit Veil moments — all normal attacks pass through him while veiled. Two veil attacks: Shadow Blade (single heavy wide-reach slash — Heavenly Strike during the windup animation interrupts it) and Spirit Surge (veiled charge toward Atsu — Heavenly Strike the moment the charge starts stops it). Keep at least one Heavenly Strike charge reserved at all times. Between veil moments he fights normally — use those windows for sustained damage. Phase ends at 33% health.',
+        },
+        {
+          phase: 'Phase 3 — Final Stand',
+          description: 'A 90-second countdown timer appears. Four sequential targets are placed around the arena — Ghost Stance finisher resets on each one, allowing you to chain all four and maintain Ghost Stance throughout. His new Dragon\'s Last Roar is a 270° AoE shockwave — only the area directly behind him is safe. At 30 seconds remaining he enters continuous rapid Dragon Kata combos with no pause between stances; abandon stance matching and commit to Ghost Stance finisher chains. Timer expiry is a fail state.',
+        },
       ],
     },
     cleanupNotes: tips(
@@ -562,7 +615,23 @@ export const QUESTS: Quest[] = [
     recommendedTiming: 'Available from Chapter 1. Thunder Slash is effective against armored enemies throughout the game.',
     bossInfo: {
       name: 'Mountain God Trial',
-      description: 'Not a single enemy but a gauntlet of lightning strikes and spirit guardians. Lightning is telegraphed by glowing ground circles — move immediately when you see them. Defeat the spirit guardians between lightning waves.',
+      recommendedStance: 'Wind Stance',
+      weakness: 'Spirit guardians have low health pools — focus fire between lightning waves to clear each wave before the next volley begins',
+      description: 'Not a single enemy but a three-wave gauntlet of lightning strikes and spirit guardians. Movement is the primary survival mechanic — glowing orange ground circles appear 2 seconds before each strike lands.',
+      phases: [
+        {
+          phase: 'Wave 1 — Storm Begins',
+          description: 'Three spirit guardians appear while four lightning circles spawn sequentially on the ground. Each circle glows for 2 seconds before the strike — move out of any circle the instant it appears. Guardians are semi-transparent and faster than normal enemies but have low health. Defeat all three to advance. Lightning circles pause between waves.',
+        },
+        {
+          phase: 'Wave 2 — Intensified Storm',
+          description: 'Five guardians spawn alongside six lightning circles now appearing in overlapping patterns on opposite sides of the arena. Eliminate the first three guardians before the remaining pair arrives if possible. Keep moving between engagements and do not stop to fight near a freshly spawned circle. All five must fall to advance.',
+        },
+        {
+          phase: 'Wave 3 — Peak Storm',
+          description: 'Seven guardians including one Elite Guardian (silver glow, double health) appear with continuous overlapping lightning every 1.5 seconds. Target the Elite Guardian first — it directs the others. Move in a wide consistent circle and strike the Elite on each pass rather than stopping to trade hits. Once the Elite falls, the remaining six become erratic and can be cleared quickly. Trial completes when all seven are defeated.',
+        },
+      ],
     },
     cleanupNotes: tips(
       'Lightning strikes are telegraphed by glowing ground circles — move out immediately',
@@ -592,6 +661,22 @@ export const QUESTS: Quest[] = [
     missable: false,
     overview: 'A hermit fisherman on the Ishikari riverbank speaks of a spear that strikes like a serpent\'s fang — kept in a sealed underwater vault beneath a river spirit shrine. Three river trials test swimming speed, breath control, and underwater combat. The spear is sealed in a jade case at the vault floor.',
     recommendedTiming: 'Available from Chapter 1. Venom Thrust is particularly useful against armored enemies in Chapters 2–3.',
+    bossInfo: {
+      name: 'Serpent Spirits of the Vault',
+      recommendedStance: 'Water Stance',
+      weakness: 'Alpha Serpent: red glow marks it — defeat it first to stop the others from receiving reinforcements',
+      description: 'Three serpent spirits in the underwater vault antechamber. Underwater combat is simplified — standard dodges become sideways rolls and attacks are single-strike counters. Do not attempt chained combos underwater.',
+      phases: [
+        {
+          phase: 'Phase 1 — Coordinated Pair',
+          description: 'Two serpent spirits attack together — one feints from the front while the second attacks from the flank. Sideways roll to dodge the feint, then immediately turn and strike the flanking serpent once. Alternate targets; do not fixate on one while the other repositions. Each serpent takes three strikes to defeat. A brief pause follows before Phase 2.',
+        },
+        {
+          phase: 'Phase 2 — Alpha Serpent',
+          description: 'A third serpent with a red glow appears — the Alpha. It directs the other two to attack simultaneously rather than in sequence. Prioritize the Alpha immediately: its weak point is on the back of its neck (glows brighter than its body). Strike the weak point twice to defeat it, which causes the two subordinate spirits to disperse. Attempting to defeat the subordinates first causes the Alpha to call continuous replacements.',
+        },
+      ],
+    },
     cleanupNotes: tips(
       'Breath control trial: maintain steady movement and do not sprint — sprinting depletes air faster',
       'Venom Thrust applies a poison damage-over-time effect that stacks twice',
@@ -621,10 +706,18 @@ export const QUESTS: Quest[] = [
     recommendedTiming: 'Available from Chapter 2. Bear\'s Roar pairs well with Stone Stance against grouped enemies.',
     bossInfo: {
       name: 'Storm Bear',
-      description: 'A spirit bear with charge attacks and lightning breath. Frontal breath attack covers a wide arc — stay on its flanks at all times. Strike after each charge during the recovery window.',
+      recommendedStance: 'Wind Stance',
+      weakness: 'Rear flank — frontal attacks are deflected; only side and rear strikes land full damage; no guard from behind',
+      description: 'A spirit bear with charge attacks and lightning breath. Its fur generates static electricity in Phase 2 — brief close contact causes shock feedback. Stay on its flanks at all times and strike during the recovery window after each charge.',
       phases: [
-        { phase: 'Phase 1', description: 'Charges and wide paw swipes. Circle to the flanks and strike twice after each charge finishes.' },
-        { phase: 'Phase 2', description: 'Adds lightning breath — when the bear lowers its head, immediately move to its side. Do not be directly in front.' },
+        {
+          phase: 'Phase 1 — Charge and Swipe',
+          description: 'Two primary attacks: Charge (lowers head sharply, holds for 1 second, then charges the full cave length — sidestep at 90° to the charge path and circle to the flank as it passes, strike twice during the skid-stop recovery), Wide Paw Swipe (raises one paw above shoulder height then sweeps — backstep then immediately flank and strike twice). Wind Stance\'s evasive step makes flanking fast. Phase ends at 50% health.',
+        },
+        {
+          phase: 'Phase 2 — Lightning Breath + Static Aura',
+          description: 'Gains Lightning Breath: the bear lowers its head slowly and gradually — distinct from the sharp sudden drop of the charge tell — then exhales a sustained electrical stream covering the full forward arc. Move to its side immediately on the slow head-drop, not after the breath starts. Its fur also generates a Static Aura — each strike causes minor shock feedback. Strike once per approach then immediately withdraw before the aura accumulates. Phase ends on full health depletion.',
+        },
       ],
     },
     cleanupNotes: tips(
@@ -681,6 +774,22 @@ export const QUESTS: Quest[] = [
     missable: false,
     overview: 'An old sea archer on the Oshima Coast speaks of an arrow that follows the arc of the moon. A series of lighthouse-to-lighthouse archery puzzles guide Atsu to an island shrine only accessible at low tide during the crescent moon phase. The bow awaits at the shrine altar.',
     recommendedTiming: 'Available from Chapter 3. Moon Shot\'s piercing property makes it essential for grouped archers.',
+    bossInfo: {
+      name: 'Guardian of the Crescent Moon',
+      recommendedStance: 'Moon Stance',
+      weakness: 'Lead Guardian: rushes to melee quickly when pressured — close the gap before she establishes a bow position',
+      description: 'Three guardian spirit archers defend the island shrine path, led by a named Lead Guardian who uses wind-curved arrow shots. The guardians coordinate fire to cover angles — advance directly on the Lead Guardian rather than picking off flankers first.',
+      phases: [
+        {
+          phase: 'Phase 1 — Coordinated Fire',
+          description: 'Three archers in a triangle formation — Lead Guardian center, two flankers left and right. They fire in sequence covering alternating angles, with a 1.5-second gap when all three are reloading simultaneously. Advance directly on the Lead Guardian using center-line movement. Lead Guardian uses Wind Arrow (curves 30° at range — track the arc and adjust position laterally) and Pinning Shot (fires at the ground ahead of you slowing movement if it hits — dodge sideways on the windup animation). Defeat both flankers to trigger Phase 2.',
+        },
+        {
+          phase: 'Phase 2 — Lead Guardian Solo',
+          description: 'The Lead Guardian draws a short blade and alternates between bow and melee. Bow mode: she fires three rapid shots then pauses to redraw — rush her during the draw pause. Melee mode: three-hit combo ending with a knockback push — parry the first two hits, dodge the third. Moon Stance thrusts reach her effectively during her bow-draw animation before she can redraw. Phase ends on her health depletion.',
+        },
+      ],
+    },
     cleanupNotes: tips(
       'Low tide only occurs at dawn and dusk — rest at the coastal campfire to time the crossing',
       'Moon Shot fires an arrow that pierces through all enemies in a straight line',

@@ -54,6 +54,34 @@ export function BossInfoCard({ bossInfo }: Props) {
             {bossInfo.description}
           </Text>
 
+          {/* Weakness & Recommended Stance */}
+          {(bossInfo.recommendedStance || bossInfo.weakness) && (
+            <View style={styles.meta}>
+              {bossInfo.recommendedStance && (
+                <View style={styles.metaRow}>
+                  <Ionicons name="shield-outline" size={12} color={BOSS_RED} />
+                  <Text style={[styles.metaLabel, { color: colors.mutedForeground }]}>
+                    Stance:{' '}
+                  </Text>
+                  <Text style={[styles.metaValue, { color: colors.foreground }]}>
+                    {bossInfo.recommendedStance}
+                  </Text>
+                </View>
+              )}
+              {bossInfo.weakness && (
+                <View style={styles.metaRow}>
+                  <Ionicons name="flash-outline" size={12} color={BOSS_RED} />
+                  <Text style={[styles.metaLabel, { color: colors.mutedForeground }]}>
+                    Weakness:{' '}
+                  </Text>
+                  <Text style={[styles.metaValue, { color: colors.foreground }]}>
+                    {bossInfo.weakness}
+                  </Text>
+                </View>
+              )}
+            </View>
+          )}
+
           {/* Phases */}
           {bossInfo.phases && bossInfo.phases.length > 0 && (
             <View style={styles.phases}>
@@ -144,5 +172,23 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: 'Inter_400Regular',
     lineHeight: 19,
+  },
+  meta: {
+    gap: 5,
+  },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 5,
+  },
+  metaLabel: {
+    fontSize: 12,
+    fontFamily: 'Inter_600SemiBold',
+  },
+  metaValue: {
+    fontSize: 12,
+    fontFamily: 'Inter_400Regular',
+    flex: 1,
+    lineHeight: 17,
   },
 });
