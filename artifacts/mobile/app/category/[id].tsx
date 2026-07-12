@@ -5,7 +5,9 @@ import {
   StyleSheet,
   TouchableOpacity,
   Text,
+  ScrollView,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, Stack, router } from 'expo-router';
 import { useColors } from '@/hooks/useColors';
 import { useProgress } from '@/context/ProgressContext';
@@ -16,7 +18,7 @@ import { SearchBar } from '@/components/SearchBar';
 
 type FilterType = 'all' | 'complete' | 'in_progress' | 'not_started';
 
-const FILTERS: { id: FilterType; label: string }[] = [
+const STATUS_FILTERS: { id: FilterType; label: string }[] = [
   { id: 'all', label: 'All' },
   { id: 'complete', label: 'Done' },
   { id: 'in_progress', label: 'In Progress' },
@@ -28,13 +30,22 @@ export default function CategoryDetailScreen() {
   const colors = useColors();
   const { state } = useProgress();
   const [search, setSearch] = useState('');
-  const [filter, setFilter] = useState<FilterType>('all');
+  const [statusFilter, setStatusFilter] = useState<FilterType>('all');
+  const [regionFilter, setRegionFilter] = useState<string>('');
 
   const category = getCategoryById(id ?? '');
   const allQuests = useMemo(
     () => getQuestsByCategory((id ?? '') as import('@/data/categories').CategoryId),
     [id],
   );
+
+  // Derive sorted unique regions from this category's quests
+  const regions = useMemo(() => {
+    const set = new Set(allQuests.map(q => q.region));
+    return Array.from(set).sort();
+  }, [allQuests]);
+
+  const showRegionFilter = regions.length > 1;
 
   const quests = useMemo(() => {
     return allQuests.filter(quest => {
@@ -43,10 +54,12 @@ export default function CategoryDetailScreen() {
       const isInProgress =
         !isComplete && Object.values(taskState).some(Boolean);
 
-      if (filter === 'complete' && !isComplete) return false;
-      if (filter === 'in_progress' && !isInProgress) return false;
-      if (filter === 'not_started' && (isComplete || isInProgress))
+      if (statusFilter === 'complete' && !isComplete) return false;
+      if (statusFilter === 'in_progress' && !isInProgress) return false;
+      if (statusFilter === 'not_started' && (isComplete || isInProgress))
         return false;
+
+      if (regionFilter && quest.region !== regionFilter) return false;
 
       if (search.trim()) {
         const q = search.toLowerCase();
@@ -58,7 +71,10 @@ export default function CategoryDetailScreen() {
       }
       return true;
     });
-  }, [allQuests, state, filter, search]);
+  }, [allQuests, state, statusFilter, regionFilter, search]);
+
+  const activeFilterCount =
+    (statusFilter !== 'all' ? 1 : 0) + (regionFilter ? 1 : 0);
 
   return (
     <>
@@ -84,38 +100,148 @@ export default function CategoryDetailScreen() {
               onChangeText={setSearch}
               placeholder="Search quests..."
             />
-            <View style={styles.filters}>
-              {FILTERS.map(f => (
-                <TouchableOpacity
-                  key={f.id}
-                  style={[
-                    styles.pill,
-                    {
-                      backgroundColor:
-                        filter === f.id ? colors.primary : colors.card,
-                      borderColor:
-                        filter === f.id ? colors.primary : colors.border,
-                    },
-                  ]}
-                  onPress={() => setFilter(f.id)}
-                  activeOpacity={0.75}
+
+            {/* Status filter */}
+            <View style={styles.filterSection}>
+              <Text style={[styles.filterLabel, { color: colors.mutedForeground }]}>
+                Status
+              </Text>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.chipRow}
+              >
+                {STATUS_FILTERS.map(f => {
+                  const active = statusFilter === f.id;
+                  return (
+                    <TouchableOpacity
+                      key={f.id}
+                      style={[
+                        styles.pill,
+                        {
+                          backgroundColor: active ? colors.primary : colors.card,
+                          borderColor: active ? colors.primary : colors.border,
+                        },
+                      ]}
+                      onPress={() => setStatusFilter(f.id)}
+                      activeOpacity={0.75}
+                    >
+                      <Text
+                        style={[
+                          styles.pillText,
+                          {
+                            color: active
+                              ? colors.primaryForeground
+                              : colors.mutedForeground,
+                          },
+                        ]}
+                      >
+                        {f.label}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </ScrollView>
+            </View>
+
+            {/* Region filter — only shown when the category spans multiple regions */}
+            {showRegionFilter && (
+              <View style={styles.filterSection}>
+                <Text style={[styles.filterLabel, { color: colors.mutedForeground }]}>
+                  Region
+                </Text>
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.chipRow}
                 >
-                  <Text
+                  {/* "All regions" chip */}
+                  <TouchableOpacity
                     style={[
-                      styles.pillText,
+                      styles.pill,
                       {
-                        color:
-                          filter === f.id
-                            ? colors.primaryForeground
-                            : colors.mutedForeground,
+                        backgroundColor: !regionFilter ? colors.primary : colors.card,
+                        borderColor: !regionFilter ? colors.primary : colors.border,
                       },
                     ]}
+                    onPress={() => setRegionFilter('')}
+                    activeOpacity={0.75}
                   >
-                    {f.label}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+                    <Text
+                      style={[
+                        styles.pillText,
+                        {
+                          color: !regionFilter
+                            ? colors.primaryForeground
+                            : colors.mutedForeground,
+                        },
+                      ]}
+                    >
+                      All
+                    </Text>
+                  </TouchableOpacity>
+
+                  {regions.map(region => {
+                    const active = regionFilter === region;
+                    return (
+                      <TouchableOpacity
+                        key={region}
+                        style={[
+                          styles.pill,
+                          {
+                            backgroundColor: active ? colors.primary : colors.card,
+                            borderColor: active ? colors.primary : colors.border,
+                          },
+                        ]}
+                        onPress={() =>
+                          setRegionFilter(active ? '' : region)
+                        }
+                        activeOpacity={0.75}
+                      >
+                        <Text
+                          style={[
+                            styles.pillText,
+                            {
+                              color: active
+                                ? colors.primaryForeground
+                                : colors.mutedForeground,
+                            },
+                          ]}
+                          numberOfLines={1}
+                        >
+                          {region}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </ScrollView>
+              </View>
+            )}
+
+            {/* Active filter summary */}
+            {activeFilterCount > 0 && (
+              <TouchableOpacity
+                style={styles.clearRow}
+                onPress={() => {
+                  setStatusFilter('all');
+                  setRegionFilter('');
+                }}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="close-circle" size={14} color={colors.mutedForeground} />
+                <Text style={[styles.clearText, { color: colors.mutedForeground }]}>
+                  Clear {activeFilterCount} filter{activeFilterCount > 1 ? 's' : ''}
+                  {'  ·  '}
+                  {quests.length} of {allQuests.length} quests
+                </Text>
+              </TouchableOpacity>
+            )}
+
+            {activeFilterCount === 0 && (
+              <Text style={[styles.countText, { color: colors.mutedForeground }]}>
+                {allQuests.length} quest{allQuests.length !== 1 ? 's' : ''}
+              </Text>
+            )}
           </View>
         }
         renderItem={({ item }) => {
@@ -140,17 +266,28 @@ export default function CategoryDetailScreen() {
               color={colors.mutedForeground}
             />
             <Text style={[styles.emptyText, { color: colors.mutedForeground }]}>
-              No quests match your filter
+              No quests match your filters
             </Text>
+            {(activeFilterCount > 0 || search.trim()) && (
+              <TouchableOpacity
+                onPress={() => {
+                  setStatusFilter('all');
+                  setRegionFilter('');
+                  setSearch('');
+                }}
+                activeOpacity={0.7}
+              >
+                <Text style={[styles.emptyLink, { color: colors.primary }]}>
+                  Clear all filters
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
         }
       />
     </>
   );
 }
-
-// Ionicons import needed for empty state
-import { Ionicons } from '@expo/vector-icons';
 
 const styles = StyleSheet.create({
   list: {
@@ -159,12 +296,21 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingVertical: 16,
-    gap: 12,
+    gap: 10,
   },
-  filters: {
+  filterSection: {
+    gap: 6,
+  },
+  filterLabel: {
+    fontSize: 11,
+    fontFamily: 'Inter_500Medium',
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+  },
+  chipRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
     gap: 8,
+    paddingRight: 4,
   },
   pill: {
     paddingHorizontal: 14,
@@ -176,6 +322,21 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: 'Inter_500Medium',
   },
+  clearRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingTop: 2,
+  },
+  clearText: {
+    fontSize: 12,
+    fontFamily: 'Inter_400Regular',
+  },
+  countText: {
+    fontSize: 12,
+    fontFamily: 'Inter_400Regular',
+    paddingTop: 2,
+  },
   empty: {
     paddingVertical: 48,
     alignItems: 'center',
@@ -184,5 +345,10 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 14,
     fontFamily: 'Inter_400Regular',
+  },
+  emptyLink: {
+    fontSize: 14,
+    fontFamily: 'Inter_500Medium',
+    marginTop: 4,
   },
 });
