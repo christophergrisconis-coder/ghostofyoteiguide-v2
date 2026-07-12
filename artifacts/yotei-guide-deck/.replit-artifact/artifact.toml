@@ -1,0 +1,27 @@
+kind = "slides"
+previewPath = "/yotei-guide-deck/"
+title = "Ghost of Yotei Guide — Dev Deck"
+version = "1.0.0"
+id = "artifacts/yotei-guide-deck"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/yotei-guide-deck/" ]
+localPort = 23085
+
+[services.development]
+run = "pnpm --filter @workspace/yotei-guide-deck run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/yotei-guide-deck", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/yotei-guide-deck/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23085"
+BASE_PATH = "/yotei-guide-deck/"

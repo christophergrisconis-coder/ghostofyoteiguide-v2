@@ -1,0 +1,58 @@
+[
+  {
+    "id": "c1a2b3d4-e5f6-7890-abcd-ef1234567801",
+    "position": 1,
+    "filepath": "src/pages/slides/Slide1Title.tsx",
+    "title": "Ghost of Yotei Guide",
+    "description": "Title slide — hero image with app overview",
+    "speakerNotes": ""
+  },
+  {
+    "id": "c1a2b3d4-e5f6-7890-abcd-ef1234567802",
+    "position": 2,
+    "filepath": "src/pages/slides/Slide2WhatItDoes.tsx",
+    "title": "What It Does",
+    "description": "App overview — tabs, completion tracking, dashboard",
+    "speakerNotes": ""
+  },
+  {
+    "id": "c1a2b3d4-e5f6-7890-abcd-ef1234567803",
+    "position": 3,
+    "filepath": "src/pages/slides/Slide3DataCoverage.tsx",
+    "title": "Data Coverage",
+    "description": "119 quests, 319 collectibles, 54 trophies, 6 regions",
+    "speakerNotes": ""
+  },
+  {
+    "id": "c1a2b3d4-e5f6-7890-abcd-ef1234567804",
+    "position": 4,
+    "filepath": "src/pages/slides/Slide4TechStack.tsx",
+    "title": "Tech Stack",
+    "description": "Expo 54, React Native, Expo Router, AsyncStorage, TanStack Query",
+    "speakerNotes": ""
+  },
+  {
+    "id": "c1a2b3d4-e5f6-7890-abcd-ef1234567805",
+    "position": 5,
+    "filepath": "src/pages/slides/Slide5KeyFeatures.tsx",
+    "title": "Key Features",
+    "description": "Composable filters, auto-backup, issue reporting, queue cap",
+    "speakerNotes": ""
+  },
+  {
+    "id": "c1a2b3d4-e5f6-7890-abcd-ef1234567806",
+    "position": 6,
+    "filepath": "src/pages/slides/Slide6BuildPublish.tsx",
+    "title": "Build & Publish",
+    "description": "Bundle ID, EAS profiles, versioning",
+    "speakerNotes": ""
+  },
+  {
+    "id": "c1a2b3d4-e5f6-7890-abcd-ef1234567807",
+    "position": 7,
+    "filepath": "src/pages/slides/Slide7OpenWork.tsx",
+    "title": "Open Work",
+    "description": "5 proposed next tasks",
+    "speakerNotes": ""
+  }
+]
