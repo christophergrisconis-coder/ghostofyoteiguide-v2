@@ -375,8 +375,8 @@ export default function SettingsScreen() {
         </Text>
         <Text style={[styles.aboutBody, { color: colors.mutedForeground }]}>
           A data-first 100% completion guide for Ghost of Yotei. Track your
-          progress through all quests, collectibles, and trophies. Built for
-          Expo Go on iOS and Android.
+          progress through all quests, collectibles, and trophies. Available on
+          iOS and Android.
         </Text>
         <Text
           style={[
