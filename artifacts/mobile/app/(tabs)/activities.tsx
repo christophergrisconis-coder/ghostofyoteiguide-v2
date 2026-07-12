@@ -39,12 +39,21 @@ type Section = {
 // Derive region list from actual activity data
 const ALL_REGIONS = [...new Set(WORLD_ACTIVITIES.map(a => a.region))].sort();
 
+type StatusFilter = 'all' | 'remaining' | 'done';
+
+const STATUS_FILTERS: { id: StatusFilter; label: string }[] = [
+  { id: 'all', label: 'All' },
+  { id: 'remaining', label: 'Remaining' },
+  { id: 'done', label: 'Done' },
+];
+
 export default function ActivitiesScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { state, toggleCollectible } = useProgress();
   const [query, setQuery] = useState('');
   const [regionFilter, setRegionFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
 
   const sections: Section[] = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -57,6 +66,11 @@ export default function ActivitiesScreen() {
       let items = allItems;
       if (regionFilter) {
         items = items.filter(a => a.region === regionFilter);
+      }
+      if (statusFilter === 'remaining') {
+        items = items.filter(a => !state.collectibleCompletion[a.id]);
+      } else if (statusFilter === 'done') {
+        items = items.filter(a => !!state.collectibleCompletion[a.id]);
       }
       if (q) {
         items = items.filter(
@@ -76,9 +90,9 @@ export default function ActivitiesScreen() {
         data: items,
       };
     }).filter(s => s.data.length > 0);
-  }, [state.collectibleCompletion, query, regionFilter]);
+  }, [state.collectibleCompletion, query, regionFilter, statusFilter]);
 
-  const isFiltering = query.trim().length > 0 || !!regionFilter;
+  const isFiltering = query.trim().length > 0 || !!regionFilter || statusFilter !== 'all';
 
   return (
     <SectionList
@@ -121,6 +135,49 @@ export default function ActivitiesScreen() {
               autoCorrect={false}
               autoCapitalize="none"
             />
+          </View>
+
+          {/* Status filter */}
+          <View style={styles.filterSection}>
+            <Text style={[styles.filterLabel, { color: colors.mutedForeground }]}>
+              STATUS
+            </Text>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.chipRow}
+            >
+              {STATUS_FILTERS.map(f => {
+                const active = statusFilter === f.id;
+                return (
+                  <TouchableOpacity
+                    key={f.id}
+                    style={[
+                      styles.pill,
+                      {
+                        backgroundColor: active ? colors.primary : colors.card,
+                        borderColor: active ? colors.primary : colors.border,
+                      },
+                    ]}
+                    onPress={() => setStatusFilter(f.id)}
+                    activeOpacity={0.75}
+                  >
+                    <Text
+                      style={[
+                        styles.pillText,
+                        {
+                          color: active
+                            ? colors.primaryForeground
+                            : colors.mutedForeground,
+                        },
+                      ]}
+                    >
+                      {f.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
           </View>
 
           {/* Region filter */}
@@ -205,6 +262,7 @@ export default function ActivitiesScreen() {
               onPress={() => {
                 setQuery('');
                 setRegionFilter('');
+                setStatusFilter('all');
               }}
               activeOpacity={0.7}
             >
