@@ -23,8 +23,16 @@ import {
 import { ChecklistItem } from '@/components/ChecklistItem';
 import { ProgressBar } from '@/components/ProgressBar';
 
-// Only show categories that have items in the dataset
-const ACTIVE_CATEGORIES: ActivityCategory[] = ['liberation', 'duel', 'haiku', 'vanity'];
+// All activity categories present in the dataset
+const ACTIVE_CATEGORIES: ActivityCategory[] = [
+  'camp',
+  'dueling_tree',
+  'wolf_den',
+  'bamboo_strike',
+  'shrine_climb',
+  'hot_spring',
+  'sumi_e',
+];
 
 type Section = {
   catId: ActivityCategory;

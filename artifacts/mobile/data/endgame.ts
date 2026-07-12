@@ -1,6 +1,6 @@
 // Endgame guidance for Ghost of Yōtei 100% completion
-// Cleanup roadmap: recommended completion order based on the ghost franchise pattern
-// NG+ details: all specifics are pre-release estimates — flagged accordingly
+// Updated post-launch (October 2025) against confirmed trophy list and activity counts.
+// Sources: powerpyx.com, allthings.how, pushsquare.com
 
 export interface CleanupStep {
   order: number;
@@ -25,167 +25,139 @@ export interface NGPlusInfo {
 }
 
 // ── Cleanup Roadmap ──────────────────────────────────────────────────────────
-// Recommended order to reach 100% without backtracking or missed content.
-// Based on Ghost of Tsushima franchise structure — verify against final game.
+// Recommended order to reach 100% without backtracking.
+// No trophies are missable — full free-roam is available after the story ends.
 
 export const CLEANUP_ROADMAP: CleanupStep[] = [
   {
     order: 1,
     title: 'Complete the Main Story',
     description:
-      'Finish all 10 main story quests in order. Do not rush — side content encountered on the way can be done now or cleaned up later.',
+      'Finish all main tale missions to unlock The Onryō Rests (gold trophy). Do not rush — side content can be cleaned up in free-roam afterward. Nothing is permanently missable.',
     effort: '~8–10 hrs',
   },
   {
     order: 2,
-    title: 'Do bnty_04 (Black Powder Ippei) BEFORE Saito Compound',
+    title: 'Complete the 3 Weapon Master questlines',
     description:
-      'Accept this bounty from the Yotei Grasslands board immediately — a known bug permanently removes it if you visit the Saito Compound first.',
-    effort: '15 min',
-    warning:
-      'Missable: permanent lock if Saito Compound is approached first. Accept this before any story mission that takes you east of the Grasslands.',
+      'Finish Way of the Yari (Sensei Takahashi), Way of the Kusarigama (Master Enomoto), and Way of the Odachi (Master Yoshida) for three Silver trophies. These also unlock combat moves needed for several Bronze trophies.',
+    effort: '~3–5 hrs',
   },
   {
     order: 3,
-    title: 'Clear all 7 Mythic Tales',
+    title: 'Complete all 31 Bounties',
     description:
-      'Mythic Tales unlock the best techniques and weapons. Several are region-gated — do them as you open each region during the story to avoid backtracking.',
-    effort: '~3–4 hrs',
-  },
-  {
-    order: 4,
-    title: 'Complete all 4 Sensei companion arcs',
-    description:
-      'The 20 Sensei Tales run across 4 companions (Jubei, Kei, Tomoe, Riku — 5 quests each). Finish each arc fully before the end of the story to unlock companions for The Reckoning.',
-    effort: '~5–6 hrs',
-    warning: 'Completing each arc before the final main quest unlocks that companion as an ally in The Reckoning.',
-  },
-  {
-    order: 5,
-    title: 'Finish all 31 Bounty Quests',
-    description:
-      'Bounties are available in any order and persist after the story. The final bounty (The Shadow of Ezo) unlocks only after all 30 others are complete.',
+      'Accept bounties from regional boards and Kojiro the Bounty Broker. All 31 remain available after the story ends. Completing all earns Master Bounty Hunter (gold trophy).',
     effort: '~4–5 hrs',
   },
   {
-    order: 6,
-    title: 'Complete all 48 Side Tales',
+    order: 4,
+    title: 'Clear all 22 Yōtei Six Camps',
     description:
-      'Side Tales are region-spread across all 6 areas. Track by region in the Quests screen. None are missable after the story ends.',
-    effort: '~10–12 hrs',
+      'Clear all red-marker camps across every region to earn For the Living (silver trophy). Each cleared camp also contains an Altar of Reflection — pray at all 22, then find 8 more Altars in the open world for Moments of Reflection (silver).',
+    effort: '~3–4 hrs',
+    warning:
+      'Some hidden camps in Teshio Ridge require solving fox-statue shrine puzzles. Check the Activities tab for tips on each camp.',
+  },
+  {
+    order: 5,
+    title: 'Complete the Takezo the Unrivalled mythic tale',
+    description:
+      'Find and duel all 6 Dueling Trees across Ezo (Yotei Grasslands and Tokachi Range only), then face Takezo on the peak of Mount Yōtei for the Unrivaled bronze trophy.',
+    effort: '~1–2 hrs',
+  },
+  {
+    order: 6,
+    title: 'Clear all 10 Wolf Dens',
+    description:
+      'Find each Wolf Den mound (tree on a rock with enemy corpses), trigger the wolf, follow it to the Trapper camp, and kill all enemies. All 10 earns Wolves of Ezo (bronze). Each also rewards a Technique Point for wolf upgrades.',
+    effort: '~1–2 hrs',
   },
   {
     order: 7,
-    title: 'Clear the 3 Post-Story epilogue quests',
+    title: 'Complete all Bamboo Strikes, Shrine Climbs, and Hot Springs',
     description:
-      'Three endgame quests unlock after the main story concludes. Complete these to close out all quest categories.',
-    effort: '~1–2 hrs',
+      '15 Bamboo Strikes (2 are story auto-completes), 13 Shrine Climbs (1 is story auto-complete during The Oni), and 16 Hot Springs across all regions. All three completed together earns Body, Mind, and Spirit (silver trophy). Completing all Shrine Climbs also unlocks the Golden Mask; all Hot Springs unlock the Fundoshi Armor Set.',
+    effort: '~4–6 hrs',
   },
   {
     order: 8,
-    title: 'Liberate all 18 settlements',
+    title: 'Complete all 15 open-world Sumi-e Paintings',
     description:
-      'Work through all 6 regions systematically. Liberating settlements unlocks smiths, merchants, and late-game upgrade materials.',
-    effort: '~3–4 hrs',
-    verificationNeeded: true,
+      'Find all 15 open-world Sumi-e Painting viewpoints (not the 3 quest-related ones, which do not count). Sit on the mat and swipe the Touchpad to draw. Earns An Artist\'s Eye (bronze trophy). Each painting rewards a cosmetic Hat, Headband, or Mask.',
+    effort: '~1 hr',
   },
   {
     order: 9,
-    title: 'Collect all region-specific collectibles',
+    title: 'Collect all Armor sets and complete all Fox Dens',
     description:
-      'Clear one region at a time: Ainu Sacred Sites → Sumi-e Paintings → Ancient Maps → Clan Trophies → Hot Springs → Bamboo Strikes → Shrines → Puzzle Boxes. Per-region filters in the Collectibles screen help track what is left.',
-    effort: '~8–12 hrs',
-    verificationNeeded: true,
+      'Acquire all Armor sets for For All Occasions (silver). Complete all 11 Fox Dens to receive the Fox Mask cosmetic and Guardian of Inari (bronze). Also collect all 7 Shamisen songs for Like Mother, Like Daughter (bronze) and solve all 12 Nine Tails Puzzle Boxes for Trickster Fox (bronze).',
+    effort: '~3–5 hrs',
   },
   {
     order: 10,
-    title: 'Complete all Haiku stations and Dueling Circles',
+    title: 'Acquire all weapons and upgrade the Wolf Blade',
     description:
-      'Haiku stations and dueling circles are scattered across all 6 regions. Use the Activities checklist (this screen) to track completion.',
+      'Collect all Melee, Ranged, and Quickfire weapons for Tools of a Warrior, Take Aim, and Quick Draw (all bronze). Fully upgrade the Wolf Blade with high-end materials (Metals, Oni Raider Mask Pieces, Shinobi Steel, Gun Parts, Rare Metals) for Like Father, Like Daughter (bronze).',
     effort: '~2–3 hrs',
-    verificationNeeded: true,
   },
   {
     order: 11,
-    title: 'Finish all Vanity Challenges',
+    title: 'Mop-up: combat, exploration, and misc bronze trophies',
     description:
-      'The final Vanity Challenge (Ultimate Warrior) unlocks only after all 7 Mythic Tales are done. Complete all others first.',
-    effort: '~1 hr',
-    verificationNeeded: true,
+      'Check remaining bronzes: From the Hip (Pistol Parry), The Owl\'s Talon (Kusarigama ranged kill), Sayonara (cliff knockoff), You Dropped This (disarm+return kill), The Horror (20 Onryō\'s Howl collapses), Wolf Bait, Brush Fire, Spear Fishing (5 fish with yari), Good with Coins (win a zeni hajiki charm), Fireside Performance, Speaking with the Land (10 special places), Gifts for a Ghost (8 offerings), Purely Decorative (30 Vanity Gear pieces), Charming (upgrade 10 charms), Memento (Photo Mode), Inheritance (Mount Yōtei summit charms).',
+    effort: '~2–4 hrs',
   },
   {
     order: 12,
-    title: 'Upgrade all weapons and armour to T5',
+    title: 'New Game Plus (not required for any trophy)',
     description:
-      'Requires liberated settlement smiths in every region. Farm late-game materials from Nayoro Wilds and Oshima Coast. Check the Upgrades tab for material requirements.',
-    effort: '~2–3 hrs',
-    verificationNeeded: true,
-  },
-  {
-    order: 13,
-    title: 'Mop-up: check trophy list and fill remaining gaps',
-    description:
-      'Open the Trophies screen and scan for any bronze/silver that have not triggered. Common gaps: haiku count, duel count, specific technique use, Sumi-e paintings.',
-    effort: '~1–2 hrs',
-  },
-  {
-    order: 14,
-    title: 'New Game Plus sweep (if applicable)',
-    description:
-      'NG+ likely resets quest completion but carries over techniques and cosmetics. Use a second playthrough to reach any missed trophies that require specific story choices.',
-    effort: 'Variable',
+      'Ghost of Yōtei does not require New Game Plus for any trophies. All content is available in free-roam after the story. NG+ may be added as a future update.',
+    effort: 'N/A',
     verificationNeeded: true,
   },
 ];
 
 // ── New Game Plus overview ────────────────────────────────────────────────────
-// Based on Ghost of Tsushima NG+ pattern — all specifics need verification.
+// NG+ was not included at launch (October 2025). Details below are estimates
+// based on the Ghost of Tsushima franchise pattern and may be updated if Sucker
+// Punch adds NG+ as post-launch content.
 
 export const NG_PLUS_INFO: NGPlusInfo = {
   overview:
-    'Ghost of Yōtei is expected to include a New Game Plus mode based on the franchise pattern. All details below are pre-release estimates — update this section once the game ships and NG+ is confirmed.',
+    'Ghost of Yōtei did not include New Game Plus at launch (October 2025). No trophies require NG+. If NG+ is added in a post-launch update, this section will be updated with confirmed details.',
   verificationNeeded: true,
   carriesOver: [
     {
       label: 'All unlocked techniques and skills',
-      detail: 'Your full skill tree carries into NG+.',
+      detail: 'Expected: full skill tree carries into NG+ (based on franchise pattern).',
       verificationNeeded: true,
     },
     {
       label: 'Cosmetics and dye colours',
-      detail: 'All unlocked armour cosmetics and dyes are retained.',
-      verificationNeeded: true,
-    },
-    {
-      label: 'Charms collected',
-      detail: 'Shrine charms and slots carry over.',
+      detail: 'Expected: all unlocked armour cosmetics and dyes retained.',
       verificationNeeded: true,
     },
     {
       label: 'Weapon upgrade tiers',
-      detail: 'All weapons remain at their NG upgrade tier.',
+      detail: 'Expected: all weapons remain at their current upgrade tier.',
       verificationNeeded: true,
     },
   ],
   resets: [
     {
       label: 'Quest completion',
-      detail: 'All quests restart from the beginning.',
+      detail: 'Expected: all quests restart from the beginning.',
       verificationNeeded: true,
     },
     {
-      label: 'Collectible progress',
-      detail: 'Collectibles reset — all must be found again.',
-      verificationNeeded: true,
-    },
-    {
-      label: 'Settlement liberations',
-      detail: 'All settlements return to occupied status.',
+      label: 'Activity and collectible progress',
+      detail: 'Expected: Yōtei Six Camps, Wolf Dens, Bamboo Strikes, Hot Springs, Shrine Climbs, Sumi-e, and other activities reset.',
       verificationNeeded: true,
     },
     {
       label: 'Bounty board',
-      detail: 'All 31 bounties reset and must be re-accepted.',
+      detail: 'Expected: all 31 bounties reset and must be re-accepted.',
       verificationNeeded: true,
     },
   ],

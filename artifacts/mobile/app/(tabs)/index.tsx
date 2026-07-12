@@ -21,7 +21,10 @@ import { CategoryCard } from '@/components/CategoryCard';
 import { QuestCard } from '@/components/QuestCard';
 import { ProgressBar } from '@/components/ProgressBar';
 
-const ACTIVITY_CATS: ActivityCategory[] = ['liberation', 'duel', 'haiku', 'vanity'];
+// Derived from WORLD_ACTIVITIES so dashboard always stays in sync with the dataset
+const ACTIVITY_CATS: ActivityCategory[] = [
+  ...new Set(WORLD_ACTIVITIES.map(a => a.category)),
+] as ActivityCategory[];
 
 export default function DashboardScreen() {
   const colors = useColors();

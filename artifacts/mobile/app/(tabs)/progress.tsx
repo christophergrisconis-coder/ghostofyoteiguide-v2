@@ -25,7 +25,15 @@ import { PreReleaseNotice } from '@/components/PreReleaseNotice';
 import { CLEANUP_ROADMAP, NG_PLUS_INFO } from '@/data/endgame';
 
 // Summary-only: full checklist lives in the Activities tab
-const ACTIVITY_CATEGORIES: ActivityCategory[] = ['liberation', 'duel', 'haiku', 'vanity'];
+const ACTIVITY_CATEGORIES: ActivityCategory[] = [
+  'camp',
+  'dueling_tree',
+  'wolf_den',
+  'bamboo_strike',
+  'shrine_climb',
+  'hot_spring',
+  'sumi_e',
+];
 
 const ROADMAP_PREVIEW = 4; // steps shown before "Show all"
 
