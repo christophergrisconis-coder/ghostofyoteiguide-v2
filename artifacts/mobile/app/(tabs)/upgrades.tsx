@@ -10,6 +10,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '@/hooks/useColors';
+import { PreReleaseNotice } from '@/components/PreReleaseNotice';
 
 // ── Data ─────────────────────────────────────────────────────────────────────
 // All specific values flagged for verification once the final game ships and
@@ -177,9 +178,7 @@ export default function UpgradesScreen() {
       <Text style={[styles.heading, { color: colors.foreground }]}>
         Upgrades
       </Text>
-      <Text style={[styles.subheading, { color: colors.mutedForeground }]}>
-        Material costs and set bonuses are estimates — flagged for verification once the final game ships.
-      </Text>
+      <PreReleaseNotice message="Pre-release data — material costs, armour set names, and charm effects are estimates that will be updated once the game ships." />
 
       {/* ── Tab switcher ─────────────────────────────────────── */}
       <View

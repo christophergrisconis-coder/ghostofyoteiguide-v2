@@ -22,6 +22,7 @@ import {
 import { ProgressBar } from '@/components/ProgressBar';
 import { CompletionRing } from '@/components/CompletionRing';
 import { ChecklistItem } from '@/components/ChecklistItem';
+import { PreReleaseNotice } from '@/components/PreReleaseNotice';
 
 // Group activities by category for the checklist section
 const ACTIVITY_CATEGORIES: ActivityCategory[] = ['liberation', 'duel', 'haiku', 'vanity'];
@@ -188,6 +189,7 @@ export default function ProgressScreen() {
       </View>
 
       {/* ── World Activities ─────────────────────────────── */}
+      <PreReleaseNotice message="World activity names and locations are pre-release estimates — counts and names will be verified once the game ships." />
       {ACTIVITY_CATEGORIES.map(catId => {
         const items = WORLD_ACTIVITIES.filter(a => a.category === catId);
         if (items.length === 0) return null;

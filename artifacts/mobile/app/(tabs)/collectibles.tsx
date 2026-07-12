@@ -20,6 +20,7 @@ import {
 } from '@/data/collectibles';
 import { ChecklistItem } from '@/components/ChecklistItem';
 import { ProgressBar } from '@/components/ProgressBar';
+import { PreReleaseNotice } from '@/components/PreReleaseNotice';
 
 type Section = {
   groupId: CollectibleGroup;
@@ -93,6 +94,8 @@ export default function CollectiblesScreen() {
           <Text style={[styles.heading, { color: colors.foreground }]}>
             Collectibles
           </Text>
+
+          <PreReleaseNotice message="Pre-release data — collectible names and locations are estimates that will be updated once the game ships." />
 
           {/* Search */}
           <View
