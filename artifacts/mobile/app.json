@@ -1,11 +1,11 @@
 {
   "expo": {
     "name": "Ghost of Yotei Guide",
-    "slug": "mobile",
+    "slug": "ghost-of-yotei-guide",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "mobile",
+    "scheme": "ghost-of-yotei-guide",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "splash": {
@@ -14,10 +14,16 @@
       "backgroundColor": "#0A0A0F"
     },
     "ios": {
-      "supportsTablet": false
+      "supportsTablet": false,
+      "bundleIdentifier": "com.ghostofyoteiguide.app"
     },
     "android": {
-      "backgroundColor": "#0A0A0F"
+      "package": "com.ghostofyoteiguide.app",
+      "backgroundColor": "#0A0A0F",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/icon.png",
+        "backgroundColor": "#0A0A0F"
+      }
     },
     "web": {
       "favicon": "./assets/images/icon.png"
