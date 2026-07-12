@@ -1,0 +1,215 @@
+Revise my Ghost of Yotei Expo React Native app and keep EVERYTHING in one single App.js file.
+
+Important output rule:
+- Return one complete single-block App.js only
+- Do not split into multiple files
+- Do not create components in separate files
+- Do not create JSON files
+- Do not create helper files
+- Do not output partial snippets
+- Do not explain the code first
+- Just return one complete App.js that I can paste directly into Expo Snack
+
+Main goal:
+Fix the current UI and rewrite the mission system so expanded mission menus contain REAL detailed step-by-step instructions instead of generic filler.
+
+Current problem:
+The guide currently says vague things like:
+- talk to the relevant person
+- go to the quest location
+- complete the objective
+
+That is not acceptable.
+I need specific mission steps that tell the player exactly what to do and in what order.
+
+Very important example:
+The Prologue must explicitly include the flashback / return home / training progression and not stop at the early combat or Snake fight.
+The guide also needs to mention scouting, home sequence, shamisen, forge/tutorial, and training/duel progression in the opening mission.
+Do not leave out important progression beats.
+
+Reference direction:
+Use the structure and depth of IGN’s Ghost of Yotei walkthrough organization:
+- walkthrough hub
+- main mission walkthroughs
+- side quest walkthroughs
+- how-to guidance
+- interactive map/checklist thinking
+
+App requirements:
+- Expo Go compatible
+- One single App.js file only
+- React Native only
+- Fully interactive
+- Search bar
+- Category filters
+- Region filters
+- Progress tracking
+- Expand/collapse mission cards
+- Checkboxes for each step
+- Mission progress bars
+- Notes field per mission
+- Clean Japanese-inspired UI
+- Long-form readable mission detail layout
+
+Architecture rule:
+Even though this must stay in one single file, it still needs to be organized internally.
+Inside App.js, use:
+- reusable inline helper functions
+- reusable render functions
+- reusable components defined in the same file
+- structured mission data arrays/objects
+Do NOT make the code a giant messy repeated block.
+
+Mission data requirements:
+Each mission object must include:
+- id
+- title
+- category
+- region
+- act
+- unlockRequirements
+- recommendedTiming
+- estimatedDuration
+- rewards
+- missableWarning
+- bossInfo
+- followUpMission
+- overview
+- cleanupNotes
+- notes
+- expanded
+- steps array
+
+Each step must include:
+- id
+- title
+- detail
+- warning (optional)
+- tip (optional)
+- rewardNote (optional)
+- beforeLeaving (optional)
+- completed
+
+Critical writing rule:
+Every step must be specific.
+Do NOT write generic filler steps.
+
+Bad:
+- Talk to the NPC
+- Travel to the area
+- Complete the combat
+- Continue the mission
+
+Good:
+- Enter the house after clearing the street encounter to trigger the next wave and prevent wandering without progress
+- After defeating the Snake, do not assume the mission is over; use the next prompt to scout the marked destination and continue the return-home portion
+- Follow Jubei through the homestead until the memory/tutorial sequence begins
+- Complete the shamisen interaction when prompted before exploring further
+- Help at the forge to finish the home/tutorial chain before moving to the next family sequence
+- Finish the training and duel segment so the Prologue fully closes out correctly
+
+Content priority:
+The first priority is depth and accuracy for the early game.
+At minimum, fully detail:
+- Prologue
+- first several main missions
+- first several side missions
+- early training / sensei missions
+- any mission that teaches core mechanics
+
+If the entire game is too large for one file, then:
+- fully detail the Prologue with high accuracy
+- fully detail the next 5 to 10 major missions
+- create a clearly structured but lighter template format for later missions
+- but do NOT leave the Prologue or early missions generic
+
+Prologue requirements:
+The Prologue must be broken into detailed ordered steps and must cover:
+- opening setup
+- town progression
+- first enemy encounters
+- approach to the house
+- house fight
+- the Snake duel
+- what to do after the duel
+- scouting with the Spyglass
+- travel to childhood home
+- following Jubei
+- practicing shamisen
+- home exploration / past and present sequence
+- reliving memory / flashback progression
+- helping at the forge
+- following parents / family sequence
+- training / duel / practice completion
+Do not compress this into only a few short steps.
+
+Expanded mission UI requirements:
+When a mission expands, show:
+1. title and mission metadata
+2. overview
+3. unlock requirements
+4. rewards
+5. warning box if missable or easy to overlook progression exists
+6. boss/combat box if applicable
+7. detailed ordered step cards
+8. cleanup before leaving section
+9. notes field
+10. mission progress bar
+
+Step card UI requirements:
+Each step card should visibly show:
+- step number
+- checkbox
+- bold step title
+- long detailed instruction text
+- optional warning text in a highlighted style
+- optional tip text
+- optional reward note
+- optional “before leaving” note
+The UI must remain readable with long text.
+
+Filtering requirements:
+Allow filtering by:
+- category
+- region
+- act
+- complete/incomplete
+- boss missions
+- missable content
+
+Dashboard requirements:
+Show:
+- overall completion %
+- completed missions
+- in-progress missions
+- incomplete missions
+- collectibles tracked
+- next recommended mission
+- recently updated missions
+
+UI design direction:
+Use a Japanese-inspired visual theme that feels elegant and readable:
+- dark ink / parchment / indigo / muted gold / crimson accents
+- clean panels
+- readable spacing
+- clear section hierarchy
+- not neon
+- not cluttered
+- not gamey in a cheap way
+
+Code quality requirements:
+- one single App.js only
+- clean formatting
+- no syntax errors
+- no placeholders pretending to be detailed
+- no dead buttons
+- no fake tabs
+- all progress logic must work
+- all step checkboxes must work
+- expanded missions must not break layout
+- long mission text must wrap correctly
+- all data must render from structured arrays/objects in the same file
+
+Before finishing:
+Check for syntax correctness and make sure the file can paste into Expo Snack as one block.
+Then return only the full final App.js.
