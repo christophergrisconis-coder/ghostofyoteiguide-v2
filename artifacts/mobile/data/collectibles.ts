@@ -53,7 +53,7 @@ export const COLLECTIBLE_GROUPS: CollectibleGroupInfo[] = [
     color: '#4682B4',
     description: 'Thermal springs that permanently increase maximum health when soaked in.',
     total: 16,
-    trophy: 'Well of Spirit',
+    trophy: 'Body, Mind, and Spirit',
     guideUrl: 'https://www.100pguides.com/guides/ghost-of-yotei-all-hot-spring-locations/',
   },
   {
@@ -63,7 +63,7 @@ export const COLLECTIBLE_GROUPS: CollectibleGroupInfo[] = [
     color: '#B8860B',
     description: 'Button-timing challenges that increase Spirit and award Technique Points.',
     total: 15,
-    trophy: 'The Bamboo Path',
+    trophy: 'Body, Mind, and Spirit',
     guideUrl: 'https://www.powerpyx.com/ghost-of-yotei-all-bamboo-strike-locations/',
   },
   {
@@ -73,7 +73,7 @@ export const COLLECTIBLE_GROUPS: CollectibleGroupInfo[] = [
     color: '#C9A84C',
     description: 'Mountain shrines reached by climbing. Each grants a new Charm and a Charm slot.',
     total: 13,
-    trophy: 'Body, Mind and Spirit',
+    trophy: 'Body, Mind, and Spirit',
     guideUrl: 'https://www.powerpyx.com/ghost-of-yotei-all-shrine-climb-locations/',
   },
   {
@@ -83,7 +83,7 @@ export const COLLECTIBLE_GROUPS: CollectibleGroupInfo[] = [
     color: '#8B1A1A',
     description: 'Fox-spirit puzzle boxes hidden in caves and ruins. Each rewards a powerful charm.',
     total: 12,
-    trophy: 'Nine-Tails Champion',
+    trophy: 'Trickster Fox',
     guideUrl: 'https://www.powerpyx.com/ghost-of-yotei-all-collectibles-locations-guide/',
   },
   {
@@ -93,7 +93,6 @@ export const COLLECTIBLE_GROUPS: CollectibleGroupInfo[] = [
     color: '#4A9B6F',
     description: 'Indigenous Ainu spiritual locations preserving the history and culture of Ezo.',
     total: 80,
-    trophy: 'Ainu Wanderer',
     guideUrl: 'https://www.powerpyx.com/ghost-of-yotei-all-collectibles-locations-guide/',
   },
   {
@@ -103,7 +102,6 @@ export const COLLECTIBLE_GROUPS: CollectibleGroupInfo[] = [
     color: '#8B1A1A',
     description: 'Enemy clan relics and banners found inside outposts and fortresses.',
     total: 68,
-    trophy: 'Relic Hunter',
     guideUrl: 'https://www.powerpyx.com/ghost-of-yotei-all-collectibles-locations-guide/',
   },
   {
@@ -113,7 +111,6 @@ export const COLLECTIBLE_GROUPS: CollectibleGroupInfo[] = [
     color: '#9B59B6',
     description: 'Hidden treasure maps found in enemy strongholds that reveal secret locations.',
     total: 55,
-    trophy: 'Cartographer',
     guideUrl: 'https://www.powerpyx.com/ghost-of-yotei-all-collectibles-locations-guide/',
   },
 ];

@@ -566,7 +566,7 @@ export const QUESTS: Quest[] = [
       s('end_03', 1, 'Visit each of the five liberated settlements to witness their recovery', { detail: 'The five settlements are: Kasabe village, the Ishikari valley market, Huranui Mill, the Nayoro Wilds trading post, and the Matsumae harbor district. Each has a short environmental scene showing recovery.' }),
       s('end_03', 2, 'Speak with three survivors whose quests you completed — their lives have visibly changed', { detail: 'If you completed side tales across the five settlements, recognizable NPCs appear with updated dialogue. This is the payoff for completionist play.' }),
       s('end_03', 3, 'Travel to Mount Yotei and begin the ascent to the summit shrine', { detail: 'The path up Mount Yotei is a dedicated route that opens only now. No enemies. The ascent takes approximately four minutes of travel.' }),
-      s('end_03', 4, 'Make a final offering at Mount Yotei\'s summit shrine to trigger the true ending cutscene', { detail: 'Interact with the offering stone at the summit. The true ending cutscene plays. This cannot be skipped on first viewing.', rewardNote: 'True Ending cutscene plays; Platinum Progress milestone records completion; Trophy: Ezo\'s New Dawn unlocks' }),
+      s('end_03', 4, 'Make a final offering at Mount Yotei\'s summit shrine to trigger the true ending cutscene', { detail: 'Interact with the offering stone at the summit. The true ending cutscene plays. This cannot be skipped on first viewing.', rewardNote: 'True Ending cutscene plays; Platinum Progress milestone records completion' }),
     ],
     relatedQuests: [],
   },
