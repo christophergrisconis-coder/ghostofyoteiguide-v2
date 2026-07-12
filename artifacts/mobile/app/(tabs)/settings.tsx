@@ -15,6 +15,24 @@ import * as Haptics from 'expo-haptics';
 import { useColors } from '@/hooks/useColors';
 import { useProgress } from '@/context/ProgressContext';
 
+function formatBackupTime(iso: string | null): string {
+  if (!iso) return 'Never';
+  try {
+    const d = new Date(iso);
+    const now = new Date();
+    const diffMs = now.getTime() - d.getTime();
+    const diffMin = Math.floor(diffMs / 60_000);
+    if (diffMin < 1) return 'Just now';
+    if (diffMin < 60) return `${diffMin}m ago`;
+    const diffHr = Math.floor(diffMin / 60);
+    if (diffHr < 24) return `${diffHr}h ago`;
+    const diffDay = Math.floor(diffHr / 24);
+    return `${diffDay}d ago`;
+  } catch {
+    return 'Unknown';
+  }
+}
+
 function SettingRow({
   icon,
   label,
@@ -22,6 +40,7 @@ function SettingRow({
   onPress,
   danger,
   loading,
+  rightElement,
 }: {
   icon: string;
   label: string;
@@ -29,6 +48,7 @@ function SettingRow({
   onPress: () => void;
   danger?: boolean;
   loading?: boolean;
+  rightElement?: React.ReactNode;
 }) {
   const colors = useColors();
   const iconColor = danger ? colors.destructive : colors.primary;
@@ -60,6 +80,8 @@ function SettingRow({
       </View>
       {loading ? (
         <ActivityIndicator size="small" color={colors.mutedForeground} />
+      ) : rightElement ? (
+        rightElement
       ) : (
         <Ionicons
           name="chevron-forward"
@@ -74,9 +96,20 @@ function SettingRow({
 export default function SettingsScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { resetProgress, exportProgress, importProgress, stats } = useProgress();
+  const {
+    resetProgress,
+    exportProgress,
+    importProgress,
+    backupNow,
+    restoreFromBackup,
+    stats,
+    lastBackupAt,
+    hasPendingRestore,
+    dismissRestorePrompt,
+  } = useProgress();
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
+  const [isBacking, setIsBacking] = useState(false);
 
   const handleExport = async () => {
     setIsExporting(true);
@@ -119,6 +152,48 @@ export default function SettingsScreen() {
     );
   };
 
+  const handleBackupNow = async () => {
+    setIsBacking(true);
+    try {
+      const ok = await backupNow();
+      if (ok) {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      } else {
+        Alert.alert('Backup Failed', 'Could not write backup. Please try again.');
+      }
+    } catch {
+      Alert.alert('Backup Failed', 'Something went wrong.');
+    } finally {
+      setIsBacking(false);
+    }
+  };
+
+  const handleCloudRestore = () => {
+    Alert.alert(
+      'Restore from Auto-Backup',
+      'A backup from your previous install was found. Restore it now? Your current progress (if any) will be replaced.',
+      [
+        {
+          text: 'Dismiss',
+          style: 'cancel',
+          onPress: dismissRestorePrompt,
+        },
+        {
+          text: 'Restore',
+          onPress: async () => {
+            const result = await restoreFromBackup();
+            if (result.success) {
+              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+              Alert.alert('Restored', result.message);
+            } else {
+              Alert.alert('Restore Failed', result.message);
+            }
+          },
+        },
+      ],
+    );
+  };
+
   const handleReset = () => {
     Alert.alert(
       'Reset All Progress',
@@ -139,6 +214,9 @@ export default function SettingsScreen() {
     );
   };
 
+  const backupTimeLabel = formatBackupTime(lastBackupAt);
+  const showAutoBackup = Platform.OS !== 'web';
+
   return (
     <ScrollView
       style={{ backgroundColor: colors.background }}
@@ -155,6 +233,29 @@ export default function SettingsScreen() {
       <Text style={[styles.heading, { color: colors.foreground }]}>
         Settings
       </Text>
+
+      {/* Restore banner — shown only when a backup exists from a prior install */}
+      {hasPendingRestore && (
+        <TouchableOpacity
+          style={[
+            styles.restoreBanner,
+            { backgroundColor: colors.primary + '18', borderColor: colors.primary + '55' },
+          ]}
+          onPress={handleCloudRestore}
+          activeOpacity={0.8}
+        >
+          <Ionicons name="cloud-download-outline" size={20} color={colors.primary} />
+          <View style={styles.bannerText}>
+            <Text style={[styles.bannerTitle, { color: colors.primary }]}>
+              Previous backup found
+            </Text>
+            <Text style={[styles.bannerSub, { color: colors.mutedForeground }]}>
+              Tap to restore your progress from a prior install
+            </Text>
+          </View>
+          <Ionicons name="chevron-forward" size={15} color={colors.primary} />
+        </TouchableOpacity>
+      )}
 
       {/* App identity */}
       <View
@@ -207,7 +308,7 @@ export default function SettingsScreen() {
         ))}
       </View>
 
-      {/* Actions */}
+      {/* Data */}
       <View
         style={[
           styles.card,
@@ -219,6 +320,23 @@ export default function SettingsScreen() {
         >
           DATA
         </Text>
+
+        {/* Auto-backup status row — iOS/Android only */}
+        {showAutoBackup && (
+          <SettingRow
+            icon="cloud-outline"
+            label="Auto Backup"
+            sublabel={`Saved to device storage · Last backup: ${backupTimeLabel}`}
+            onPress={handleBackupNow}
+            loading={isBacking}
+            rightElement={
+              <Text style={[styles.backupNowLabel, { color: colors.primary }]}>
+                Back Up Now
+              </Text>
+            }
+          />
+        )}
+
         <SettingRow
           icon="share-outline"
           label="Export Progress"
@@ -268,6 +386,19 @@ export default function SettingsScreen() {
           Content references are based on pre-release information and may be
           updated after the game launches.
         </Text>
+        {showAutoBackup && (
+          <Text
+            style={[
+              styles.aboutBody,
+              { color: colors.mutedForeground, marginTop: 8 },
+            ]}
+          >
+            Your progress is automatically backed up to your device's document
+            storage, which iOS backs up to iCloud and Android backs up to
+            Google Drive. If you reinstall the app, you'll be offered to restore
+            your data on first launch.
+          </Text>
+        )}
       </View>
     </ScrollView>
   );
@@ -280,6 +411,23 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter_700Bold',
     letterSpacing: -0.5,
     marginBottom: 4,
+  },
+  restoreBanner: {
+    borderRadius: 12,
+    borderWidth: 1,
+    padding: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  bannerText: { flex: 1, gap: 2 },
+  bannerTitle: {
+    fontSize: 14,
+    fontFamily: 'Inter_600SemiBold',
+  },
+  bannerSub: {
+    fontSize: 12,
+    fontFamily: 'Inter_400Regular',
   },
   heroCard: {
     borderRadius: 14,
@@ -354,5 +502,9 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: 'Inter_400Regular',
     lineHeight: 19,
+  },
+  backupNowLabel: {
+    fontSize: 12,
+    fontFamily: 'Inter_600SemiBold',
   },
 });

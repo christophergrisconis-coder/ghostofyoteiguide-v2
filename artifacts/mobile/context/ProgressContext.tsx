@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
@@ -9,6 +9,14 @@ import { COLLECTIBLE_IDS, COLLECTIBLE_GROUPS } from '@/data/collectibles';
 import { TROPHIES } from '@/data/trophies';
 
 const STORAGE_KEY = '@ghost_yotei_v1';
+const LAST_BACKUP_KEY = '@ghost_yotei_last_backup_at';
+
+// The document directory is automatically backed up by iOS iCloud and Android
+// Auto Backup — so writing here gives "free" cloud safety without any SDK.
+const BACKUP_FILE =
+  Platform.OS !== 'web' && FileSystem.documentDirectory
+    ? FileSystem.documentDirectory + 'ghost-yotei-backup.json'
+    : '';
 
 interface ProgressState {
   questCompletion: Record<string, boolean>;
@@ -58,6 +66,8 @@ interface ProgressContextType {
   state: ProgressState;
   stats: CompletionStats;
   isLoaded: boolean;
+  lastBackupAt: string | null;
+  hasPendingRestore: boolean;
   toggleQuest: (questId: string) => void;
   toggleTask: (questId: string, taskIndex: number) => void;
   toggleCollectible: (collectibleId: string) => void;
@@ -66,12 +76,14 @@ interface ProgressContextType {
   resetProgress: () => void;
   exportProgress: () => Promise<void>;
   importProgress: () => Promise<{ success: boolean; message: string }>;
+  backupNow: () => Promise<boolean>;
+  restoreFromBackup: () => Promise<{ success: boolean; message: string }>;
+  dismissRestorePrompt: () => void;
 }
 
 const ProgressContext = createContext<ProgressContextType | undefined>(undefined);
 
 // Precompute valid ID sets to guard against stale keys from older app versions.
-// Completion counts only recognise IDs that exist in the current catalog.
 const VALID_QUEST_IDS = new Set(QUESTS.map(q => q.id));
 const VALID_TROPHY_IDS = new Set(TROPHIES.map(t => t.id));
 const TOTAL_COLLECTIBLES = COLLECTIBLE_GROUPS.reduce((sum, g) => sum + g.total, 0);
@@ -102,13 +114,11 @@ function computeStats(state: ProgressState): CompletionStats {
     cat.percentage = cat.total > 0 ? Math.round((cat.completed / cat.total) * 100) : 0;
   }
 
-  // Guard against stale collectible keys from older app versions.
   const completedCollectibles = Object.entries(state.collectibleCompletion).filter(
     ([id, done]) => done && COLLECTIBLE_IDS.has(id),
   ).length;
   const totalCollectibles = TOTAL_COLLECTIBLES;
 
-  // Guard against stale trophy keys from older app versions.
   const completedTrophies = Object.entries(state.trophyCompletion).filter(
     ([id, done]) => done && VALID_TROPHY_IDS.has(id),
   ).length;
@@ -132,7 +142,6 @@ function computeStats(state: ProgressState): CompletionStats {
     byTier: trophyByTier,
   };
 
-  // Overall: quests + collectibles + trophies all count equally
   const totalItems = totalQuests + totalCollectibles + totalTrophies;
   const completedItems = completedQuests + completedCollectibles + completedTrophies;
   const overallPercentage = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
@@ -159,29 +168,70 @@ function persist(newState: ProgressState): void {
   AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(newState)).catch(() => {});
 }
 
+async function writeBackupFile(state: ProgressState): Promise<string> {
+  const ts = new Date().toISOString();
+  const snapshot = { version: 1, backedUpAt: ts, data: state };
+  await FileSystem.writeAsStringAsync(BACKUP_FILE, JSON.stringify(snapshot), {
+    encoding: FileSystem.EncodingType.UTF8,
+  });
+  await AsyncStorage.setItem(LAST_BACKUP_KEY, ts);
+  return ts;
+}
+
 export function ProgressProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<ProgressState>(DEFAULT_STATE);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [lastBackupAt, setLastBackupAt] = useState<string | null>(null);
+  const [hasPendingRestore, setHasPendingRestore] = useState(false);
 
+  // Debounce timer ref for automatic backup
+  const backupTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Schedule a debounced write to the backup file (2 s after last change)
+  const scheduleBackup = useCallback((nextState: ProgressState) => {
+    if (Platform.OS === 'web' || !BACKUP_FILE) return;
+    if (backupTimerRef.current) clearTimeout(backupTimerRef.current);
+    backupTimerRef.current = setTimeout(async () => {
+      try {
+        const ts = await writeBackupFile(nextState);
+        setLastBackupAt(ts);
+      } catch {}
+    }, 2000);
+  }, []);
+
+  // Load state on mount
   useEffect(() => {
-    AsyncStorage.getItem(STORAGE_KEY)
-      .then(data => {
+    (async () => {
+      try {
+        const [data, savedBackupAt] = await Promise.all([
+          AsyncStorage.getItem(STORAGE_KEY),
+          AsyncStorage.getItem(LAST_BACKUP_KEY),
+        ]);
+
+        if (savedBackupAt) setLastBackupAt(savedBackupAt);
+
         if (data) {
           try {
             const parsed = JSON.parse(data) as Partial<ProgressState>;
-            // Merge with defaults to handle missing keys from older saves.
-            // Stale keys in collectible/trophy/quest completion are ignored at
-            // stat-computation time (see VALID_*_IDS guards above) — no need
-            // to prune here, which avoids unnecessary re-writes on load.
             setState({ ...DEFAULT_STATE, ...parsed });
           } catch {}
+        } else if (Platform.OS !== 'web' && BACKUP_FILE) {
+          // No local data — check if a backup exists from a previous install
+          try {
+            const fileInfo = await FileSystem.getInfoAsync(BACKUP_FILE);
+            if (fileInfo.exists) {
+              setHasPendingRestore(true);
+            }
+          } catch {}
         }
-      })
-      .finally(() => setIsLoaded(true));
+      } finally {
+        setIsLoaded(true);
+      }
+    })();
   }, []);
 
   const toggleQuest = useCallback((questId: string) => {
-    if (!VALID_QUEST_IDS.has(questId)) return; // ignore unknown IDs
+    if (!VALID_QUEST_IDS.has(questId)) return;
     setState(prev => {
       const next: ProgressState = {
         ...prev,
@@ -189,9 +239,10 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
         recentlyUpdated: addToRecent(questId, prev.recentlyUpdated),
       };
       persist(next);
+      scheduleBackup(next);
       return next;
     });
-  }, []);
+  }, [scheduleBackup]);
 
   const toggleTask = useCallback((questId: string, taskIndex: number) => {
     setState(prev => {
@@ -205,12 +256,13 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
         recentlyUpdated: addToRecent(questId, prev.recentlyUpdated),
       };
       persist(next);
+      scheduleBackup(next);
       return next;
     });
-  }, []);
+  }, [scheduleBackup]);
 
   const toggleCollectible = useCallback((collectibleId: string) => {
-    if (!COLLECTIBLE_IDS.has(collectibleId)) return; // ignore stale/unknown IDs
+    if (!COLLECTIBLE_IDS.has(collectibleId)) return;
     setState(prev => {
       const next: ProgressState = {
         ...prev,
@@ -220,12 +272,13 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
         },
       };
       persist(next);
+      scheduleBackup(next);
       return next;
     });
-  }, []);
+  }, [scheduleBackup]);
 
   const toggleTrophy = useCallback((trophyId: string) => {
-    if (!VALID_TROPHY_IDS.has(trophyId)) return; // ignore stale/unknown IDs
+    if (!VALID_TROPHY_IDS.has(trophyId)) return;
     setState(prev => {
       const next: ProgressState = {
         ...prev,
@@ -235,9 +288,10 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
         },
       };
       persist(next);
+      scheduleBackup(next);
       return next;
     });
-  }, []);
+  }, [scheduleBackup]);
 
   const updateNotes = useCallback((questId: string, notes: string) => {
     setState(prev => {
@@ -246,13 +300,72 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
         playerNotes: { ...prev.playerNotes, [questId]: notes },
       };
       persist(next);
+      scheduleBackup(next);
       return next;
     });
-  }, []);
+  }, [scheduleBackup]);
 
   const resetProgress = useCallback(() => {
     setState(DEFAULT_STATE);
     AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_STATE)).catch(() => {});
+    // Also overwrite the backup file so a re-install won't restore old data
+    if (Platform.OS !== 'web' && BACKUP_FILE) {
+      writeBackupFile(DEFAULT_STATE)
+        .then(ts => setLastBackupAt(ts))
+        .catch(() => {});
+    }
+  }, []);
+
+  // Immediate backup — callable from Settings "Back Up Now"
+  const backupNow = useCallback(async (): Promise<boolean> => {
+    if (Platform.OS === 'web' || !BACKUP_FILE) return false;
+    try {
+      if (backupTimerRef.current) {
+        clearTimeout(backupTimerRef.current);
+        backupTimerRef.current = null;
+      }
+      const ts = await writeBackupFile(state);
+      setLastBackupAt(ts);
+      return true;
+    } catch {
+      return false;
+    }
+  }, [state]);
+
+  // Restore from the backup file (used when hasPendingRestore is true)
+  const restoreFromBackup = useCallback(async (): Promise<{ success: boolean; message: string }> => {
+    if (Platform.OS === 'web' || !BACKUP_FILE) {
+      return { success: false, message: 'Auto-backup is not available on web.' };
+    }
+    try {
+      const text = await FileSystem.readAsStringAsync(BACKUP_FILE, {
+        encoding: FileSystem.EncodingType.UTF8,
+      });
+      const parsed = JSON.parse(text);
+      const restored = parsed?.data ?? parsed;
+      if (
+        typeof restored !== 'object' ||
+        typeof restored.questCompletion !== 'object' ||
+        typeof restored.collectibleCompletion !== 'object'
+      ) {
+        return { success: false, message: 'Backup file does not look like valid Ghost of Yotei data.' };
+      }
+      const next: ProgressState = { ...DEFAULT_STATE, ...restored };
+      setState(next);
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      setHasPendingRestore(false);
+      // Stamp when it was "backed up" (use the file's own timestamp if present)
+      const ts: string = parsed?.backedUpAt ?? new Date().toISOString();
+      setLastBackupAt(ts);
+      await AsyncStorage.setItem(LAST_BACKUP_KEY, ts);
+      return { success: true, message: 'Progress restored from backup.' };
+    } catch {
+      return { success: false, message: 'Could not read the backup file.' };
+    }
+  }, []);
+
+  const dismissRestorePrompt = useCallback(() => {
+    setHasPendingRestore(false);
   }, []);
 
   const exportProgress = useCallback(async () => {
@@ -264,7 +377,6 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
     const json = JSON.stringify(snapshot, null, 2);
 
     if (Platform.OS === 'web') {
-      // Web: trigger a download via a data URL
       const blob = new Blob([json], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -293,7 +405,6 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
   const importProgress = useCallback(async (): Promise<{ success: boolean; message: string }> => {
     try {
       if (Platform.OS === 'web') {
-        // Web: use a hidden file input
         return await new Promise(resolve => {
           const input = document.createElement('input');
           input.type = 'file';
@@ -342,7 +453,6 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
       });
 
       const parsed = JSON.parse(text);
-      // Support both the versioned wrapper { version, exportedAt, data } and raw state dumps
       const restored = parsed?.data ?? parsed;
 
       if (
@@ -357,7 +467,7 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
       setState(next);
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
       return { success: true, message: 'Progress restored successfully.' };
-    } catch (err) {
+    } catch {
       return { success: false, message: 'Could not read the selected file.' };
     }
   }, []);
@@ -366,7 +476,24 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <ProgressContext.Provider
-      value={{ state, stats, isLoaded, toggleQuest, toggleTask, toggleCollectible, toggleTrophy, updateNotes, resetProgress, exportProgress, importProgress }}
+      value={{
+        state,
+        stats,
+        isLoaded,
+        lastBackupAt,
+        hasPendingRestore,
+        toggleQuest,
+        toggleTask,
+        toggleCollectible,
+        toggleTrophy,
+        updateNotes,
+        resetProgress,
+        exportProgress,
+        importProgress,
+        backupNow,
+        restoreFromBackup,
+        dismissRestorePrompt,
+      }}
     >
       {children}
     </ProgressContext.Provider>

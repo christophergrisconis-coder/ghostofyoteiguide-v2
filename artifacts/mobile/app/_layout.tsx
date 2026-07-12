@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
+import { Alert } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -12,38 +13,79 @@ import {
 } from '@expo-google-fonts/inter';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { ProgressProvider } from '@/context/ProgressContext';
+import { ProgressProvider, useProgress } from '@/context/ProgressContext';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
+/**
+ * Shows a one-time alert on first launch when a backup exists from a prior
+ * install. Lives inside ProgressProvider so it can read context.
+ */
+function RestorePrompt() {
+  const { isLoaded, hasPendingRestore, restoreFromBackup, dismissRestorePrompt } = useProgress();
+  const prompted = useRef(false);
+
+  useEffect(() => {
+    if (!isLoaded || !hasPendingRestore || prompted.current) return;
+    prompted.current = true;
+
+    Alert.alert(
+      'Previous Backup Found',
+      'A backup of your progress was found from a previous install. Would you like to restore it?',
+      [
+        {
+          text: 'Not Now',
+          style: 'cancel',
+          onPress: dismissRestorePrompt,
+        },
+        {
+          text: 'Restore',
+          onPress: async () => {
+            const result = await restoreFromBackup();
+            if (!result.success) {
+              Alert.alert('Restore Failed', result.message);
+            }
+          },
+        },
+      ],
+      { cancelable: false },
+    );
+  }, [isLoaded, hasPendingRestore, restoreFromBackup, dismissRestorePrompt]);
+
+  return null;
+}
+
 function RootLayoutNav() {
   return (
-    <Stack
-      screenOptions={{
-        headerStyle: { backgroundColor: '#0A0A0F' },
-        headerTintColor: '#C9A84C',
-        headerTitleStyle: { fontFamily: 'Inter_600SemiBold', color: '#F5EDD3' },
-        headerBackTitle: 'Back',
-        contentStyle: { backgroundColor: '#0A0A0F' },
-      }}
-    >
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen
-        name="quest/[id]"
-        options={{
-          title: 'Quest',
+    <>
+      <RestorePrompt />
+      <Stack
+        screenOptions={{
+          headerStyle: { backgroundColor: '#0A0A0F' },
+          headerTintColor: '#C9A84C',
+          headerTitleStyle: { fontFamily: 'Inter_600SemiBold', color: '#F5EDD3' },
           headerBackTitle: 'Back',
+          contentStyle: { backgroundColor: '#0A0A0F' },
         }}
-      />
-      <Stack.Screen
-        name="category/[id]"
-        options={{
-          title: 'Category',
-          headerBackTitle: 'Back',
-        }}
-      />
-    </Stack>
+      >
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="quest/[id]"
+          options={{
+            title: 'Quest',
+            headerBackTitle: 'Back',
+          }}
+        />
+        <Stack.Screen
+          name="category/[id]"
+          options={{
+            title: 'Category',
+            headerBackTitle: 'Back',
+          }}
+        />
+      </Stack>
+    </>
   );
 }
 
