@@ -1,5 +1,12 @@
-import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, SectionList, Platform } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  SectionList,
+  Platform,
+  TextInput,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '@/hooks/useColors';
@@ -27,13 +34,22 @@ export default function CollectiblesScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { state, toggleCollectible } = useProgress();
+  const [query, setQuery] = useState('');
 
   const sections: Section[] = useMemo(() => {
+    const q = query.trim().toLowerCase();
     return COLLECTIBLE_GROUPS.map(group => {
-      const items = COLLECTIBLES.filter(c => c.group === group.id);
-      const completed = items.filter(
+      const allItems = COLLECTIBLES.filter(c => c.group === group.id);
+      const completed = allItems.filter(
         c => state.collectibleCompletion[c.id],
       ).length;
+      const items = q
+        ? allItems.filter(
+            c =>
+              c.name.toLowerCase().includes(q) ||
+              c.region.toLowerCase().includes(q),
+          )
+        : allItems;
       return {
         groupId: group.id,
         label: group.label,
@@ -44,8 +60,10 @@ export default function CollectiblesScreen() {
         completed,
         data: items,
       };
-    });
-  }, [state.collectibleCompletion]);
+    }).filter(s => s.data.length > 0);
+  }, [state.collectibleCompletion, query]);
+
+  const isFiltering = query.trim().length > 0;
 
   return (
     <SectionList
@@ -59,9 +77,43 @@ export default function CollectiblesScreen() {
         paddingBottom: Platform.OS === 'web' ? 118 : 100,
       }}
       ListHeaderComponent={
-        <Text style={[styles.heading, { color: colors.foreground }]}>
-          Collectibles
-        </Text>
+        <View>
+          <Text style={[styles.heading, { color: colors.foreground }]}>
+            Collectibles
+          </Text>
+          <View
+            style={[
+              styles.searchBar,
+              {
+                backgroundColor: colors.card,
+                borderColor: colors.border,
+              },
+            ]}
+          >
+            <Ionicons
+              name="search-outline"
+              size={16}
+              color={colors.mutedForeground}
+              style={styles.searchIcon}
+            />
+            <TextInput
+              style={[styles.searchInput, { color: colors.foreground }]}
+              placeholder="Search by name or region…"
+              placeholderTextColor={colors.mutedForeground}
+              value={query}
+              onChangeText={setQuery}
+              returnKeyType="search"
+              clearButtonMode="while-editing"
+              autoCorrect={false}
+              autoCapitalize="none"
+            />
+          </View>
+          {isFiltering && sections.length === 0 && (
+            <Text style={[styles.emptyText, { color: colors.mutedForeground }]}>
+              No collectibles match "{query}"
+            </Text>
+          )}
+        </View>
       }
       renderSectionHeader={({ section }) => {
         const s = section as unknown as Section;
@@ -93,25 +145,29 @@ export default function CollectiblesScreen() {
                 >
                   {s.label}
                 </Text>
-                <Text
-                  style={[
-                    styles.groupDesc,
-                    { color: colors.mutedForeground },
-                  ]}
-                  numberOfLines={1}
-                >
-                  {s.description}
-                </Text>
+                {!isFiltering && (
+                  <Text
+                    style={[
+                      styles.groupDesc,
+                      { color: colors.mutedForeground },
+                    ]}
+                    numberOfLines={1}
+                  >
+                    {s.description}
+                  </Text>
+                )}
               </View>
               <Text style={[styles.groupCount, { color: s.color }]}>
                 {s.completed}/{s.total}
               </Text>
             </View>
-            <ProgressBar
-              percentage={pct}
-              height={3}
-              color={s.color}
-            />
+            {!isFiltering && (
+              <ProgressBar
+                percentage={pct}
+                height={3}
+                color={s.color}
+              />
+            )}
           </View>
         );
       }}
@@ -123,7 +179,9 @@ export default function CollectiblesScreen() {
           ]}
         >
           <ChecklistItem
-            label={`${item.name} — ${item.hint}`}
+            label={item.name}
+            subtitle={item.region}
+            hint={item.hint}
             checked={!!state.collectibleCompletion[item.id]}
             onToggle={() => toggleCollectible(item.id)}
           />
@@ -139,7 +197,31 @@ const styles = StyleSheet.create({
     fontSize: 26,
     fontFamily: 'Inter_700Bold',
     letterSpacing: -0.5,
-    marginBottom: 16,
+    marginBottom: 12,
+  },
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 10,
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    height: 40,
+    marginBottom: 4,
+  },
+  searchIcon: {
+    marginRight: 6,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 14,
+    fontFamily: 'Inter_400Regular',
+    paddingVertical: 0,
+  },
+  emptyText: {
+    fontSize: 14,
+    fontFamily: 'Inter_400Regular',
+    textAlign: 'center',
+    marginTop: 32,
   },
   groupHeader: {
     paddingTop: 20,

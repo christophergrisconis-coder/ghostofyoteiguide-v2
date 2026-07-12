@@ -15,9 +15,13 @@ interface Props {
   checked: boolean;
   onToggle: () => void;
   number?: number;
+  /** Optional secondary line shown beneath the label (e.g. region name) */
+  subtitle?: string;
+  /** Optional hint shown as a third, muted line */
+  hint?: string;
 }
 
-export function ChecklistItem({ label, checked, onToggle, number }: Props) {
+export function ChecklistItem({ label, checked, onToggle, number, subtitle, hint }: Props) {
   const colors = useColors();
   const scale = useSharedValue(1);
 
@@ -59,19 +63,37 @@ export function ChecklistItem({ label, checked, onToggle, number }: Props) {
           <Ionicons name="checkmark" size={13} color={colors.primary} />
         )}
       </Animated.View>
-      <Text
-        style={[
-          styles.label,
-          {
-            color: checked ? colors.mutedForeground : colors.foreground,
-            textDecorationLine: checked ? 'line-through' : 'none',
-            opacity: checked ? 0.65 : 1,
-          },
-        ]}
-        numberOfLines={3}
-      >
-        {label}
-      </Text>
+      <View style={styles.textStack}>
+        <Text
+          style={[
+            styles.label,
+            {
+              color: checked ? colors.mutedForeground : colors.foreground,
+              textDecorationLine: checked ? 'line-through' : 'none',
+              opacity: checked ? 0.65 : 1,
+            },
+          ]}
+          numberOfLines={3}
+        >
+          {label}
+        </Text>
+        {subtitle ? (
+          <Text
+            style={[styles.subtitle, { color: colors.mutedForeground }]}
+            numberOfLines={1}
+          >
+            {subtitle}
+          </Text>
+        ) : null}
+        {hint ? (
+          <Text
+            style={[styles.hint, { color: colors.mutedForeground }]}
+            numberOfLines={2}
+          >
+            {hint}
+          </Text>
+        ) : null}
+      </View>
     </TouchableOpacity>
   );
 }
@@ -100,10 +122,24 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 1,
   },
-  label: {
+  textStack: {
     flex: 1,
+    gap: 2,
+  },
+  label: {
     fontSize: 14,
     fontFamily: 'Inter_400Regular',
     lineHeight: 20,
+  },
+  subtitle: {
+    fontSize: 11,
+    fontFamily: 'Inter_400Regular',
+    opacity: 0.7,
+  },
+  hint: {
+    fontSize: 11,
+    fontFamily: 'Inter_400Regular',
+    opacity: 0.55,
+    fontStyle: 'italic',
   },
 });
