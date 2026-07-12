@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import {
   View,
   FlatList,
+  SectionList,
   StyleSheet,
   TouchableOpacity,
   Text,
@@ -12,9 +13,52 @@ import { useLocalSearchParams, Stack, router } from 'expo-router';
 import { useColors } from '@/hooks/useColors';
 import { useProgress } from '@/context/ProgressContext';
 import { getCategoryById } from '@/data/categories';
-import { getQuestsByCategory } from '@/data/quests';
+import { getQuestsByCategory, type Quest } from '@/data/quests';
 import { QuestCard } from '@/components/QuestCard';
 import { SearchBar } from '@/components/SearchBar';
+import { ProgressBar } from '@/components/ProgressBar';
+
+// ── Sensei companion arc definitions ─────────────────────────────────────────
+// 4 arcs × 5 quests each = 20 Sensei Tales total.
+// Colours are distinct from the base sensei category purple to tell arcs apart.
+interface SenseiArc {
+  key: string;
+  name: string;
+  companion: string;
+  color: string;
+  questIds: string[];
+}
+
+const SENSEI_ARCS: SenseiArc[] = [
+  {
+    key: 'jubei',
+    name: "Jubei's Arc",
+    companion: 'Jubei',
+    color: '#C9A84C',
+    questIds: ['sen_01', 'sen_02', 'sen_03', 'sen_04', 'sen_05'],
+  },
+  {
+    key: 'kei',
+    name: "Kei's Arc",
+    companion: 'Kei',
+    color: '#4A9B8E',
+    questIds: ['sen_06', 'sen_07', 'sen_08', 'sen_09', 'sen_10'],
+  },
+  {
+    key: 'tomoe',
+    name: "Tomoe's Arc",
+    companion: 'Tomoe',
+    color: '#E07B54',
+    questIds: ['sen_11', 'sen_12', 'sen_13', 'sen_14', 'sen_15'],
+  },
+  {
+    key: 'riku',
+    name: "Riku's Arc",
+    companion: 'Riku',
+    color: '#5B9BD5',
+    questIds: ['sen_16', 'sen_17', 'sen_18', 'sen_19', 'sen_20'],
+  },
+];
 
 type FilterType = 'all' | 'complete' | 'in_progress' | 'not_started';
 
@@ -89,6 +133,26 @@ export default function CategoryDetailScreen() {
     });
   }, [allQuests, state, statusFilter, regionFilter, actFilter, bossFilter, missableFilter, search]);
 
+  // Sensei arc sections — only computed when viewing the sensei category
+  const senseiSections = useMemo(() => {
+    if (id !== 'sensei') return null;
+    return SENSEI_ARCS.map(arc => {
+      // All quests in this arc (for overall progress count, ignoring filters)
+      const arcAllQuests = allQuests.filter(q => arc.questIds.includes(q.id));
+      const arcCompleted = arcAllQuests.filter(
+        q => state.questCompletion[q.id] === true,
+      ).length;
+      // Filtered quests for display
+      const arcVisible = quests.filter(q => arc.questIds.includes(q.id));
+      return {
+        arc,
+        arcTotal: arcAllQuests.length,
+        arcCompleted,
+        data: arcVisible,
+      };
+    }).filter(s => s.data.length > 0);
+  }, [id, quests, allQuests, state.questCompletion]);
+
   const activeFilterCount =
     (statusFilter !== 'all' ? 1 : 0) +
     (regionFilter ? 1 : 0) +
@@ -107,24 +171,8 @@ export default function CategoryDetailScreen() {
 
   const accentColor = category?.color ?? colors.primary;
 
-  return (
-    <>
-      <Stack.Screen
-        options={{
-          title: category?.label ?? 'Category',
-          headerStyle: { backgroundColor: colors.card },
-          headerTintColor: colors.foreground,
-          headerShadowVisible: false,
-          headerBackTitle: 'Back',
-        }}
-      />
-      <FlatList
-        style={{ backgroundColor: colors.background }}
-        data={quests}
-        keyExtractor={item => item.id}
-        contentContainerStyle={styles.list}
-        showsVerticalScrollIndicator={false}
-        ListHeaderComponent={
+  // Shared header rendered above both FlatList and SectionList
+  const listHeader = (
           <View style={styles.header}>
             <SearchBar
               value={search}
@@ -418,41 +466,110 @@ export default function CategoryDetailScreen() {
               </Text>
             )}
           </View>
-        }
-        renderItem={({ item }) => {
-          const isComplete = state.questCompletion[item.id] === true;
-          const taskState = state.taskCompletion[item.id] ?? {};
-          const isInProgress =
-            !isComplete && Object.values(taskState).some(Boolean);
-          return (
-            <QuestCard
-              quest={item}
-              isComplete={isComplete}
-              isInProgress={isInProgress}
-              onPress={() => router.push(`/quest/${item.id}`)}
-            />
-          );
-        }}
-        ListEmptyComponent={
-          <View style={styles.empty}>
-            <Ionicons
-              name="search-outline"
-              size={32}
-              color={colors.mutedForeground}
-            />
-            <Text style={[styles.emptyText, { color: colors.mutedForeground }]}>
-              No quests match your filters
-            </Text>
-            {(activeFilterCount > 0 || search.trim()) && (
-              <TouchableOpacity onPress={clearAllFilters} activeOpacity={0.7}>
-                <Text style={[styles.emptyLink, { color: colors.primary }]}>
-                  Clear all filters
-                </Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        }
+  );
+
+  // Shared empty state
+  const emptyComponent = (
+    <View style={styles.empty}>
+      <Ionicons name="search-outline" size={32} color={colors.mutedForeground} />
+      <Text style={[styles.emptyText, { color: colors.mutedForeground }]}>
+        No quests match your filters
+      </Text>
+      {(activeFilterCount > 0 || search.trim()) && (
+        <TouchableOpacity onPress={clearAllFilters} activeOpacity={0.7}>
+          <Text style={[styles.emptyLink, { color: colors.primary }]}>
+            Clear all filters
+          </Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
+
+  // Shared quest item renderer
+  const renderQuestItem = (item: Quest) => {
+    const isComplete = state.questCompletion[item.id] === true;
+    const taskState = state.taskCompletion[item.id] ?? {};
+    const isInProgress = !isComplete && Object.values(taskState).some(Boolean);
+    return (
+      <QuestCard
+        quest={item}
+        isComplete={isComplete}
+        isInProgress={isInProgress}
+        onPress={() => router.push(`/quest/${item.id}`)}
       />
+    );
+  };
+
+  return (
+    <>
+      <Stack.Screen
+        options={{
+          title: category?.label ?? 'Category',
+          headerStyle: { backgroundColor: colors.card },
+          headerTintColor: colors.foreground,
+          headerShadowVisible: false,
+          headerBackTitle: 'Back',
+        }}
+      />
+
+      {/* ── Sensei: SectionList grouped by companion arc ───── */}
+      {id === 'sensei' && senseiSections ? (
+        <SectionList
+          style={{ backgroundColor: colors.background }}
+          sections={senseiSections}
+          keyExtractor={item => item.id}
+          contentContainerStyle={styles.list}
+          showsVerticalScrollIndicator={false}
+          stickySectionHeadersEnabled={false}
+          ListHeaderComponent={listHeader}
+          renderSectionHeader={({ section }) => {
+            const { arc, arcTotal, arcCompleted } = section as typeof senseiSections[number];
+            const pct = arcTotal > 0 ? Math.round((arcCompleted / arcTotal) * 100) : 0;
+            const allDone = arcCompleted === arcTotal;
+            return (
+              <View style={styles.arcHeader}>
+                <View style={[styles.arcAccent, { backgroundColor: arc.color }]} />
+                <View style={styles.arcHeaderBody}>
+                  <View style={styles.arcTitleRow}>
+                    <Text style={[styles.arcName, { color: colors.foreground }]}>
+                      {arc.name}
+                    </Text>
+                    <View
+                      style={[
+                        styles.arcBadge,
+                        { backgroundColor: allDone ? arc.color + '30' : colors.card,
+                          borderColor: allDone ? arc.color : colors.border },
+                      ]}
+                    >
+                      {allDone && (
+                        <Ionicons name="checkmark" size={10} color={arc.color} />
+                      )}
+                      <Text style={[styles.arcBadgeText, { color: allDone ? arc.color : colors.mutedForeground }]}>
+                        {arcCompleted}/{arcTotal}
+                      </Text>
+                    </View>
+                  </View>
+                  <ProgressBar percentage={pct} height={3} color={arc.color} />
+                </View>
+              </View>
+            );
+          }}
+          renderItem={({ item }) => renderQuestItem(item)}
+          ListEmptyComponent={emptyComponent}
+        />
+      ) : (
+        /* ── All other categories: flat FlatList ─────────── */
+        <FlatList
+          style={{ backgroundColor: colors.background }}
+          data={quests}
+          keyExtractor={item => item.id}
+          contentContainerStyle={styles.list}
+          showsVerticalScrollIndicator={false}
+          ListHeaderComponent={listHeader}
+          renderItem={({ item }) => renderQuestItem(item)}
+          ListEmptyComponent={emptyComponent}
+        />
+      )}
     </>
   );
 }
@@ -534,6 +651,46 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: 'Inter_400Regular',
     paddingTop: 2,
+  },
+  // Sensei arc headers
+  arcHeader: {
+    flexDirection: 'row',
+    alignItems: 'stretch',
+    marginTop: 20,
+    marginBottom: 8,
+    gap: 0,
+  },
+  arcAccent: {
+    width: 3,
+    borderRadius: 2,
+    marginRight: 10,
+  },
+  arcHeaderBody: {
+    flex: 1,
+    gap: 6,
+  },
+  arcTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  arcName: {
+    fontSize: 15,
+    fontFamily: 'Inter_700Bold',
+    letterSpacing: -0.2,
+  },
+  arcBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  arcBadgeText: {
+    fontSize: 11,
+    fontFamily: 'Inter_600SemiBold',
   },
   empty: {
     paddingVertical: 48,
