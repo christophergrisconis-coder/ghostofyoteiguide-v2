@@ -621,10 +621,11 @@ const styles = StyleSheet.create({
   },
   actGrid: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 6,
   },
   actGridItem: {
-    flex: 1,
+    width: '22%',
     alignItems: 'center',
     gap: 4,
   },
