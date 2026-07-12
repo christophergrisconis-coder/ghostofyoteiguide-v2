@@ -1,0 +1,110 @@
+Build this as a real Expo React Native app for use in Expo Go.
+
+I am building inside Replit, but the real target is Expo Go on my phone.
+Do not build this as a web app.
+Do not build this as a website wrapped in a WebView.
+Do not optimize only for browser preview.
+The browser preview is not the final target.
+The real target is native Expo Go behavior on iPhone and Android.
+
+Project name:
+Ghost of Yotei 100% Completion Guide
+
+Reference structure:
+Use IGN’s Ghost of Yotei guide structure as the main content organization reference.
+Model the app around this kind of guide architecture:
+Ghost of Yotei Guide hub
+Walkthrough
+How-To Guides
+Completion Checklists
+Quest walkthrough pages
+Interactive map support later if needed
+
+Important reference direction:
+IGN already has a Ghost of Yotei guide hub, walkthrough pages, how-to guides, and completion checklist structure.
+Use that style of organization as the inspiration for the app’s information architecture.
+The app should feel like a premium completion tracker and walkthrough codex for Ghost of Yotei.
+
+Main goal:
+Create a fully interactive Japanese-themed Ghost of Yotei completion guide mobile app with:
+real progress tracking
+real checkboxes
+categorized quests
+individual quest detail pages
+descriptive walkthroughs
+collectibles tracking
+progress bars
+search
+filters
+saved progress persistence
+
+Priority order:
+1. visible functionality first
+2. real interaction second
+3. styling third
+
+This must be a true mobile app with working React Native screens and Expo-compatible packages only.
+
+Core app requirements:
+Build a complete Expo React Native app with these main screens:
+Dashboard
+Quest Categories
+Quest Detail
+Collectibles
+Progress
+Settings
+
+Dashboard requirements:
+The Dashboard screen must include:
+overall game completion percentage
+total completed quests
+total incomplete quests
+in-progress quests
+category progress cards
+quick navigation to major sections
+a strong themed hero header
+recently updated or recently completed area
+clean summary panels for progression
+
+Quest Categories requirements:
+Include clearly separated categories for:
+Main Story Quests
+Side Quests
+Mythic or Special Quests
+Character or Sensei Questlines
+Collectibles
+Activities
+Armor / Weapons / Charms / Upgrades
+Trophies / Achievements
+Regions / Areas
+Missables / Cleanup
+Postgame / New Game Plus if applicable
+
+Each category must show:
+total items
+completed items
+remaining items
+completion percentage
+tap into category details
+visual progress indication
+
+Quest Detail screen requirements:
+This screen is one of the most important parts of the app.
+
+For every individual quest include:
+quest title
+category
+region
+story act or recommended order
+prerequisites
+rewards
+estimated time
+missable warning if relevant
+overall quest completion checkbox
+individual task checklist
+descriptive walkthrough
+tips / combat notes / stealth notes
+related follow-up unlocks or related quests
+manual notes field for the player
+
+Every quest must be broken down 
