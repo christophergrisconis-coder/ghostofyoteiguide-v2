@@ -148,16 +148,14 @@ const CAMPS: WorldActivity[] = [
     name: 'Deserted Village',
     category: 'camp',
     region: 'Teshio Ridge',
-    description: 'An abandoned settlement in Teshio Ridge taken over by Yōtei Six forces.',
-    verificationNeeded: true,
+    description: 'An abandoned village in central Teshio Ridge that has been occupied by Yōtei Six forces. Clear all enemies to liberate the settlement and access the Altar of Reflection.',
   },
   {
     id: 'act_camp_16',
     name: 'Soya Port',
     category: 'camp',
     region: 'Teshio Ridge',
-    description: 'A port settlement on the Teshio coast occupied by Yōtei Six forces.',
-    verificationNeeded: true,
+    description: 'A coastal port at the northern tip of Teshio Ridge, near the Soya Strait. Yōtei Six forces have seized the docks and surrounding buildings. Clear all enemies to liberate the port and access the Altar of Reflection.',
   },
   {
     id: 'act_camp_17',
@@ -195,8 +193,7 @@ const CAMPS: WorldActivity[] = [
     name: 'Iwasaki Farmstead',
     category: 'camp',
     region: 'Oshima Coast',
-    description: 'A farming settlement on the Oshima Coast taken over by Yōtei Six forces.',
-    verificationNeeded: true,
+    description: 'A farming settlement in the interior of the Oshima Coast region, occupied by Yōtei Six forces. Clear all enemies to liberate the farmstead and access the Altar of Reflection.',
   },
   {
     id: 'act_camp_22',
