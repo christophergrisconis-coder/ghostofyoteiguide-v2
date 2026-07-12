@@ -28,6 +28,7 @@ const ACTIVE_CATEGORIES: ActivityCategory[] = [
   'camp',
   'dueling_tree',
   'wolf_den',
+  'fox_den',
   'bamboo_strike',
   'shrine_climb',
   'hot_spring',

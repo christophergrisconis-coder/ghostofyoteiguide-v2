@@ -7,12 +7,14 @@
 //   Shrine Climbs:    powerpyx.com/ghost-of-yotei-all-shrine-climbs-locations/
 //   Hot Springs:      pushsquare.com/guides/ghost-of-yotei-all-hot-springs-locations
 //   Wolf Dens:        pushsquare.com/guides/ghost-of-yotei-all-wolf-dens-locations
+//   Fox Dens:         powerpyx.com/ghost-of-yotei-all-fox-den-locations/
 //   Sumi-e Paintings: powerpyx.com/ghost-of-yotei-all-sumi-e-painting-locations/
 
 export type ActivityCategory =
   | 'camp'          // Yōtei Six Camps — enemy-occupied locations (22 total)
   | 'dueling_tree'  // Dueling Tree encounters — 6 trees + Takezo final fight = 7 duels total
   | 'wolf_den'      // Wolf Dens (10 total) — Wolves of Ezo trophy
+  | 'fox_den'       // Fox Dens (11 total) — Foxes of Ezo trophy
   | 'bamboo_strike' // Bamboo Strikes (15 total) — Body, Mind, and Spirit trophy
   | 'shrine_climb'  // Shrine Climbs (13 total) — Body, Mind, and Spirit trophy + Golden Mask
   | 'hot_spring'    // Hot Springs (16 total) — Body, Mind, and Spirit trophy + Fundoshi Armor Set
@@ -862,11 +864,110 @@ const SUMI_E_PAINTINGS: WorldActivity[] = [
   },
 ];
 
+// ── Fox Dens (11 total — Foxes of Ezo trophy) ─────────────────────────────────
+// Find the fox at the den entrance; follow it to a hidden shrine or sacred site.
+// Pray at the destination (swipe down on Touchpad) to complete the Fox Den.
+// Each Fox Den rewards a Technique point and counts toward the Foxes of Ezo trophy.
+const FOX_DENS: WorldActivity[] = [
+  // ── Yotei Grasslands (2) ──────────────────────────────────────────────────
+  {
+    id: 'act_fox_01',
+    name: 'Mossy Glen Fox Den',
+    category: 'fox_den',
+    region: 'Yotei Grasslands',
+    description: 'In the southern Yotei Grasslands near Lake Shikotsu. Find the fox at the den entrance, follow it through the mossy forest to a hidden shrine, and pray to complete.',
+    tips: 'All 11 Fox Dens are needed for the Foxes of Ezo bronze trophy.',
+  },
+  {
+    id: 'act_fox_02',
+    name: 'River\'s Edge Fox Den',
+    category: 'fox_den',
+    region: 'Yotei Grasslands',
+    description: 'Along the Nupur River in the western Yotei Grasslands. The fox waits at a burrow near the riverbank — follow it upstream to the sacred site and pray.',
+  },
+
+  // ── Ishikari Plain (2) ────────────────────────────────────────────────────
+  {
+    id: 'act_fox_03',
+    name: 'Windswept Bluff Fox Den',
+    category: 'fox_den',
+    region: 'Ishikari Plain',
+    description: 'On the exposed bluffs of western Ishikari Plain near the coast. Follow the fox south along the cliff edge to a small shrine overlooking the sea.',
+  },
+  {
+    id: 'act_fox_04',
+    name: 'Misty Shore Fox Den',
+    category: 'fox_den',
+    region: 'Ishikari Plain',
+    description: 'In the northeastern Ishikari Plain near the Urara Forest. The fox emerges from undergrowth beside a stream — follow it into the forest mist to the hidden shrine.',
+  },
+
+  // ── Tokachi Range (2) ────────────────────────────────────────────────────
+  {
+    id: 'act_fox_05',
+    name: 'Amber Vale Fox Den',
+    category: 'fox_den',
+    region: 'Tokachi Range',
+    description: 'In the valley south of Yubari Lake in Tokachi Range. The fox leads you east through the amber-lit forest to a small torii gate and shrine. Pray at the altar to complete.',
+  },
+  {
+    id: 'act_fox_06',
+    name: 'Cliffside Fox Den',
+    category: 'fox_den',
+    region: 'Tokachi Range',
+    description: 'Near the Niikappu Falls in northeastern Tokachi Range. Follow the fox up the rocky cliffside path — use the grappling hook to keep up — to the shrine at the summit.',
+    tips: 'The fox moves quickly on the ascent — keep it in sight around the cliff corners.',
+  },
+
+  // ── Nayoro Wilds (2) ─────────────────────────────────────────────────────
+  {
+    id: 'act_fox_07',
+    name: 'Frozen Grove Fox Den',
+    category: 'fox_den',
+    region: 'Nayoro Wilds',
+    description: 'In the western Nayoro Wilds amid snow-laden pines. Find the fox near a frozen stream and follow it deeper into the grove to the sacred site.',
+  },
+  {
+    id: 'act_fox_08',
+    name: 'Ancient Path Fox Den',
+    category: 'fox_den',
+    region: 'Nayoro Wilds',
+    description: 'In the northeastern Nayoro Wilds on the upper ridge. The fox den is beside a large boulder on the ridgeline — follow the fox down the ancient stone-marked path to the shrine below.',
+  },
+
+  // ── Teshio Ridge (2) ─────────────────────────────────────────────────────
+  {
+    id: 'act_fox_09',
+    name: 'Snow Peak Fox Den',
+    category: 'fox_den',
+    region: 'Teshio Ridge',
+    description: 'On the upper slopes of Teshio Ridge, northwest of Sarobetsu Lake. The fox leads you along an icy ledge to a small shrine with a view across the frozen plain.',
+  },
+  {
+    id: 'act_fox_10',
+    name: 'Northern Pass Fox Den',
+    category: 'fox_den',
+    region: 'Teshio Ridge',
+    description: 'Near the northern pass in Teshio Ridge, east of Soya Port. Follow the fox through the wind-carved rocks to a tucked-away shrine on the far side of the pass.',
+  },
+
+  // ── Oshima Coast (1) ─────────────────────────────────────────────────────
+  {
+    id: 'act_fox_11',
+    name: 'Coastal Cliff Fox Den',
+    category: 'fox_den',
+    region: 'Oshima Coast',
+    description: 'On the rocky southern coast of Oshima Coast near Esan Inlet. The fox den is at the cliff base — follow the fox up the switchback trail to a shrine at the cliff top. Completing this final Fox Den earns the Foxes of Ezo trophy if all others are done.',
+    tips: 'If this is your 11th Fox Den, the Foxes of Ezo trophy unlocks immediately after praying.',
+  },
+];
+
 // ── Combined export ───────────────────────────────────────────────────────────
 export const WORLD_ACTIVITIES: WorldActivity[] = [
   ...CAMPS,
   ...DUELING_TREES,
   ...WOLF_DENS,
+  ...FOX_DENS,
   ...BAMBOO_STRIKES,
   ...SHRINE_CLIMBS,
   ...HOT_SPRINGS,
@@ -880,6 +981,7 @@ export const ACTIVITY_CATEGORY_LABELS: Record<ActivityCategory, string> = {
   camp: 'Yōtei Six Camps',
   dueling_tree: 'Dueling Trees',
   wolf_den: 'Wolf Dens',
+  fox_den: 'Fox Dens',
   bamboo_strike: 'Bamboo Strikes',
   shrine_climb: 'Shrine Climbs',
   hot_spring: 'Hot Springs',
@@ -890,6 +992,7 @@ export const ACTIVITY_CATEGORY_ICONS: Record<ActivityCategory, string> = {
   camp: 'flag-outline',
   dueling_tree: 'flash-outline',
   wolf_den: 'paw-outline',
+  fox_den: 'footsteps-outline',
   bamboo_strike: 'leaf-outline',
   shrine_climb: 'triangle-outline',
   hot_spring: 'water-outline',
@@ -900,6 +1003,7 @@ export const ACTIVITY_CATEGORY_COLORS: Record<ActivityCategory, string> = {
   camp: '#8B1A1A',
   dueling_tree: '#C9A84C',
   wolf_den: '#7B68EE',
+  fox_den: '#D4853A',
   bamboo_strike: '#4A9B6F',
   shrine_climb: '#4A9B8E',
   hot_spring: '#4682B4',
