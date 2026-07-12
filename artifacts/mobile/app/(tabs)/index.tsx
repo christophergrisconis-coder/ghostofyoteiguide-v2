@@ -26,6 +26,12 @@ const ACTIVITY_CATS: ActivityCategory[] = [
   ...new Set(WORLD_ACTIVITIES.map(a => a.category)),
 ] as ActivityCategory[];
 
+// Target 4 columns. If the grid ever grows past 8 categories, widen to 5.
+const ACT_GRID_COLS = ACTIVITY_CATS.length > 8 ? 5 : 4;
+// Width as a percentage that leaves room for the inter-item gaps.
+// Formula: floor(100/cols) - 2  →  23% for 4-col, 18% for 5-col
+const ACT_GRID_ITEM_WIDTH = `${Math.floor(100 / ACT_GRID_COLS) - 2}%` as const;
+
 export default function DashboardScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
@@ -275,7 +281,7 @@ export default function DashboardScreen() {
             const icon = ACTIVITY_CATEGORY_ICONS[catId];
             const label = ACTIVITY_CATEGORY_LABELS[catId];
             return (
-              <View key={catId} style={styles.actGridItem}>
+              <View key={catId} style={[styles.actGridItem, { width: ACT_GRID_ITEM_WIDTH }]}>
                 <View style={[styles.actCatIconWrap, { backgroundColor: color + '20' }]}>
                   <Ionicons name={icon as any} size={12} color={color} />
                 </View>
@@ -625,7 +631,8 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   actGridItem: {
-    width: '22%',
+    // width is applied inline, derived from ACT_GRID_ITEM_WIDTH, so new
+    // categories never break the layout (see ACT_GRID_COLS constant above).
     alignItems: 'center',
     gap: 4,
   },
