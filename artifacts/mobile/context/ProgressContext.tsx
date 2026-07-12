@@ -1,5 +1,9 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as FileSystem from 'expo-file-system/legacy';
+import * as Sharing from 'expo-sharing';
+import * as DocumentPicker from 'expo-document-picker';
+import { Platform } from 'react-native';
 import { QUESTS } from '@/data/quests';
 import { COLLECTIBLE_IDS, COLLECTIBLE_GROUPS } from '@/data/collectibles';
 import { TROPHIES } from '@/data/trophies';
@@ -60,6 +64,8 @@ interface ProgressContextType {
   toggleTrophy: (trophyId: string) => void;
   updateNotes: (questId: string, notes: string) => void;
   resetProgress: () => void;
+  exportProgress: () => Promise<void>;
+  importProgress: () => Promise<{ success: boolean; message: string }>;
 }
 
 const ProgressContext = createContext<ProgressContextType | undefined>(undefined);
@@ -249,11 +255,118 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
     AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_STATE)).catch(() => {});
   }, []);
 
+  const exportProgress = useCallback(async () => {
+    const snapshot = {
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      data: state,
+    };
+    const json = JSON.stringify(snapshot, null, 2);
+
+    if (Platform.OS === 'web') {
+      // Web: trigger a download via a data URL
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'ghost-yotei-progress.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      return;
+    }
+
+    const fileUri = FileSystem.cacheDirectory + 'ghost-yotei-progress.json';
+    await FileSystem.writeAsStringAsync(fileUri, json, {
+      encoding: FileSystem.EncodingType.UTF8,
+    });
+
+    const canShare = await Sharing.isAvailableAsync();
+    if (canShare) {
+      await Sharing.shareAsync(fileUri, {
+        mimeType: 'application/json',
+        dialogTitle: 'Save your Ghost of Yotei progress',
+        UTI: 'public.json',
+      });
+    }
+  }, [state]);
+
+  const importProgress = useCallback(async (): Promise<{ success: boolean; message: string }> => {
+    try {
+      if (Platform.OS === 'web') {
+        // Web: use a hidden file input
+        return await new Promise(resolve => {
+          const input = document.createElement('input');
+          input.type = 'file';
+          input.accept = 'application/json,.json';
+          input.onchange = async () => {
+            const file = input.files?.[0];
+            if (!file) {
+              resolve({ success: false, message: 'No file selected.' });
+              return;
+            }
+            try {
+              const text = await file.text();
+              const parsed = JSON.parse(text);
+              const restored = parsed?.data ?? parsed;
+              if (
+                typeof restored.questCompletion !== 'object' ||
+                typeof restored.collectibleCompletion !== 'object'
+              ) {
+                resolve({ success: false, message: 'File does not look like a valid Ghost of Yotei backup.' });
+                return;
+              }
+              const next: ProgressState = { ...DEFAULT_STATE, ...restored };
+              setState(next);
+              await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+              resolve({ success: true, message: 'Progress restored successfully.' });
+            } catch {
+              resolve({ success: false, message: 'Could not read the selected file.' });
+            }
+          };
+          input.click();
+        });
+      }
+
+      const result = await DocumentPicker.getDocumentAsync({
+        type: ['application/json', 'public.json', 'text/plain'],
+        copyToCacheDirectory: true,
+      });
+
+      if (result.canceled || !result.assets?.[0]) {
+        return { success: false, message: 'Import cancelled.' };
+      }
+
+      const asset = result.assets[0];
+      const text = await FileSystem.readAsStringAsync(asset.uri, {
+        encoding: FileSystem.EncodingType.UTF8,
+      });
+
+      const parsed = JSON.parse(text);
+      // Support both the versioned wrapper { version, exportedAt, data } and raw state dumps
+      const restored = parsed?.data ?? parsed;
+
+      if (
+        typeof restored !== 'object' ||
+        typeof restored.questCompletion !== 'object' ||
+        typeof restored.collectibleCompletion !== 'object'
+      ) {
+        return { success: false, message: 'File does not look like a valid Ghost of Yotei backup.' };
+      }
+
+      const next: ProgressState = { ...DEFAULT_STATE, ...restored };
+      setState(next);
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      return { success: true, message: 'Progress restored successfully.' };
+    } catch (err) {
+      return { success: false, message: 'Could not read the selected file.' };
+    }
+  }, []);
+
   const stats = useMemo(() => computeStats(state), [state]);
 
   return (
     <ProgressContext.Provider
-      value={{ state, stats, isLoaded, toggleQuest, toggleTask, toggleCollectible, toggleTrophy, updateNotes, resetProgress }}
+      value={{ state, stats, isLoaded, toggleQuest, toggleTask, toggleCollectible, toggleTrophy, updateNotes, resetProgress, exportProgress, importProgress }}
     >
       {children}
     </ProgressContext.Provider>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Alert,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -20,12 +21,14 @@ function SettingRow({
   sublabel,
   onPress,
   danger,
+  loading,
 }: {
   icon: string;
   label: string;
   sublabel?: string;
   onPress: () => void;
   danger?: boolean;
+  loading?: boolean;
 }) {
   const colors = useColors();
   const iconColor = danger ? colors.destructive : colors.primary;
@@ -35,6 +38,7 @@ function SettingRow({
       style={[styles.row, { borderBottomColor: colors.border }]}
       onPress={onPress}
       activeOpacity={0.7}
+      disabled={loading}
     >
       <View style={[styles.rowIcon, { backgroundColor: iconBg }]}>
         <Ionicons name={icon as any} size={17} color={iconColor} />
@@ -54,11 +58,15 @@ function SettingRow({
           </Text>
         )}
       </View>
-      <Ionicons
-        name="chevron-forward"
-        size={15}
-        color={colors.mutedForeground}
-      />
+      {loading ? (
+        <ActivityIndicator size="small" color={colors.mutedForeground} />
+      ) : (
+        <Ionicons
+          name="chevron-forward"
+          size={15}
+          color={colors.mutedForeground}
+        />
+      )}
     </TouchableOpacity>
   );
 }
@@ -66,7 +74,50 @@ function SettingRow({
 export default function SettingsScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { resetProgress, stats } = useProgress();
+  const { resetProgress, exportProgress, importProgress, stats } = useProgress();
+  const [isExporting, setIsExporting] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
+
+  const handleExport = async () => {
+    setIsExporting(true);
+    try {
+      await exportProgress();
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch {
+      Alert.alert('Export Failed', 'Could not export your progress. Please try again.');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleImport = () => {
+    Alert.alert(
+      'Restore Progress',
+      'This will replace your current progress with the data from the backup file. Continue?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Choose File',
+          onPress: async () => {
+            setIsImporting(true);
+            try {
+              const result = await importProgress();
+              if (result.success) {
+                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                Alert.alert('Restored', result.message);
+              } else if (result.message !== 'Import cancelled.') {
+                Alert.alert('Import Failed', result.message);
+              }
+            } catch {
+              Alert.alert('Import Failed', 'Something went wrong. Please try again.');
+            } finally {
+              setIsImporting(false);
+            }
+          },
+        },
+      ],
+    );
+  };
 
   const handleReset = () => {
     Alert.alert(
@@ -168,6 +219,20 @@ export default function SettingsScreen() {
         >
           DATA
         </Text>
+        <SettingRow
+          icon="share-outline"
+          label="Export Progress"
+          sublabel="Save a backup of your completion data as a JSON file"
+          onPress={handleExport}
+          loading={isExporting}
+        />
+        <SettingRow
+          icon="download-outline"
+          label="Import Progress"
+          sublabel="Restore from a previously exported backup file"
+          onPress={handleImport}
+          loading={isImporting}
+        />
         <SettingRow
           icon="trash-outline"
           label="Reset All Progress"
