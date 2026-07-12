@@ -12,6 +12,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import Constants from 'expo-constants';
 import { useColors } from '@/hooks/useColors';
 import { useProgress } from '@/context/ProgressContext';
 
@@ -271,7 +272,7 @@ export default function SettingsScreen() {
           100% Completion Guide
         </Text>
         <Text style={[styles.appVer, { color: colors.mutedForeground }]}>
-          v1.0.0 · For Expo Go
+          v{Constants.expoConfig?.version ?? '1.0.0'} · {Platform.OS === 'ios' ? 'App Store' : Platform.OS === 'android' ? 'Google Play' : 'Web'}
         </Text>
       </View>
 
