@@ -32,7 +32,7 @@ export default function CategoryDetailScreen() {
 
   const category = getCategoryById(id ?? '');
   const allQuests = useMemo(
-    () => getQuestsByCategory(id ?? ''),
+    () => getQuestsByCategory((id ?? '') as import('@/data/categories').CategoryId),
     [id],
   );
 

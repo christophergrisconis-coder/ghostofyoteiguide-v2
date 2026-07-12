@@ -48,7 +48,7 @@ export default function DashboardScreen() {
               100% Guide
             </Text>
             <Text style={[styles.heroDesc, { color: colors.mutedForeground }]}>
-              Complete tracker for all quests,{'\n'}collectibles & trophies
+              119 quests · 319 collectibles{'\n'}54 trophies · 0 missable
             </Text>
           </View>
           <CompletionRing percentage={stats.overallPercentage} size={128} />
@@ -77,27 +77,47 @@ export default function DashboardScreen() {
         />
       </View>
 
-      {/* ── Collectibles Banner ──────────────────────────────── */}
-      <View
-        style={[
-          styles.collectibleBanner,
-          { backgroundColor: colors.card, borderColor: colors.border },
-        ]}
-      >
-        <View>
+      {/* ── Collectibles + Trophies Banner row ───────────────── */}
+      <View style={styles.bannerRow}>
+        <View
+          style={[
+            styles.bannerCard,
+            { backgroundColor: colors.card, borderColor: colors.border },
+          ]}
+        >
           <Text style={[styles.bannerLabel, { color: colors.mutedForeground }]}>
             COLLECTIBLES
           </Text>
+          <Text style={[styles.bannerCount, { color: colors.primary }]}>
+            {stats.completedCollectibles}
+            <Text style={[styles.bannerTotal, { color: colors.mutedForeground }]}>
+              /{stats.totalCollectibles}
+            </Text>
+          </Text>
           <Text style={[styles.bannerSub, { color: colors.mutedForeground }]}>
-            {stats.totalCollectibles - stats.completedCollectibles} remaining
+            {stats.totalCollectibles - stats.completedCollectibles} left
           </Text>
         </View>
-        <Text style={[styles.bannerCount, { color: colors.primary }]}>
-          {stats.completedCollectibles}
-          <Text style={[styles.bannerTotal, { color: colors.mutedForeground }]}>
-            /{stats.totalCollectibles}
+
+        <View
+          style={[
+            styles.bannerCard,
+            { backgroundColor: colors.card, borderColor: colors.border },
+          ]}
+        >
+          <Text style={[styles.bannerLabel, { color: colors.mutedForeground }]}>
+            TROPHIES
           </Text>
-        </Text>
+          <Text style={[styles.bannerCount, { color: '#C9A84C' }]}>
+            {stats.completedTrophies}
+            <Text style={[styles.bannerTotal, { color: colors.mutedForeground }]}>
+              /{stats.totalTrophies}
+            </Text>
+          </Text>
+          <Text style={[styles.bannerSub, { color: colors.mutedForeground }]}>
+            {stats.trophyStats.percentage}% unlocked
+          </Text>
+        </View>
       </View>
 
       {/* ── Category Cards (horizontal) ──────────────────────── */}
@@ -165,8 +185,8 @@ export default function DashboardScreen() {
               Begin Your Journey
             </Text>
             <Text style={[styles.emptyBody, { color: colors.mutedForeground }]}>
-              Navigate to Quests to start tracking your progress through Ghost
-              of Yotei.
+              119 quests, 319 collectibles and 54 trophies await.{'\n'}
+              Navigate to Quests to start tracking.
             </Text>
           </View>
         </View>
@@ -209,33 +229,35 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginTop: 16,
   },
-  collectibleBanner: {
+  bannerRow: {
+    flexDirection: 'row',
+    gap: 10,
     marginHorizontal: 20,
     marginTop: 12,
+  },
+  bannerCard: {
+    flex: 1,
     padding: 14,
     borderRadius: 12,
     borderWidth: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    gap: 2,
   },
   bannerLabel: {
-    fontSize: 10,
+    fontSize: 9,
     fontFamily: 'Inter_600SemiBold',
     letterSpacing: 2,
   },
-  bannerSub: {
-    fontSize: 12,
-    fontFamily: 'Inter_400Regular',
-    marginTop: 2,
-  },
   bannerCount: {
-    fontSize: 26,
+    fontSize: 22,
     fontFamily: 'Inter_700Bold',
     letterSpacing: -0.5,
   },
   bannerTotal: {
-    fontSize: 16,
+    fontSize: 13,
+    fontFamily: 'Inter_400Regular',
+  },
+  bannerSub: {
+    fontSize: 11,
     fontFamily: 'Inter_400Regular',
   },
   section: {

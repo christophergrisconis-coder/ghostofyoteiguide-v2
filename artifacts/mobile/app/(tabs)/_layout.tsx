@@ -27,6 +27,10 @@ function NativeTabLayout() {
         <Icon sf={{ default: 'star', selected: 'star.fill' }} />
         <Label>Collectibles</Label>
       </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="trophies">
+        <Icon sf={{ default: 'trophy', selected: 'trophy.fill' }} />
+        <Label>Trophies</Label>
+      </NativeTabs.Trigger>
       <NativeTabs.Trigger name="progress">
         <Icon sf={{ default: 'chart.bar', selected: 'chart.bar.fill' }} />
         <Label>Progress</Label>
@@ -110,6 +114,18 @@ function ClassicTabLayout() {
               <SymbolView name="star" tintColor={color} size={24} />
             ) : (
               <Feather name="star" size={22} color={color} />
+            ),
+        }}
+      />
+      <Tabs.Screen
+        name="trophies"
+        options={{
+          title: 'Trophies',
+          tabBarIcon: ({ color }) =>
+            isIOS ? (
+              <SymbolView name="trophy" tintColor={color} size={24} />
+            ) : (
+              <Feather name="award" size={22} color={color} />
             ),
         }}
       />

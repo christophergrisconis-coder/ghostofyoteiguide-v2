@@ -10,6 +10,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useColors } from '@/hooks/useColors';
 import { useProgress } from '@/context/ProgressContext';
 import { CATEGORIES } from '@/data/categories';
+import { TROPHY_TIER_COLORS, TROPHY_TIER_LABELS, TROPHY_TIER_ORDER } from '@/data/trophies';
 import { ProgressBar } from '@/components/ProgressBar';
 import { CompletionRing } from '@/components/CompletionRing';
 
@@ -26,6 +27,7 @@ export default function ProgressScreen() {
     stats.totalCollectibles > 0
       ? Math.round((stats.completedCollectibles / stats.totalCollectibles) * 100)
       : 0;
+  const trophyPct = stats.trophyStats.percentage;
 
   return (
     <ScrollView
@@ -53,28 +55,20 @@ export default function ProgressScreen() {
         <View style={styles.ringRow}>
           <CompletionRing percentage={stats.overallPercentage} size={120} />
           <View style={styles.overallList}>
-            <Text
-              style={[styles.overallTitle, { color: colors.foreground }]}
-            >
+            <Text style={[styles.overallTitle, { color: colors.foreground }]}>
               Overall Completion
             </Text>
             {[
               { label: 'Quests done', value: `${stats.completedQuests}/${stats.totalQuests}`, color: colors.primary },
               { label: 'Collectibles', value: `${stats.completedCollectibles}/${stats.totalCollectibles}`, color: colors.primary },
+              { label: 'Trophies', value: `${stats.completedTrophies}/${stats.totalTrophies}`, color: '#C9A84C' },
               { label: 'In progress', value: String(stats.inProgressQuests), color: colors.warning },
             ].map(row => (
               <View key={row.label} style={styles.overallRow}>
-                <Text
-                  style={[
-                    styles.overallLabel,
-                    { color: colors.mutedForeground },
-                  ]}
-                >
+                <Text style={[styles.overallLabel, { color: colors.mutedForeground }]}>
                   {row.label}
                 </Text>
-                <Text
-                  style={[styles.overallValue, { color: row.color }]}
-                >
+                <Text style={[styles.overallValue, { color: row.color }]}>
                   {row.value}
                 </Text>
               </View>
@@ -83,7 +77,7 @@ export default function ProgressScreen() {
         </View>
       </View>
 
-      {/* ── Split bars ──────────────────────────────────── */}
+      {/* ── Three-way split bars ─────────────────────────── */}
       <View
         style={[
           styles.splitCard,
@@ -91,30 +85,55 @@ export default function ProgressScreen() {
         ]}
       >
         <Text style={[styles.cardTitle, { color: colors.foreground }]}>
-          Quests vs Collectibles
+          Quests · Collectibles · Trophies
         </Text>
         {[
           { label: 'Quests', pct: questPct, color: colors.primary },
           { label: 'Collectibles', pct: collectPct, color: colors.accent },
+          { label: 'Trophies', pct: trophyPct, color: '#C9A84C' },
         ].map(row => (
           <View key={row.label} style={styles.splitRow}>
-            <Text
-              style={[styles.splitLabel, { color: colors.mutedForeground }]}
-            >
+            <Text style={[styles.splitLabel, { color: colors.mutedForeground }]}>
               {row.label}
             </Text>
             <View style={styles.splitBar}>
-              <ProgressBar
-                percentage={row.pct}
-                height={5}
-                color={row.color}
-              />
+              <ProgressBar percentage={row.pct} height={5} color={row.color} />
             </View>
             <Text style={[styles.splitPct, { color: row.color }]}>
               {row.pct}%
             </Text>
           </View>
         ))}
+      </View>
+
+      {/* ── Trophy tier breakdown ────────────────────────── */}
+      <View
+        style={[
+          styles.splitCard,
+          { backgroundColor: colors.card, borderColor: colors.border },
+        ]}
+      >
+        <Text style={[styles.cardTitle, { color: colors.foreground }]}>
+          Trophies by Tier
+        </Text>
+        {TROPHY_TIER_ORDER.map(tier => {
+          const data = stats.trophyStats.byTier[tier] ?? { total: 0, completed: 0 };
+          const pct = data.total > 0 ? Math.round((data.completed / data.total) * 100) : 0;
+          const tierColor = TROPHY_TIER_COLORS[tier];
+          return (
+            <View key={tier} style={styles.splitRow}>
+              <Text style={[styles.splitLabel, { color: colors.mutedForeground }]}>
+                {TROPHY_TIER_LABELS[tier]}
+              </Text>
+              <View style={styles.splitBar}>
+                <ProgressBar percentage={pct} height={5} color={tierColor} />
+              </View>
+              <Text style={[styles.splitPct, { color: tierColor }]}>
+                {data.completed}/{data.total}
+              </Text>
+            </View>
+          );
+        })}
       </View>
 
       {/* ── Per-category breakdown ──────────────────────── */}
@@ -125,7 +144,7 @@ export default function ProgressScreen() {
         ]}
       >
         <Text style={[styles.cardTitle, { color: colors.foreground }]}>
-          By Category
+          Quests by Category
         </Text>
         {CATEGORIES.map(cat => {
           const cs = stats.categoryStats[cat.id] ?? {
@@ -148,9 +167,7 @@ export default function ProgressScreen() {
                   color={cat.color}
                 />
               </View>
-              <Text
-                style={[styles.catCount, { color: colors.mutedForeground }]}
-              >
+              <Text style={[styles.catCount, { color: colors.mutedForeground }]}>
                 {cs.completed}/{cs.total}
               </Text>
             </View>
@@ -224,7 +241,7 @@ const styles = StyleSheet.create({
   splitPct: {
     fontSize: 12,
     fontFamily: 'Inter_700Bold',
-    width: 32,
+    width: 40,
     textAlign: 'right',
   },
   catCard: {

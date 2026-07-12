@@ -1,7 +1,8 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { QUESTS } from '@/data/quests';
-import { COLLECTIBLE_GROUPS } from '@/data/collectibles';
+import { COLLECTIBLE_IDS, COLLECTIBLE_GROUPS } from '@/data/collectibles';
+import { TROPHIES } from '@/data/trophies';
 
 const STORAGE_KEY = '@ghost_yotei_v1';
 
@@ -9,6 +10,7 @@ interface ProgressState {
   questCompletion: Record<string, boolean>;
   taskCompletion: Record<string, Record<number, boolean>>;
   collectibleCompletion: Record<string, boolean>;
+  trophyCompletion: Record<string, boolean>;
   playerNotes: Record<string, string>;
   recentlyUpdated: string[];
 }
@@ -17,6 +19,7 @@ const DEFAULT_STATE: ProgressState = {
   questCompletion: {},
   taskCompletion: {},
   collectibleCompletion: {},
+  trophyCompletion: {},
   playerNotes: {},
   recentlyUpdated: [],
 };
@@ -27,14 +30,24 @@ export interface CategoryStats {
   percentage: number;
 }
 
+export interface TrophyStats {
+  total: number;
+  completed: number;
+  percentage: number;
+  byTier: Record<string, { total: number; completed: number }>;
+}
+
 export interface CompletionStats {
   totalQuests: number;
   completedQuests: number;
   inProgressQuests: number;
   totalCollectibles: number;
   completedCollectibles: number;
+  totalTrophies: number;
+  completedTrophies: number;
   overallPercentage: number;
   categoryStats: Record<string, CategoryStats>;
+  trophyStats: TrophyStats;
 }
 
 interface ProgressContextType {
@@ -44,11 +57,18 @@ interface ProgressContextType {
   toggleQuest: (questId: string) => void;
   toggleTask: (questId: string, taskIndex: number) => void;
   toggleCollectible: (collectibleId: string) => void;
+  toggleTrophy: (trophyId: string) => void;
   updateNotes: (questId: string, notes: string) => void;
   resetProgress: () => void;
 }
 
 const ProgressContext = createContext<ProgressContextType | undefined>(undefined);
+
+// Precompute valid ID sets to guard against stale keys from older app versions.
+// Completion counts only recognise IDs that exist in the current catalog.
+const VALID_QUEST_IDS = new Set(QUESTS.map(q => q.id));
+const VALID_TROPHY_IDS = new Set(TROPHIES.map(t => t.id));
+const TOTAL_COLLECTIBLES = COLLECTIBLE_GROUPS.reduce((sum, g) => sum + g.total, 0);
 
 function computeStats(state: ProgressState): CompletionStats {
   const totalQuests = QUESTS.length;
@@ -76,11 +96,39 @@ function computeStats(state: ProgressState): CompletionStats {
     cat.percentage = cat.total > 0 ? Math.round((cat.completed / cat.total) * 100) : 0;
   }
 
-  const totalCollectibles = COLLECTIBLE_GROUPS.reduce((sum, g) => sum + g.total, 0);
-  const completedCollectibles = Object.values(state.collectibleCompletion).filter(Boolean).length;
+  // Guard against stale collectible keys from older app versions.
+  const completedCollectibles = Object.entries(state.collectibleCompletion).filter(
+    ([id, done]) => done && COLLECTIBLE_IDS.has(id),
+  ).length;
+  const totalCollectibles = TOTAL_COLLECTIBLES;
 
-  const totalItems = totalQuests + totalCollectibles;
-  const completedItems = completedQuests + completedCollectibles;
+  // Guard against stale trophy keys from older app versions.
+  const completedTrophies = Object.entries(state.trophyCompletion).filter(
+    ([id, done]) => done && VALID_TROPHY_IDS.has(id),
+  ).length;
+  const totalTrophies = TROPHIES.length;
+
+  const trophyByTier: Record<string, { total: number; completed: number }> = {};
+  for (const trophy of TROPHIES) {
+    if (!trophyByTier[trophy.tier]) {
+      trophyByTier[trophy.tier] = { total: 0, completed: 0 };
+    }
+    trophyByTier[trophy.tier].total++;
+    if (state.trophyCompletion[trophy.id] && VALID_TROPHY_IDS.has(trophy.id)) {
+      trophyByTier[trophy.tier].completed++;
+    }
+  }
+
+  const trophyStats: TrophyStats = {
+    total: totalTrophies,
+    completed: completedTrophies,
+    percentage: totalTrophies > 0 ? Math.round((completedTrophies / totalTrophies) * 100) : 0,
+    byTier: trophyByTier,
+  };
+
+  // Overall: quests + collectibles + trophies all count equally
+  const totalItems = totalQuests + totalCollectibles + totalTrophies;
+  const completedItems = completedQuests + completedCollectibles + completedTrophies;
   const overallPercentage = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
 
   return {
@@ -89,8 +137,11 @@ function computeStats(state: ProgressState): CompletionStats {
     inProgressQuests,
     totalCollectibles,
     completedCollectibles,
+    totalTrophies,
+    completedTrophies,
     overallPercentage,
     categoryStats,
+    trophyStats,
   };
 }
 
@@ -111,7 +162,12 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
       .then(data => {
         if (data) {
           try {
-            setState(JSON.parse(data) as ProgressState);
+            const parsed = JSON.parse(data) as Partial<ProgressState>;
+            // Merge with defaults to handle missing keys from older saves.
+            // Stale keys in collectible/trophy/quest completion are ignored at
+            // stat-computation time (see VALID_*_IDS guards above) — no need
+            // to prune here, which avoids unnecessary re-writes on load.
+            setState({ ...DEFAULT_STATE, ...parsed });
           } catch {}
         }
       })
@@ -119,6 +175,7 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const toggleQuest = useCallback((questId: string) => {
+    if (!VALID_QUEST_IDS.has(questId)) return; // ignore unknown IDs
     setState(prev => {
       const next: ProgressState = {
         ...prev,
@@ -147,12 +204,28 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const toggleCollectible = useCallback((collectibleId: string) => {
+    if (!COLLECTIBLE_IDS.has(collectibleId)) return; // ignore stale/unknown IDs
     setState(prev => {
       const next: ProgressState = {
         ...prev,
         collectibleCompletion: {
           ...prev.collectibleCompletion,
           [collectibleId]: !prev.collectibleCompletion[collectibleId],
+        },
+      };
+      persist(next);
+      return next;
+    });
+  }, []);
+
+  const toggleTrophy = useCallback((trophyId: string) => {
+    if (!VALID_TROPHY_IDS.has(trophyId)) return; // ignore stale/unknown IDs
+    setState(prev => {
+      const next: ProgressState = {
+        ...prev,
+        trophyCompletion: {
+          ...prev.trophyCompletion,
+          [trophyId]: !prev.trophyCompletion[trophyId],
         },
       };
       persist(next);
@@ -180,7 +253,7 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <ProgressContext.Provider
-      value={{ state, stats, isLoaded, toggleQuest, toggleTask, toggleCollectible, updateNotes, resetProgress }}
+      value={{ state, stats, isLoaded, toggleQuest, toggleTask, toggleCollectible, toggleTrophy, updateNotes, resetProgress }}
     >
       {children}
     </ProgressContext.Provider>

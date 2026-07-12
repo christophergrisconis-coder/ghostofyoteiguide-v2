@@ -1,14 +1,10 @@
 export type CategoryId =
   | 'main_story'
-  | 'side_quests'
+  | 'side_tales'
   | 'mythic'
   | 'sensei'
-  | 'activities'
-  | 'gear'
-  | 'trophies'
-  | 'regions'
-  | 'missables'
-  | 'postgame';
+  | 'bounty'
+  | 'endgame';
 
 export interface Category {
   id: CategoryId;
@@ -16,6 +12,7 @@ export interface Category {
   icon: string; // Ionicons name
   color: string;
   description: string;
+  count: number;
 }
 
 export const CATEGORIES: Category[] = [
@@ -24,70 +21,48 @@ export const CATEGORIES: Category[] = [
     label: 'Main Story',
     icon: 'book-outline',
     color: '#C9A84C',
-    description: "Follow Atsu's journey across the wilds of Ezo",
+    description: "Follow Atsu's journey of revenge across Ezo against the Yotei Six",
+    count: 10,
   },
   {
-    id: 'side_quests',
-    label: 'Side Quests',
+    id: 'side_tales',
+    label: 'Side Tales',
     icon: 'people-outline',
     color: '#4A9B8E',
-    description: 'Help the people of Ezo survive the chaos',
+    description: 'Help the people of Ezo survive and rebuild across 48 stories',
+    count: 48,
   },
   {
     id: 'mythic',
     label: 'Mythic Tales',
     icon: 'flame-outline',
     color: '#8B1A1A',
-    description: 'Legendary challenges steeped in folklore',
+    description: 'Legendary challenges steeped in Ainu and samurai folklore',
+    count: 7,
   },
   {
     id: 'sensei',
-    label: 'Sensei Questlines',
+    label: 'Sensei Tales',
     icon: 'person-outline',
     color: '#7B68EE',
-    description: 'Journey alongside your closest allies',
+    description: 'Journey alongside your closest allies through 20 companion questlines',
+    count: 20,
   },
   {
-    id: 'activities',
-    label: 'Activities',
-    icon: 'fitness-outline',
-    color: '#4A9B6F',
-    description: 'Training, meditation, and exploration challenges',
-  },
-  {
-    id: 'gear',
-    label: 'Armor & Weapons',
-    icon: 'shield-outline',
+    id: 'bounty',
+    label: 'Bounty Quests',
+    icon: 'skull-outline',
     color: '#B8860B',
-    description: 'Forge, find and upgrade your equipment',
+    description: 'Track down and eliminate 31 dangerous criminals across Ezo',
+    count: 31,
   },
   {
-    id: 'trophies',
-    label: 'Trophies',
-    icon: 'trophy-outline',
-    color: '#DAA520',
-    description: 'Unlock all achievements for platinum',
-  },
-  {
-    id: 'regions',
-    label: 'Regions',
-    icon: 'map-outline',
-    color: '#4682B4',
-    description: 'Fully explore every area of Ezo',
-  },
-  {
-    id: 'missables',
-    label: 'Missables',
-    icon: 'warning-outline',
-    color: '#FF6B35',
-    description: 'Time-sensitive or permanently missable content',
-  },
-  {
-    id: 'postgame',
-    label: 'Postgame / NG+',
+    id: 'endgame',
+    label: 'Post-Story',
     icon: 'refresh-outline',
     color: '#9B59B6',
-    description: 'End-game challenges and New Game Plus',
+    description: 'Three epilogue tales that continue after the main story concludes',
+    count: 3,
   },
 ];
 
