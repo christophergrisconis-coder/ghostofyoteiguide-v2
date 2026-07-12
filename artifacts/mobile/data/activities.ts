@@ -410,14 +410,14 @@ const BAMBOO_STRIKES: WorldActivity[] = [
     name: 'Urara Bamboo Strike',
     category: 'bamboo_strike',
     region: 'Ishikari Plain',
-    description: 'An open-world Bamboo Strike in the Ishikari Plain region.',
+    description: 'In the central Ishikari Plain along the Urara River. From the Urara settlement, head east along the riverbank — the bamboo stand is on a low rise overlooking the water, beside a cluster of pine trees.',
   },
   {
     id: 'act_bamb_07',
     name: 'Rumoi Bamboo Strike',
     category: 'bamboo_strike',
     region: 'Ishikari Plain',
-    description: 'An open-world Bamboo Strike in the Ishikari Plain near Rumoi.',
+    description: 'In the northern Ishikari Plain near the Rumoi settlement. Head northeast from the Broken Horn Garrison along the road toward Rumoi — the bamboo stand is on a wooded hillside just west of the settlement, visible from the road.',
   },
 
   // ── Tokachi Range (3) ────────────────────────────────────────────────────
@@ -484,7 +484,8 @@ const BAMBOO_STRIKES: WorldActivity[] = [
     name: 'Matsumae Bamboo Strike',
     category: 'bamboo_strike',
     region: 'Oshima Coast',
-    description: 'A Bamboo Strike in the Oshima Coast region. Completing this earns the final Spirit increase needed if all others are done.',
+    description: 'In southern Oshima Coast near the Matsumae area. From the southern coastal road, head inland toward the forested hillside — the bamboo stand is on an elevated terrace overlooking the inlet below. This is typically the last Bamboo Strike players encounter; completing it earns the final Spirit increase if all 14 others are already done.',
+    tips: 'If this is your 15th Bamboo Strike, the Body, Mind, and Spirit silver trophy unlocks immediately after.',
   },
 ];
 
