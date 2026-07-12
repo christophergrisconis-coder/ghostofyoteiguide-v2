@@ -8,11 +8,20 @@ import { useColors } from '@/hooks/useColors';
 import { useProgress } from '@/context/ProgressContext';
 import { CATEGORIES, getCategoryById } from '@/data/categories';
 import { QUESTS, getQuestById } from '@/data/quests';
+import {
+  WORLD_ACTIVITIES,
+  ACTIVITY_CATEGORY_LABELS,
+  ACTIVITY_CATEGORY_ICONS,
+  ACTIVITY_CATEGORY_COLORS,
+  type ActivityCategory,
+} from '@/data/activities';
 import { CompletionRing } from '@/components/CompletionRing';
 import { StatCard } from '@/components/StatCard';
 import { CategoryCard } from '@/components/CategoryCard';
 import { QuestCard } from '@/components/QuestCard';
 import { ProgressBar } from '@/components/ProgressBar';
+
+const ACTIVITY_CATS: ActivityCategory[] = ['liberation', 'duel', 'haiku', 'vanity'];
 
 export default function DashboardScreen() {
   const colors = useColors();
@@ -46,6 +55,19 @@ export default function DashboardScreen() {
       })
       .slice(0, 3);
   }, [state]);
+
+  // ── Activity stats (computed from collectibleCompletion, filtered to ACTIVITY_IDS) ──
+  const activityStats = useMemo(() => {
+    const byCat = ACTIVITY_CATS.map(catId => {
+      const items = WORLD_ACTIVITIES.filter(a => a.category === catId);
+      const completed = items.filter(a => !!state.collectibleCompletion[a.id]).length;
+      return { catId, total: items.length, completed };
+    });
+    const total = byCat.reduce((s, c) => s + c.total, 0);
+    const completed = byCat.reduce((s, c) => s + c.completed, 0);
+    const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+    return { total, completed, pct, byCat };
+  }, [state.collectibleCompletion]);
 
   const recentQuests = state.recentlyUpdated
     .map(id => getQuestById(id))
@@ -211,6 +233,60 @@ export default function DashboardScreen() {
           </Text>
         </View>
       </View>
+
+      {/* ── Activities summary card ──────────────────────────── */}
+      <TouchableOpacity
+        style={[
+          styles.actCard,
+          { backgroundColor: colors.card, borderColor: colors.border },
+        ]}
+        onPress={() => router.push('/(tabs)/activities')}
+        activeOpacity={0.8}
+      >
+        {/* Header row */}
+        <View style={styles.actHeader}>
+          <View style={[styles.actIconWrap, { backgroundColor: '#4A9B8E20' }]}>
+            <Ionicons name="flag-outline" size={16} color="#4A9B8E" />
+          </View>
+          <Text style={[styles.actLabel, { color: colors.mutedForeground }]}>
+            ACTIVITIES
+          </Text>
+          <Text style={[styles.actTotal, { color: '#4A9B8E' }]}>
+            {activityStats.completed}
+            <Text style={[styles.actTotalOf, { color: colors.mutedForeground }]}>
+              /{activityStats.total}
+            </Text>
+          </Text>
+          <Ionicons name="chevron-forward" size={14} color={colors.mutedForeground} />
+        </View>
+
+        {/* Overall progress bar */}
+        <View style={styles.actBarWrap}>
+          <ProgressBar percentage={activityStats.pct} height={4} color="#4A9B8E" />
+        </View>
+
+        {/* Per-category breakdown */}
+        <View style={styles.actGrid}>
+          {activityStats.byCat.map(({ catId, total, completed }) => {
+            const color = ACTIVITY_CATEGORY_COLORS[catId];
+            const icon = ACTIVITY_CATEGORY_ICONS[catId];
+            const label = ACTIVITY_CATEGORY_LABELS[catId];
+            return (
+              <View key={catId} style={styles.actGridItem}>
+                <View style={[styles.actCatIconWrap, { backgroundColor: color + '20' }]}>
+                  <Ionicons name={icon as any} size={12} color={color} />
+                </View>
+                <Text style={[styles.actCatLabel, { color: colors.mutedForeground }]} numberOfLines={1}>
+                  {label}
+                </Text>
+                <Text style={[styles.actCatCount, { color: colors.foreground }]}>
+                  {completed}/{total}
+                </Text>
+              </View>
+            );
+          })}
+        </View>
+      </TouchableOpacity>
 
       {/* ── In Progress quests ───────────────────────────────── */}
       {inProgressQuests.length > 0 && (
@@ -500,6 +576,71 @@ const styles = StyleSheet.create({
   categoryScroll: {
     gap: 10,
     paddingRight: 4,
+  },
+  // Activities summary card
+  actCard: {
+    marginHorizontal: 20,
+    marginTop: 8,
+    borderRadius: 12,
+    borderWidth: 1,
+    padding: 14,
+    gap: 10,
+  },
+  actHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  actIconWrap: {
+    width: 28,
+    height: 28,
+    borderRadius: 7,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  actLabel: {
+    flex: 1,
+    fontSize: 10,
+    fontFamily: 'Inter_600SemiBold',
+    letterSpacing: 1.5,
+  },
+  actTotal: {
+    fontSize: 16,
+    fontFamily: 'Inter_700Bold',
+    letterSpacing: -0.3,
+  },
+  actTotalOf: {
+    fontSize: 11,
+    fontFamily: 'Inter_400Regular',
+  },
+  actBarWrap: {
+    marginTop: -2,
+  },
+  actGrid: {
+    flexDirection: 'row',
+    gap: 6,
+  },
+  actGridItem: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 4,
+  },
+  actCatIconWrap: {
+    width: 26,
+    height: 26,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  actCatLabel: {
+    fontSize: 9,
+    fontFamily: 'Inter_500Medium',
+    letterSpacing: 0.3,
+    textAlign: 'center',
+  },
+  actCatCount: {
+    fontSize: 12,
+    fontFamily: 'Inter_700Bold',
   },
   emptyCard: {
     padding: 20,
