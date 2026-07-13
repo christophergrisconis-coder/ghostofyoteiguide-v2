@@ -1,9 +1,9 @@
 /**
- * Ghost of Yōtei — 100% Guide Dashboard
+ * Ghost of Yōtei — 100% Completion Guide
  * Self-contained Expo Snack demo
  *
- * Paste this into a new Snack as App.tsx (not App.js).
- * All imports come from packages Snack provides by default.
+ * Paste this entire file into snack.expo.dev as App.tsx (NOT App.js).
+ * Every import comes from packages Snack provides by default — no extras needed.
  */
 
 import React, { useEffect, useMemo, useState } from "react";
@@ -16,7 +16,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import Svg, { Circle } from "react-native-svg";
 import Animated, {
@@ -31,27 +30,27 @@ import Animated, {
 // DESIGN TOKENS
 // ─────────────────────────────────────────────────────────────────────────────
 const C = {
-  background: "#0A0A0F",
-  foreground: "#F0EAD6",
+  bg: "#0A0A0F",
   card: "#14141E",
-  primary: "#C9A84C",
-  mutedForeground: "#7A7A90",
+  cardAlt: "#1A1A28",
+  fg: "#F0EAD6",
+  fgMuted: "#7A7A90",
   border: "#2A2A3E",
-  success: "#4A9B6F",
-  warning: "#E8A838",
+  gold: "#C9A84C",
   teal: "#4A9B8E",
   purple: "#7B68EE",
   orange: "#D4853A",
-  red: "#8B1A1A",
+  red: "#C0392B",
   blue: "#4682B4",
   mauve: "#9B7B8B",
   green: "#4A9B6F",
+  warn: "#E8A838",
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MOCK DATA
+// TYPES
 // ─────────────────────────────────────────────────────────────────────────────
-type QuestCategory =
+type QuestCat =
   | "main_story"
   | "side_tales"
   | "sensei_arcs"
@@ -61,327 +60,120 @@ type QuestCategory =
 interface Quest {
   id: string;
   title: string;
-  category: QuestCategory;
+  category: QuestCat;
   region: string;
   act: string;
   order: number;
   missable: boolean;
 }
 
-const QUESTS: Quest[] = [
-  {
-    id: "q01",
-    title: "The Ghost of Yōtei",
-    category: "main_story",
-    region: "Yotei Grasslands",
-    act: "Act 1",
-    order: 1,
-    missable: false,
-  },
-  {
-    id: "q02",
-    title: "Ashes on the Wind",
-    category: "main_story",
-    region: "Ishikari Plain",
-    act: "Act 1",
-    order: 2,
-    missable: false,
-  },
-  {
-    id: "q03",
-    title: "A Debt of Blood",
-    category: "main_story",
-    region: "Tokachi Range",
-    act: "Act 2",
-    order: 3,
-    missable: false,
-  },
-  {
-    id: "q04",
-    title: "The Weight of Iron",
-    category: "main_story",
-    region: "Nayoro Wilds",
-    act: "Act 2",
-    order: 4,
-    missable: false,
-  },
-  {
-    id: "q05",
-    title: "Wolves at the Gate",
-    category: "main_story",
-    region: "Teshio Ridge",
-    act: "Act 3",
-    order: 5,
-    missable: false,
-  },
-  {
-    id: "q06",
-    title: "The Blossom and the Blade",
-    category: "side_tales",
-    region: "Yotei Grasslands",
-    act: "Act 1",
-    order: 1,
-    missable: true,
-  },
-  {
-    id: "q07",
-    title: "Smoke on Still Water",
-    category: "side_tales",
-    region: "Ishikari Plain",
-    act: "Act 1",
-    order: 2,
-    missable: false,
-  },
-  {
-    id: "q08",
-    title: "A Merchant's Debt",
-    category: "side_tales",
-    region: "Tokachi Range",
-    act: "Act 2",
-    order: 3,
-    missable: false,
-  },
-  {
-    id: "q09",
-    title: "The Wandering Blade",
-    category: "sensei_arcs",
-    region: "Nayoro Wilds",
-    act: "Act 1",
-    order: 1,
-    missable: false,
-  },
-  {
-    id: "q10",
-    title: "Song of the Mountain",
-    category: "mythic_tales",
-    region: "Tokachi Range",
-    act: "Act 2",
-    order: 1,
-    missable: false,
-  },
-  {
-    id: "q11",
-    title: "The Silverback Wolf",
-    category: "bounties",
-    region: "Yotei Grasslands",
-    act: "Act 1",
-    order: 1,
-    missable: false,
-  },
-  {
-    id: "q12",
-    title: "Blood on the Pass",
-    category: "bounties",
-    region: "Teshio Ridge",
-    act: "Act 2",
-    order: 2,
-    missable: false,
-  },
-];
-
-interface Category {
-  id: QuestCategory;
+interface Activity {
+  id: string;
   label: string;
-  description: string;
-  color: string;
   icon: string;
+  color: string;
+  total: number;
 }
 
-const CATEGORIES: Category[] = [
-  {
-    id: "main_story",
-    label: "Main Story",
-    description: "Core narrative quests",
-    color: C.primary,
-    icon: "bookmark",
-  },
-  {
-    id: "side_tales",
-    label: "Side Tales",
-    description: "Optional story quests",
-    color: C.teal,
-    icon: "reader-outline",
-  },
-  {
-    id: "sensei_arcs",
-    label: "Sensei Arcs",
-    description: "Companion storylines",
-    color: C.purple,
-    icon: "people-outline",
-  },
-  {
-    id: "mythic_tales",
-    label: "Mythic Tales",
-    description: "Legendary weapon quests",
-    color: C.orange,
-    icon: "flame-outline",
-  },
-  {
-    id: "bounties",
-    label: "Bounties",
-    description: "Tracked criminals & creatures",
-    color: C.red,
-    icon: "skull-outline",
-  },
+// ─────────────────────────────────────────────────────────────────────────────
+// DATA
+// ─────────────────────────────────────────────────────────────────────────────
+const QUESTS: Quest[] = [
+  // Main Story
+  { id: "ms1", title: "The Ghost of Yōtei",      category: "main_story", region: "Yōtei Grasslands", act: "Act 1", order: 1, missable: false },
+  { id: "ms2", title: "Ashes on the Wind",        category: "main_story", region: "Ishikari Plain",   act: "Act 1", order: 2, missable: false },
+  { id: "ms3", title: "A Debt of Blood",          category: "main_story", region: "Tokachi Range",    act: "Act 2", order: 3, missable: false },
+  { id: "ms4", title: "The Weight of Iron",       category: "main_story", region: "Nayoro Wilds",     act: "Act 2", order: 4, missable: false },
+  { id: "ms5", title: "Wolves at the Gate",       category: "main_story", region: "Teshio Ridge",     act: "Act 3", order: 5, missable: false },
+  // Side Tales
+  { id: "st1", title: "The Blossom and the Blade", category: "side_tales", region: "Yōtei Grasslands", act: "Act 1", order: 1, missable: true  },
+  { id: "st2", title: "Smoke on Still Water",      category: "side_tales", region: "Ishikari Plain",   act: "Act 1", order: 2, missable: false },
+  { id: "st3", title: "A Merchant's Debt",         category: "side_tales", region: "Tokachi Range",    act: "Act 2", order: 3, missable: false },
+  { id: "st4", title: "The Last Lantern",          category: "side_tales", region: "Nayoro Wilds",     act: "Act 2", order: 4, missable: true  },
+  // Sensei Arcs
+  { id: "sa1", title: "The Wandering Blade",  category: "sensei_arcs", region: "Nayoro Wilds",   act: "Act 1", order: 1, missable: false },
+  { id: "sa2", title: "Oaths in the Ashes",   category: "sensei_arcs", region: "Ishikari Plain", act: "Act 2", order: 2, missable: false },
+  // Mythic Tales
+  { id: "mt1", title: "Song of the Mountain", category: "mythic_tales", region: "Tokachi Range",    act: "Act 2", order: 1, missable: false },
+  { id: "mt2", title: "The Frozen Blade",     category: "mythic_tales", region: "Teshio Ridge",     act: "Act 3", order: 2, missable: false },
+  // Bounties
+  { id: "bn1", title: "The Silverback Wolf",  category: "bounties", region: "Yōtei Grasslands", act: "Act 1", order: 1, missable: false },
+  { id: "bn2", title: "Blood on the Pass",    category: "bounties", region: "Teshio Ridge",     act: "Act 2", order: 2, missable: false },
+  { id: "bn3", title: "The Pale Ronin",       category: "bounties", region: "Nayoro Wilds",     act: "Act 3", order: 3, missable: false },
 ];
 
-const ACTIVITIES = [
-  {
-    id: "camp",
-    label: "Yōtei Six Camps",
-    icon: "flag-outline",
-    color: C.red,
-    total: 22,
-  },
-  {
-    id: "dueling_tree",
-    label: "Dueling Trees",
-    icon: "flash-outline",
-    color: C.primary,
-    total: 7,
-  },
-  {
-    id: "wolf_den",
-    label: "Wolf Dens",
-    icon: "paw-outline",
-    color: C.purple,
-    total: 10,
-  },
-  {
-    id: "fox_den",
-    label: "Fox Dens",
-    icon: "footsteps-outline",
-    color: C.orange,
-    total: 11,
-  },
-  {
-    id: "bamboo_strike",
-    label: "Bamboo Strikes",
-    icon: "leaf-outline",
-    color: C.green,
-    total: 15,
-  },
-  {
-    id: "shrine_climb",
-    label: "Shrine Climbs",
-    icon: "triangle-outline",
-    color: C.teal,
-    total: 13,
-  },
-  {
-    id: "hot_spring",
-    label: "Hot Springs",
-    icon: "water-outline",
-    color: C.blue,
-    total: 16,
-  },
-  {
-    id: "sumi_e",
-    label: "Sumi-e Paintings",
-    icon: "brush-outline",
-    color: C.mauve,
-    total: 15,
-  },
+const CATEGORIES: { id: QuestCat; label: string; icon: string; color: string; desc: string }[] = [
+  { id: "main_story",   label: "Main Story",   icon: "bookmark",       color: C.gold,   desc: "Core narrative quests" },
+  { id: "side_tales",   label: "Side Tales",   icon: "reader-outline", color: C.teal,   desc: "Optional story quests" },
+  { id: "sensei_arcs",  label: "Sensei Arcs",  icon: "people-outline", color: C.purple, desc: "Companion storylines" },
+  { id: "mythic_tales", label: "Mythic Tales", icon: "flame-outline",  color: C.orange, desc: "Legendary weapon quests" },
+  { id: "bounties",     label: "Bounties",     icon: "skull-outline",  color: C.red,    desc: "Criminals & creatures" },
+];
+
+const ACTIVITIES: Activity[] = [
+  { id: "camp",         label: "Yōtei Six Camps",  icon: "flag-outline",     color: C.red,    total: 22 },
+  { id: "dueling_tree", label: "Dueling Trees",    icon: "flash-outline",    color: C.gold,   total: 7  },
+  { id: "wolf_den",     label: "Wolf Dens",        icon: "paw-outline",      color: C.purple, total: 10 },
+  { id: "fox_den",      label: "Fox Dens",         icon: "footsteps-outline",color: C.orange, total: 11 },
+  { id: "bamboo",       label: "Bamboo Strikes",   icon: "leaf-outline",     color: C.green,  total: 15 },
+  { id: "shrine",       label: "Shrine Climbs",    icon: "triangle-outline", color: C.teal,   total: 13 },
+  { id: "hot_spring",   label: "Hot Springs",      icon: "water-outline",    color: C.blue,   total: 16 },
+  { id: "sumi_e",       label: "Sumi-e Paintings", icon: "brush-outline",    color: C.mauve,  total: 15 },
 ];
 
 const TOTAL_COLLECTIBLES = 280;
 const TOTAL_TROPHIES = 40;
 
 // ─────────────────────────────────────────────────────────────────────────────
-// GRID HELPER — picks column count to minimise orphan items
+// HELPERS
 // ─────────────────────────────────────────────────────────────────────────────
-function deriveGridCols(n: number, candidates = [3, 4, 5]): number {
+/** Pick column count (from candidates) that leaves fewest orphans; tie-break → 4 */
+function gridCols(n: number, candidates = [3, 4, 5]): number {
   return candidates.reduce((best, cols) => {
-    const orphans = n % cols;
-    const bestOrphans = n % best;
-    if (orphans < bestOrphans) return cols;
-    if (orphans === bestOrphans && cols === 4) return cols;
+    const o = n % cols, ob = n % best;
+    if (o < ob) return cols;
+    if (o === ob && cols === 4) return cols;
     return best;
   }, 4);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// COMPLETION RING
+// ANIMATED RING
 // ─────────────────────────────────────────────────────────────────────────────
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
-function CompletionRing({
-  percentage,
-  size = 128,
-  strokeWidth = 10,
-}: {
-  percentage: number;
-  size?: number;
-  strokeWidth?: number;
-}) {
-  const radius = (size - strokeWidth * 2) / 2;
-  const circumference = radius * 2 * Math.PI;
-  const cx = size / 2;
-  const cy = size / 2;
+function Ring({ pct, size = 120, sw = 9 }: { pct: number; size?: number; sw?: number }) {
+  const r = (size - sw * 2) / 2;
+  const circ = r * 2 * Math.PI;
+  const cx = size / 2, cy = size / 2;
   const progress = useSharedValue(0);
 
   useEffect(() => {
-    progress.value = withTiming(Math.min(100, Math.max(0, percentage)) / 100, {
+    progress.value = withTiming(Math.min(1, Math.max(0, pct / 100)), {
       duration: 1200,
       easing: Easing.out(Easing.cubic),
     });
-  }, [percentage]);
+  }, [pct]);
 
-  const animatedProps = useAnimatedProps(() => ({
-    strokeDashoffset: circumference * (1 - progress.value),
+  const aProps = useAnimatedProps(() => ({
+    strokeDashoffset: circ * (1 - progress.value),
   }));
 
   return (
-    <View
-      style={{
-        width: size,
-        height: size,
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
+    <View style={{ width: size, height: size, alignItems: "center", justifyContent: "center" }}>
       <Svg width={size} height={size} style={StyleSheet.absoluteFill}>
-        <Circle
-          cx={cx}
-          cy={cy}
-          r={radius}
-          stroke={C.border}
-          strokeWidth={strokeWidth}
-          fill="none"
-        />
+        <Circle cx={cx} cy={cy} r={r} stroke={C.border} strokeWidth={sw} fill="none" />
         <AnimatedCircle
-          cx={cx}
-          cy={cy}
-          r={radius}
-          stroke={C.primary}
-          strokeWidth={strokeWidth}
-          fill="none"
+          cx={cx} cy={cy} r={r}
+          stroke={C.gold} strokeWidth={sw} fill="none"
           strokeLinecap="round"
-          strokeDasharray={circumference}
-          animatedProps={animatedProps}
-          rotation={-90}
-          origin={`${cx}, ${cy}`}
+          strokeDasharray={circ}
+          animatedProps={aProps}
+          rotation={-90} origin={`${cx},${cy}`}
         />
       </Svg>
-      <Text
-        style={{
-          fontSize: 26,
-          fontWeight: "700",
-          color: C.foreground,
-          letterSpacing: -1,
-        }}
-      >
-        {percentage}%
-      </Text>
-      <Text
-        style={{
-          fontSize: 10,
-          color: C.mutedForeground,
-          letterSpacing: 1.5,
-          textTransform: "uppercase",
-          marginTop: 2,
-        }}
-      >
+      <Text style={{ fontSize: 24, fontWeight: "700", color: C.fg, letterSpacing: -1 }}>{pct}%</Text>
+      <Text style={{ fontSize: 9, color: C.fgMuted, letterSpacing: 1.5, textTransform: "uppercase", marginTop: 1 }}>
         Complete
       </Text>
     </View>
@@ -389,79 +181,32 @@ function CompletionRing({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PROGRESS BAR
+// ANIMATED BAR
 // ─────────────────────────────────────────────────────────────────────────────
-function ProgressBar({
-  percentage,
-  height = 6,
-  color = C.primary,
-}: {
-  percentage: number;
-  height?: number;
-  color?: string;
-}) {
+function Bar({ pct, h = 5, color = C.gold }: { pct: number; h?: number; color?: string }) {
   const progress = useSharedValue(0);
-
   useEffect(() => {
-    progress.value = withTiming(Math.min(100, Math.max(0, percentage)) / 100, {
-      duration: 700,
-      easing: Easing.out(Easing.cubic),
+    progress.value = withTiming(Math.min(1, Math.max(0, pct / 100)), {
+      duration: 700, easing: Easing.out(Easing.cubic),
     });
-  }, [percentage]);
-
-  const animStyle = useAnimatedStyle(() => ({
-    width: `${progress.value * 100}%` as any,
-  }));
-
+  }, [pct]);
+  const aStyle = useAnimatedStyle(() => ({ width: `${progress.value * 100}%` as any }));
   return (
-    <View
-      style={{
-        height,
-        borderRadius: 100,
-        overflow: "hidden",
-        width: "100%",
-        backgroundColor: C.border,
-      }}
-    >
-      <Animated.View
-        style={[
-          { height, borderRadius: 100, backgroundColor: color },
-          animStyle,
-        ]}
-      />
+    <View style={{ height: h, borderRadius: 100, overflow: "hidden", backgroundColor: C.border }}>
+      <Animated.View style={[{ height: h, borderRadius: 100, backgroundColor: color }, aStyle]} />
     </View>
   );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// STAT CARD
+// SMALL STAT BOX
 // ─────────────────────────────────────────────────────────────────────────────
-function StatCard({
-  label,
-  value,
-  icon,
-  color,
-}: {
-  label: string;
-  value: number;
-  icon: any;
-  color: string;
-}) {
+function StatBox({ label, value, icon, color }: { label: string; value: number; icon: any; color: string }) {
   return (
-    <View
-      style={[ss.statCard, { backgroundColor: C.card, borderColor: C.border }]}
-    >
-      <Ionicons name={icon} size={20} color={color} />
-      <Text style={{ fontSize: 22, fontWeight: "700", color }}>{value}</Text>
-      <Text
-        style={{
-          fontSize: 10,
-          color: C.mutedForeground,
-          letterSpacing: 0.5,
-          textAlign: "center",
-          textTransform: "uppercase",
-        }}
-      >
+    <View style={[ss.statBox, { backgroundColor: C.card, borderColor: C.border }]}>
+      <Ionicons name={icon} size={18} color={color} />
+      <Text style={{ fontSize: 20, fontWeight: "700", color, letterSpacing: -0.5 }}>{value}</Text>
+      <Text style={{ fontSize: 9, color: C.fgMuted, letterSpacing: 0.5, textAlign: "center", textTransform: "uppercase" }}>
         {label}
       </Text>
     </View>
@@ -469,482 +214,307 @@ function StatCard({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MAIN APP
+// SECTION HEADING
+// ─────────────────────────────────────────────────────────────────────────────
+function Section({ title, right }: { title: string; right?: string }) {
+  return (
+    <View style={{ flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", marginBottom: 10 }}>
+      <Text style={{ fontSize: 17, fontWeight: "700", color: C.fg, letterSpacing: -0.3 }}>{title}</Text>
+      {right ? <Text style={{ fontSize: 11, color: C.fgMuted }}>{right}</Text> : null}
+    </View>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// APP
 // ─────────────────────────────────────────────────────────────────────────────
 export default function App() {
-  // Simple toggle state — in the real app this is persisted via AsyncStorage
-  const [questDone, setQuestDone] = useState<Record<string, boolean>>({});
-  const [activityDone, setActivityDone] = useState<Record<string, number>>({});
+  const [questDone, setQuestDone]       = useState<Record<string, boolean>>({});
+  const [actDone,   setActDone]         = useState<Record<string, number>>({});
+  const [activeTab, setActiveTab]       = useState<"dashboard" | "quests" | "activities">("dashboard");
 
-  const completedQuests = useMemo(
-    () => Object.values(questDone).filter(Boolean).length,
-    [questDone],
+  // ── derived counts ──────────────────────────────────────────────────────────
+  const completedQuests = useMemo(() => Object.values(questDone).filter(Boolean).length, [questDone]);
+
+  const totalActs = useMemo(() => ACTIVITIES.reduce((s, a) => s + a.total, 0), []);
+  const completedActs = useMemo(
+    () => ACTIVITIES.reduce((s, a) => s + (actDone[a.id] ?? 0), 0),
+    [actDone],
   );
-  const totalActivities = ACTIVITIES.reduce((s, a) => s + a.total, 0);
-  const completedActivities = useMemo(
-    () =>
-      ACTIVITIES.reduce(
-        (s, a) => s + (activityDone[a.id] ?? 0),
-        [activityDone],
-      ),
-    [activityDone],
-  );
+
   const overallPct = useMemo(() => {
-    const totalItems = QUESTS.length + TOTAL_COLLECTIBLES + totalActivities;
-    const completedItems = completedQuests + completedActivities;
-    return Math.round((completedItems / totalItems) * 100);
-  }, [completedQuests, completedActivities]);
+    const total = QUESTS.length + TOTAL_COLLECTIBLES + totalActs;
+    return Math.round(((completedQuests + completedActs) / total) * 100);
+  }, [completedQuests, completedActs, totalActs]);
 
-  const actPct =
-    totalActivities > 0
-      ? Math.round((completedActivities / totalActivities) * 100)
-      : 0;
+  const actPct = totalActs > 0 ? Math.round((completedActs / totalActs) * 100) : 0;
 
-  const ACT_COLS = deriveGridCols(ACTIVITIES.length);
-  const ACT_W = `${Math.floor(100 / ACT_COLS) - 2}%` as const;
-
-  const nextQuest = QUESTS.filter((q) => q.category === "main_story")
+  const nextMain = QUESTS
+    .filter((q) => q.category === "main_story")
     .sort((a, b) => a.order - b.order)
     .find((q) => !questDone[q.id]);
 
-  const topPad = Platform.OS === "ios" ? 54 : 24;
+  const missableLeft = QUESTS.filter((q) => q.missable && !questDone[q.id]).length;
 
+  const topPad = Platform.OS === "ios" ? 54 : 28;
+  const ACT_COLS = gridCols(ACTIVITIES.length);
+  const ACT_W = `${Math.floor(100 / ACT_COLS) - 2}%` as const;
+
+  // ── tab toggle helpers ──────────────────────────────────────────────────────
+  function toggleQuest(id: string) {
+    setQuestDone((d) => ({ ...d, [id]: !d[id] }));
+  }
+  function tickActivity(id: string, max: number) {
+    setActDone((d) => ({ ...d, [id]: Math.min(max, (d[id] ?? 0) + 1) }));
+  }
+  function resetActivity(id: string) {
+    setActDone((d) => ({ ...d, [id]: 0 }));
+  }
+
+  // ── screens ─────────────────────────────────────────────────────────────────
+  return (
+    <View style={{ flex: 1, backgroundColor: C.bg }}>
+      {/* ── CONTENT ────────────────────────────────────────────────────────── */}
+      {activeTab === "dashboard" && (
+        <DashboardScreen
+          overallPct={overallPct}
+          completedQuests={completedQuests}
+          completedActs={completedActs}
+          totalActs={totalActs}
+          actPct={actPct}
+          actDone={actDone}
+          nextMain={nextMain}
+          missableLeft={missableLeft}
+          topPad={topPad}
+          ACT_COLS={ACT_COLS}
+          ACT_W={ACT_W}
+          questDone={questDone}
+          onTickActivity={tickActivity}
+          onMarkMain={(id) => setQuestDone((d) => ({ ...d, [id]: true }))}
+        />
+      )}
+      {activeTab === "quests" && (
+        <QuestsScreen
+          topPad={topPad}
+          questDone={questDone}
+          onToggle={toggleQuest}
+        />
+      )}
+      {activeTab === "activities" && (
+        <ActivitiesScreen
+          topPad={topPad}
+          actDone={actDone}
+          actPct={actPct}
+          completedActs={completedActs}
+          totalActs={totalActs}
+          onTick={tickActivity}
+          onReset={resetActivity}
+        />
+      )}
+
+      {/* ── TAB BAR ────────────────────────────────────────────────────────── */}
+      <View style={[ss.tabBar, { borderColor: C.border, backgroundColor: C.card }]}>
+        {(["dashboard", "quests", "activities"] as const).map((tab) => {
+          const icon = tab === "dashboard" ? "grid-outline" : tab === "quests" ? "list-outline" : "flag-outline";
+          const label = tab === "dashboard" ? "Dashboard" : tab === "quests" ? "Quests" : "Activities";
+          const active = activeTab === tab;
+          return (
+            <TouchableOpacity
+              key={tab}
+              style={ss.tabItem}
+              onPress={() => setActiveTab(tab)}
+              activeOpacity={0.7}
+            >
+              <Ionicons name={icon as any} size={22} color={active ? C.gold : C.fgMuted} />
+              <Text style={{ fontSize: 10, color: active ? C.gold : C.fgMuted, marginTop: 2, fontWeight: active ? "600" : "400" }}>
+                {label}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DASHBOARD SCREEN
+// ─────────────────────────────────────────────────────────────────────────────
+function DashboardScreen({
+  overallPct, completedQuests, completedActs, totalActs, actPct,
+  actDone, nextMain, missableLeft, topPad, ACT_COLS, ACT_W,
+  questDone, onTickActivity, onMarkMain,
+}: {
+  overallPct: number; completedQuests: number; completedActs: number;
+  totalActs: number; actPct: number; actDone: Record<string, number>;
+  nextMain?: Quest; missableLeft: number; topPad: number;
+  ACT_COLS: number; ACT_W: string; questDone: Record<string, boolean>;
+  onTickActivity(id: string, max: number): void;
+  onMarkMain(id: string): void;
+}) {
   return (
     <ScrollView
-      style={{ flex: 1, backgroundColor: C.background }}
-      contentContainerStyle={{ paddingBottom: 60 }}
+      style={{ flex: 1 }}
+      contentContainerStyle={{ paddingBottom: 100 }}
       showsVerticalScrollIndicator={false}
     >
       {/* HERO */}
-      <LinearGradient
-        colors={["#1A0800", "#0D0A20", C.background]}
-        locations={[0, 0.5, 1]}
-        style={{ paddingHorizontal: 20, paddingBottom: 28, paddingTop: topPad }}
-      >
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <View style={{ flex: 1, gap: 6, paddingRight: 14 }}>
-            <Text
-              style={{
-                fontSize: 10,
-                fontWeight: "600",
-                color: C.primary,
-                letterSpacing: 2.5,
-              }}
-            >
-              GHOST OF YŌTEI
-            </Text>
-            <Text
-              style={{
-                fontSize: 32,
-                fontWeight: "700",
-                color: C.foreground,
-                letterSpacing: -0.5,
-                lineHeight: 36,
-              }}
-            >
-              100% Guide
-            </Text>
-            <Text
-              style={{ fontSize: 13, color: C.mutedForeground, lineHeight: 18 }}
-            >
-              {QUESTS.length} quests · {TOTAL_COLLECTIBLES} collectibles{"\n"}
-              {TOTAL_TROPHIES} trophies ·{" "}
-              {QUESTS.filter((q) => q.missable).length} missable
-            </Text>
-          </View>
-          <CompletionRing percentage={overallPct} size={128} />
+      <View style={[ss.hero, { paddingTop: topPad, backgroundColor: "#0F0D1A" }]}>
+        <View style={{ flex: 1, gap: 5, paddingRight: 16 }}>
+          <Text style={{ fontSize: 10, fontWeight: "600", color: C.gold, letterSpacing: 2.5 }}>
+            GHOST OF YŌTEI
+          </Text>
+          <Text style={{ fontSize: 30, fontWeight: "700", color: C.fg, letterSpacing: -0.5, lineHeight: 34 }}>
+            100%{"\n"}Guide
+          </Text>
+          <Text style={{ fontSize: 12, color: C.fgMuted, lineHeight: 18, marginTop: 2 }}>
+            {QUESTS.length} quests · {TOTAL_COLLECTIBLES} collectibles{"\n"}
+            {TOTAL_TROPHIES} trophies · {QUESTS.filter((q) => q.missable).length} missable
+          </Text>
+          {missableLeft > 0 && (
+            <View style={[ss.chip, { backgroundColor: C.warn + "22", alignSelf: "flex-start", marginTop: 4 }]}>
+              <Ionicons name="warning-outline" size={10} color={C.warn} />
+              <Text style={{ fontSize: 10, color: C.warn, fontWeight: "600" }}>
+                {missableLeft} missable left
+              </Text>
+            </View>
+          )}
         </View>
-      </LinearGradient>
+        <Ring pct={overallPct} size={118} />
+      </View>
 
-      {/* STATS ROW */}
-      <View
-        style={{
-          flexDirection: "row",
-          gap: 10,
-          paddingHorizontal: 20,
-          marginTop: 16,
-        }}
-      >
-        <StatCard
-          label="Complete"
-          value={completedQuests}
-          icon="checkmark-circle"
-          color={C.success}
-        />
-        <StatCard label="In Progress" value={0} icon="time" color={C.warning} />
-        <StatCard
-          label="Remaining"
-          value={QUESTS.length - completedQuests}
-          icon="ellipse-outline"
-          color={C.mutedForeground}
-        />
+      {/* STAT ROW */}
+      <View style={{ flexDirection: "row", gap: 8, marginHorizontal: 16, marginTop: 16 }}>
+        <StatBox label="Done"      value={completedQuests}              icon="checkmark-circle" color={C.green} />
+        <StatBox label="Remaining" value={QUESTS.length - completedQuests} icon="ellipse-outline"  color={C.fgMuted} />
+        <StatBox label="Missable"  value={missableLeft}                  icon="warning-outline"  color={C.warn} />
       </View>
 
       {/* NEXT UP */}
-      {nextQuest && (
-        <View style={{ marginTop: 24, paddingHorizontal: 20, gap: 10 }}>
-          <Text
-            style={{
-              fontSize: 18,
-              fontWeight: "700",
-              color: C.foreground,
-              letterSpacing: -0.3,
-            }}
-          >
-            Next Up
-          </Text>
+      {nextMain && (
+        <View style={{ marginTop: 22, marginHorizontal: 16, gap: 8 }}>
+          <Section title="Next Up" right="Main Story" />
           <TouchableOpacity
-            style={[
-              ss.nextCard,
-              { backgroundColor: C.card, borderColor: C.primary + "40" },
-            ]}
-            onPress={() =>
-              setQuestDone((d) => ({ ...d, [nextQuest.id]: true }))
-            }
+            style={[ss.nextCard, { backgroundColor: C.card, borderColor: C.gold + "44" }]}
+            onPress={() => onMarkMain(nextMain.id)}
             activeOpacity={0.8}
           >
-            <View style={[ss.nextAccent, { backgroundColor: C.primary }]} />
-            <View style={{ flex: 1, padding: 14, gap: 5 }}>
-              <View style={[ss.chip, { backgroundColor: C.primary + "20" }]}>
-                <Ionicons name="bookmark" size={10} color={C.primary} />
-                <Text
-                  style={{
-                    fontSize: 10,
-                    fontWeight: "600",
-                    color: C.primary,
-                    letterSpacing: 0.5,
-                  }}
-                >
-                  Main Story
+            <View style={[ss.accent, { backgroundColor: C.gold }]} />
+            <View style={{ flex: 1, padding: 12, gap: 4 }}>
+              <View style={[ss.chip, { backgroundColor: C.gold + "22" }]}>
+                <Ionicons name="bookmark" size={9} color={C.gold} />
+                <Text style={{ fontSize: 9, fontWeight: "600", color: C.gold, letterSpacing: 0.5 }}>
+                  {nextMain.act} · {nextMain.region}
                 </Text>
               </View>
-              <Text
-                style={{
-                  fontSize: 15,
-                  fontWeight: "600",
-                  color: C.foreground,
-                  lineHeight: 20,
-                }}
-              >
-                {nextQuest.title}
-              </Text>
-              <Text style={{ fontSize: 12, color: C.mutedForeground }}>
-                {nextQuest.act} · {nextQuest.region}
+              <Text style={{ fontSize: 15, fontWeight: "600", color: C.fg, lineHeight: 20 }}>
+                {nextMain.title}
               </Text>
             </View>
-            <View style={{ paddingRight: 14 }}>
-              <Ionicons name="chevron-forward" size={18} color={C.primary} />
+            <View style={{ paddingRight: 12, justifyContent: "center" }}>
+              <Ionicons name="checkmark-circle-outline" size={22} color={C.gold} />
             </View>
           </TouchableOpacity>
-          <Text
-            style={{
-              fontSize: 11,
-              color: C.mutedForeground,
-              textAlign: "center",
-            }}
-          >
-            Tap the card to mark it complete and see the next quest
+          <Text style={{ fontSize: 11, color: C.fgMuted, textAlign: "center" }}>
+            Tap to mark complete · see next quest automatically
           </Text>
         </View>
       )}
 
-      {/* BANNER ROW */}
-      <View
-        style={{
-          flexDirection: "row",
-          gap: 8,
-          marginHorizontal: 20,
-          marginTop: nextQuest ? 8 : 16,
-        }}
-      >
+      {/* SUMMARY BANNERS */}
+      <View style={{ flexDirection: "row", gap: 8, marginHorizontal: 16, marginTop: 20, flexWrap: "wrap" }}>
         {[
-          {
-            label: "QUESTS",
-            value: completedQuests,
-            total: QUESTS.length,
-            color: C.primary,
-            sub: `${QUESTS.length - completedQuests} remaining`,
-          },
-          {
-            label: "COLLECTIBLES",
-            value: 0,
-            total: TOTAL_COLLECTIBLES,
-            color: C.teal,
-            sub: `${TOTAL_COLLECTIBLES} left`,
-          },
-          {
-            label: "TROPHIES",
-            value: 0,
-            total: TOTAL_TROPHIES,
-            color: C.primary,
-            sub: "0% unlocked",
-          },
-          {
-            label: "ACTIVITIES",
-            value: completedActivities,
-            total: totalActivities,
-            color: C.teal,
-            sub: `${totalActivities - completedActivities} left`,
-          },
+          { label: "QUESTS",       value: completedQuests, total: QUESTS.length,       color: C.gold,   sub: `${QUESTS.length - completedQuests} left` },
+          { label: "COLLECTIBLES", value: 0,               total: TOTAL_COLLECTIBLES,   color: C.teal,   sub: `${TOTAL_COLLECTIBLES} left` },
+          { label: "TROPHIES",     value: 0,               total: TOTAL_TROPHIES,       color: C.purple, sub: "0 unlocked" },
+          { label: "ACTIVITIES",   value: completedActs,   total: totalActs,            color: C.teal,   sub: `${totalActs - completedActs} left` },
         ].map((b) => (
-          <View
-            key={b.label}
-            style={[
-              ss.bannerCard,
-              { backgroundColor: C.card, borderColor: C.border },
-            ]}
-          >
-            <Text
-              style={{
-                fontSize: 8,
-                fontWeight: "600",
-                color: C.mutedForeground,
-                letterSpacing: 1.5,
-              }}
-            >
-              {b.label}
-            </Text>
-            <Text
-              style={{
-                fontSize: 18,
-                fontWeight: "700",
-                letterSpacing: -0.5,
-                color: b.color,
-              }}
-            >
+          <View key={b.label} style={[ss.banner, { backgroundColor: C.card, borderColor: C.border }]}>
+            <Text style={{ fontSize: 8, fontWeight: "600", color: C.fgMuted, letterSpacing: 1.5 }}>{b.label}</Text>
+            <Text style={{ fontSize: 17, fontWeight: "700", letterSpacing: -0.5, color: b.color }}>
               {b.value}
-              <Text
-                style={{
-                  fontSize: 11,
-                  fontWeight: "400",
-                  color: C.mutedForeground,
-                }}
-              >
-                /{b.total}
-              </Text>
+              <Text style={{ fontSize: 11, fontWeight: "400", color: C.fgMuted }}>/{b.total}</Text>
             </Text>
-            <Text style={{ fontSize: 9, color: C.mutedForeground }}>
-              {b.sub}
-            </Text>
+            <Text style={{ fontSize: 9, color: C.fgMuted }}>{b.sub}</Text>
           </View>
         ))}
       </View>
 
       {/* ACTIVITIES CARD */}
-      <View
-        style={[ss.actCard, { backgroundColor: C.card, borderColor: C.border }]}
-      >
-        {/* Header */}
+      <View style={[ss.actCard, { backgroundColor: C.card, borderColor: C.border }]}>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-          <View
-            style={{
-              width: 28,
-              height: 28,
-              borderRadius: 7,
-              backgroundColor: C.teal + "20",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Ionicons name="flag-outline" size={16} color={C.teal} />
+          <View style={[ss.iconBox, { backgroundColor: C.teal + "22" }]}>
+            <Ionicons name="flag-outline" size={15} color={C.teal} />
           </View>
-          <Text
-            style={{
-              flex: 1,
-              fontSize: 10,
-              fontWeight: "600",
-              color: C.mutedForeground,
-              letterSpacing: 1.5,
-            }}
-          >
+          <Text style={{ flex: 1, fontSize: 11, fontWeight: "600", color: C.fgMuted, letterSpacing: 1.5 }}>
             ACTIVITIES
           </Text>
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: "700",
-              letterSpacing: -0.3,
-              color: C.teal,
-            }}
-          >
-            {completedActivities}
-            <Text
-              style={{
-                fontSize: 11,
-                fontWeight: "400",
-                color: C.mutedForeground,
-              }}
-            >
-              /{totalActivities}
-            </Text>
+          <Text style={{ fontSize: 15, fontWeight: "700", color: C.teal }}>
+            {completedActs}
+            <Text style={{ fontSize: 11, fontWeight: "400", color: C.fgMuted }}>/{totalActs}</Text>
           </Text>
-          <Ionicons
-            name="chevron-forward"
-            size={14}
-            color={C.mutedForeground}
-          />
         </View>
-
-        {/* Progress bar */}
-        <ProgressBar percentage={actPct} height={4} color={C.teal} />
-
-        {/* Per-category grid */}
-        <View
-          style={{
-            flexDirection: "row",
-            flexWrap: "wrap",
-            gap: 6,
-            justifyContent: "center",
-          }}
-        >
+        <Bar pct={actPct} h={4} color={C.teal} />
+        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, justifyContent: "center" }}>
           {ACTIVITIES.map(({ id, label, icon, color, total }) => {
-            const done = activityDone[id] ?? 0;
+            const done = actDone[id] ?? 0;
+            const complete = done >= total;
             return (
               <TouchableOpacity
                 key={id}
-                style={{ width: ACT_W, alignItems: "center", gap: 4 }}
-                onPress={() =>
-                  setActivityDone((d) => ({
-                    ...d,
-                    [id]: Math.min(total, (d[id] ?? 0) + 1),
-                  }))
-                }
+                style={{ width: ACT_W, alignItems: "center", gap: 3 }}
+                onPress={() => onTickActivity(id, total)}
                 activeOpacity={0.7}
               >
-                <View
-                  style={{
-                    width: 26,
-                    height: 26,
-                    borderRadius: 6,
-                    backgroundColor: color + "20",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Ionicons name={icon as any} size={12} color={color} />
+                <View style={[ss.iconBox, { backgroundColor: color + "22" }, complete && { backgroundColor: color + "44" }]}>
+                  <Ionicons name={icon as any} size={13} color={complete ? color : color} />
                 </View>
-                <Text
-                  style={{
-                    fontSize: 9,
-                    color: C.mutedForeground,
-                    letterSpacing: 0.3,
-                    textAlign: "center",
-                  }}
-                  numberOfLines={1}
-                >
+                <Text style={{ fontSize: 8, color: C.fgMuted, textAlign: "center" }} numberOfLines={1}>
                   {label}
                 </Text>
-                <Text
-                  style={{
-                    fontSize: 12,
-                    fontWeight: "700",
-                    color: done === total ? C.success : C.foreground,
-                  }}
-                >
+                <Text style={{ fontSize: 12, fontWeight: "700", color: complete ? C.green : C.fg }}>
                   {done}/{total}
                 </Text>
               </TouchableOpacity>
             );
           })}
         </View>
-        <Text
-          style={{
-            fontSize: 11,
-            color: C.mutedForeground,
-            textAlign: "center",
-          }}
-        >
-          Tap any category to increment its count
+        <Text style={{ fontSize: 10, color: C.fgMuted, textAlign: "center" }}>
+          Tap any category to tick up · visit Activities tab to reset
         </Text>
       </View>
 
-      {/* CATEGORIES */}
-      <View style={{ marginTop: 24, paddingHorizontal: 20, gap: 12 }}>
-        <Text
-          style={{
-            fontSize: 18,
-            fontWeight: "700",
-            color: C.foreground,
-            letterSpacing: -0.3,
-          }}
-        >
-          Categories
-        </Text>
+      {/* CATEGORY CARDS */}
+      <View style={{ marginTop: 24, paddingLeft: 16, gap: 10 }}>
+        <View style={{ paddingRight: 16 }}>
+          <Section title="Categories" />
+        </View>
         <FlatList
           horizontal
           data={CATEGORIES}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(c) => c.id}
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ gap: 10 }}
+          contentContainerStyle={{ gap: 10, paddingRight: 16 }}
           renderItem={({ item }) => {
             const total = QUESTS.filter((q) => q.category === item.id).length;
-            const completed = QUESTS.filter(
-              (q) => q.category === item.id && questDone[q.id],
-            ).length;
-            const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+            const done  = QUESTS.filter((q) => q.category === item.id && questDone[q.id]).length;
+            const pct   = total > 0 ? Math.round((done / total) * 100) : 0;
             return (
-              <View
-                style={[
-                  ss.catCard,
-                  { backgroundColor: C.card, borderColor: C.border },
-                ]}
-              >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: 10,
-                    marginBottom: 8,
-                  }}
-                >
-                  <View
-                    style={{
-                      width: 30,
-                      height: 30,
-                      borderRadius: 7,
-                      backgroundColor: item.color + "20",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Ionicons
-                      name={item.icon as any}
-                      size={16}
-                      color={item.color}
-                    />
+              <View style={[ss.catCard, { backgroundColor: C.card, borderColor: C.border }]}>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 10 }}>
+                  <View style={[ss.iconBox, { backgroundColor: item.color + "22" }]}>
+                    <Ionicons name={item.icon as any} size={15} color={item.color} />
                   </View>
                   <View style={{ flex: 1 }}>
-                    <Text
-                      style={{
-                        fontSize: 12,
-                        fontWeight: "600",
-                        color: C.foreground,
-                      }}
-                      numberOfLines={1}
-                    >
+                    <Text style={{ fontSize: 12, fontWeight: "600", color: C.fg }} numberOfLines={1}>
                       {item.label}
                     </Text>
-                    <Text style={{ fontSize: 10, color: C.mutedForeground }}>
-                      {completed}/{total}
-                    </Text>
+                    <Text style={{ fontSize: 10, color: C.fgMuted }}>{done}/{total} quests</Text>
                   </View>
-                  <Text
-                    style={{
-                      fontSize: 13,
-                      fontWeight: "700",
-                      color: item.color,
-                    }}
-                  >
-                    {pct}%
-                  </Text>
+                  <Text style={{ fontSize: 13, fontWeight: "700", color: item.color }}>{pct}%</Text>
                 </View>
-                <ProgressBar percentage={pct} height={3} color={item.color} />
+                <Bar pct={pct} h={3} color={item.color} />
+                <Text style={{ fontSize: 9, color: C.fgMuted, marginTop: 4 }}>{item.desc}</Text>
               </View>
             );
           }}
@@ -955,26 +525,210 @@ export default function App() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SHARED STYLES
+// QUESTS SCREEN
+// ─────────────────────────────────────────────────────────────────────────────
+function QuestsScreen({
+  topPad, questDone, onToggle,
+}: {
+  topPad: number;
+  questDone: Record<string, boolean>;
+  onToggle(id: string): void;
+}) {
+  const [filter, setFilter] = useState<QuestCat | "all">("all");
+
+  const shown = filter === "all" ? QUESTS : QUESTS.filter((q) => q.category === filter);
+  const cat = filter !== "all" ? CATEGORIES.find((c) => c.id === filter) : null;
+
+  const done  = shown.filter((q) => questDone[q.id]).length;
+  const total = shown.length;
+  const pct   = total > 0 ? Math.round((done / total) * 100) : 0;
+
+  return (
+    <View style={{ flex: 1 }}>
+      {/* Header */}
+      <View style={[ss.screenHeader, { paddingTop: topPad, backgroundColor: C.card, borderColor: C.border }]}>
+        <Text style={{ fontSize: 22, fontWeight: "700", color: C.fg, letterSpacing: -0.5 }}>Quests</Text>
+        <Text style={{ fontSize: 13, color: C.fgMuted, marginTop: 2 }}>
+          {done}/{total} complete · {pct}%
+        </Text>
+        <Bar pct={pct} h={3} color={cat?.color ?? C.gold} />
+      </View>
+
+      {/* Category filter */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={{ backgroundColor: C.card, borderBottomWidth: 1, borderColor: C.border }}
+        contentContainerStyle={{ gap: 6, padding: 10 }}
+      >
+        {[{ id: "all" as const, label: "All", color: C.gold }, ...CATEGORIES.map((c) => ({ id: c.id as QuestCat | "all", label: c.label, color: c.color }))].map((c) => {
+          const active = filter === c.id;
+          return (
+            <TouchableOpacity
+              key={c.id}
+              style={[ss.filterChip, { backgroundColor: active ? c.color + "33" : C.cardAlt, borderColor: active ? c.color + "77" : C.border }]}
+              onPress={() => setFilter(c.id)}
+              activeOpacity={0.7}
+            >
+              <Text style={{ fontSize: 11, fontWeight: "600", color: active ? c.color : C.fgMuted }}>
+                {c.label}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </ScrollView>
+
+      {/* Quest list */}
+      <FlatList
+        data={shown}
+        keyExtractor={(q) => q.id}
+        contentContainerStyle={{ padding: 14, gap: 8, paddingBottom: 100 }}
+        renderItem={({ item }) => {
+          const c = CATEGORIES.find((c) => c.id === item.category)!;
+          const checked = !!questDone[item.id];
+          return (
+            <TouchableOpacity
+              style={[ss.questRow, { backgroundColor: C.card, borderColor: checked ? c.color + "55" : C.border }]}
+              onPress={() => onToggle(item.id)}
+              activeOpacity={0.75}
+            >
+              <View style={[ss.accent, { backgroundColor: checked ? c.color : C.border }]} />
+              <View style={{ flex: 1, padding: 11, gap: 3 }}>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+                  <Text style={{ flex: 1, fontSize: 14, fontWeight: "600", color: checked ? C.fgMuted : C.fg, lineHeight: 18 }}
+                    numberOfLines={2}>
+                    {item.title}
+                  </Text>
+                  {item.missable && (
+                    <View style={[ss.chip, { backgroundColor: C.warn + "22" }]}>
+                      <Ionicons name="warning-outline" size={9} color={C.warn} />
+                      <Text style={{ fontSize: 9, color: C.warn, fontWeight: "600" }}>Missable</Text>
+                    </View>
+                  )}
+                </View>
+                <Text style={{ fontSize: 11, color: C.fgMuted }}>
+                  {item.act} · {item.region}
+                </Text>
+                <View style={[ss.chip, { backgroundColor: c.color + "18", alignSelf: "flex-start", marginTop: 2 }]}>
+                  <Ionicons name={c.icon as any} size={9} color={c.color} />
+                  <Text style={{ fontSize: 9, color: c.color, fontWeight: "600" }}>{c.label}</Text>
+                </View>
+              </View>
+              <View style={{ paddingRight: 12, justifyContent: "center" }}>
+                <View style={[ss.checkbox, { borderColor: checked ? c.color : C.border, backgroundColor: checked ? c.color : "transparent" }]}>
+                  {checked && <Ionicons name="checkmark" size={13} color={C.bg} />}
+                </View>
+              </View>
+            </TouchableOpacity>
+          );
+        }}
+      />
+    </View>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ACTIVITIES SCREEN
+// ─────────────────────────────────────────────────────────────────────────────
+function ActivitiesScreen({
+  topPad, actDone, actPct, completedActs, totalActs, onTick, onReset,
+}: {
+  topPad: number;
+  actDone: Record<string, number>;
+  actPct: number;
+  completedActs: number;
+  totalActs: number;
+  onTick(id: string, max: number): void;
+  onReset(id: string): void;
+}) {
+  return (
+    <View style={{ flex: 1 }}>
+      <View style={[ss.screenHeader, { paddingTop: topPad, backgroundColor: C.card, borderColor: C.border }]}>
+        <Text style={{ fontSize: 22, fontWeight: "700", color: C.fg, letterSpacing: -0.5 }}>Activities</Text>
+        <Text style={{ fontSize: 13, color: C.fgMuted, marginTop: 2 }}>
+          {completedActs}/{totalActs} complete · {actPct}%
+        </Text>
+        <Bar pct={actPct} h={3} color={C.teal} />
+      </View>
+
+      <FlatList
+        data={ACTIVITIES}
+        keyExtractor={(a) => a.id}
+        contentContainerStyle={{ padding: 14, gap: 10, paddingBottom: 100 }}
+        renderItem={({ item }) => {
+          const done = actDone[item.id] ?? 0;
+          const complete = done >= item.total;
+          const pct = Math.round((done / item.total) * 100);
+          return (
+            <View style={[ss.actRow, { backgroundColor: C.card, borderColor: complete ? item.color + "55" : C.border }]}>
+              <View style={[ss.accent, { backgroundColor: complete ? item.color : C.border }]} />
+              <View style={{ flex: 1, padding: 12, gap: 8 }}>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+                  <View style={[ss.iconBox, { backgroundColor: item.color + "22" }]}>
+                    <Ionicons name={item.icon as any} size={16} color={item.color} />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 14, fontWeight: "600", color: complete ? C.fgMuted : C.fg }}>
+                      {item.label}
+                    </Text>
+                    <Text style={{ fontSize: 11, color: C.fgMuted }}>{done}/{item.total} · {pct}%</Text>
+                  </View>
+                  {complete
+                    ? <Ionicons name="checkmark-circle" size={22} color={C.green} />
+                    : (
+                      <TouchableOpacity
+                        style={[ss.tickBtn, { backgroundColor: item.color + "22", borderColor: item.color + "55" }]}
+                        onPress={() => onTick(item.id, item.total)}
+                        activeOpacity={0.7}
+                      >
+                        <Ionicons name="add" size={18} color={item.color} />
+                      </TouchableOpacity>
+                    )
+                  }
+                </View>
+                <Bar pct={pct} h={4} color={item.color} />
+                {done > 0 && (
+                  <TouchableOpacity onPress={() => onReset(item.id)} activeOpacity={0.7}>
+                    <Text style={{ fontSize: 10, color: C.fgMuted, textAlign: "right" }}>Reset</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            </View>
+          );
+        }}
+      />
+    </View>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// STYLES
 // ─────────────────────────────────────────────────────────────────────────────
 const ss = StyleSheet.create({
-  statCard: {
+  hero: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingBottom: 24,
+    gap: 8,
+  },
+  statBox: {
     flex: 1,
     alignItems: "center",
-    paddingVertical: 14,
-    paddingHorizontal: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 6,
     borderRadius: 12,
     borderWidth: 1,
-    gap: 4,
+    gap: 3,
   },
   nextCard: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "stretch",
     borderRadius: 12,
     borderWidth: 1,
     overflow: "hidden",
   },
-  nextAccent: {
+  accent: {
     width: 3,
     alignSelf: "stretch",
   },
@@ -982,30 +736,94 @@ const ss = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
-    alignSelf: "flex-start",
-    paddingHorizontal: 8,
+    paddingHorizontal: 7,
     paddingVertical: 3,
     borderRadius: 20,
   },
-  bannerCard: {
+  banner: {
     flex: 1,
-    padding: 12,
+    minWidth: "40%",
+    padding: 11,
     borderRadius: 12,
     borderWidth: 1,
     gap: 1,
   },
   actCard: {
-    marginHorizontal: 20,
-    marginTop: 8,
-    borderRadius: 12,
+    marginHorizontal: 16,
+    marginTop: 10,
+    borderRadius: 14,
     borderWidth: 1,
     padding: 14,
     gap: 10,
   },
   catCard: {
-    width: 160,
+    width: 158,
     padding: 12,
-    borderRadius: 10,
+    borderRadius: 12,
     borderWidth: 1,
+  },
+  iconBox: {
+    width: 30,
+    height: 30,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  tabBar: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    flexDirection: "row",
+    borderTopWidth: 1,
+    paddingBottom: Platform.OS === "ios" ? 24 : 8,
+    paddingTop: 8,
+  },
+  tabItem: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  screenHeader: {
+    paddingHorizontal: 20,
+    paddingBottom: 14,
+    borderBottomWidth: 1,
+    gap: 6,
+  },
+  filterChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    borderWidth: 1,
+  },
+  questRow: {
+    flexDirection: "row",
+    alignItems: "stretch",
+    borderRadius: 12,
+    borderWidth: 1,
+    overflow: "hidden",
+  },
+  checkbox: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 1.5,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  actRow: {
+    flexDirection: "row",
+    alignItems: "stretch",
+    borderRadius: 12,
+    borderWidth: 1,
+    overflow: "hidden",
+  },
+  tickBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
