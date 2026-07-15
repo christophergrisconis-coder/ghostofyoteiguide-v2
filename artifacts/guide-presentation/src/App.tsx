@@ -1052,9 +1052,68 @@ function StrategySection() {
   );
 }
 
+// ── Reset Confirmation Dialog ─────────────────────────────────────────────────
+
+function ResetDialog({ onConfirm, onCancel }: { onConfirm: () => void; onCancel: () => void }) {
+  return (
+    <div
+      onClick={onCancel}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 9999,
+        background: 'rgba(4,4,12,0.80)', display: 'flex',
+        alignItems: 'center', justifyContent: 'center',
+      }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{
+          background: '#0f0f1a', border: `1px solid ${GOLD40}`,
+          borderRadius: 14, padding: '32px 36px', maxWidth: 380, width: '90%',
+          boxShadow: '0 24px 80px rgba(0,0,0,0.7)',
+        }}
+      >
+        <div style={{ fontSize: 36, textAlign: 'center', marginBottom: 16 }}>⚠️</div>
+        <h2 style={{ fontFamily: 'Georgia, serif', fontSize: 20, color: WHITE, textAlign: 'center', marginBottom: 10 }}>
+          Start Fresh?
+        </h2>
+        <p style={{ fontFamily: 'sans-serif', fontSize: 13, color: DIM, lineHeight: 1.6, textAlign: 'center', marginBottom: 28 }}>
+          This will clear <span style={{ color: WHITE }}>all checked progress</span> — quests, collectibles, and activities — from this browser. This cannot be undone.
+        </p>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button
+            onClick={onCancel}
+            style={{
+              flex: 1, padding: '10px', borderRadius: 8,
+              border: `1px solid rgba(255,255,255,0.12)`,
+              background: 'rgba(255,255,255,0.05)', color: DIM,
+              fontFamily: 'sans-serif', fontSize: 13, cursor: 'pointer',
+            }}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            style={{
+              flex: 1, padding: '10px', borderRadius: 8,
+              border: '1px solid rgba(239,68,68,0.5)',
+              background: 'rgba(239,68,68,0.15)', color: '#ef4444',
+              fontFamily: 'sans-serif', fontSize: 13, fontWeight: 700, cursor: 'pointer',
+            }}
+          >
+            Reset Progress
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Sidebar ───────────────────────────────────────────────────────────────────
 
 function Sidebar({ activeSection, onNav }: { activeSection: string; onNav: (id: string) => void }) {
+  const { reset } = useProgress();
+  const [showResetDialog, setShowResetDialog] = useState(false);
+
   const groups = [
     { key: 'guide',  label: 'Guide' },
     { key: 'quests', label: 'Quests' },
@@ -1062,8 +1121,20 @@ function Sidebar({ activeSection, onNav }: { activeSection: string; onNav: (id: 
     { key: 'status', label: 'Completion' },
   ];
 
+  function handleConfirmReset() {
+    reset();
+    setShowResetDialog(false);
+  }
+
   return (
     <>
+      {showResetDialog && (
+        <ResetDialog
+          onConfirm={handleConfirmReset}
+          onCancel={() => setShowResetDialog(false)}
+        />
+      )}
+
       {/* Logo header */}
       <div style={{ padding: '24px 20px 18px', borderBottom: `1px solid ${GOLD20}`, flexShrink: 0 }}>
         <p style={{ fontFamily: 'sans-serif', fontSize: 9, letterSpacing: '0.25em', color: GOLD, textTransform: 'uppercase', marginBottom: 6, opacity: 0.8 }}>Complete Guide</p>
@@ -1092,7 +1163,7 @@ function Sidebar({ activeSection, onNav }: { activeSection: string; onNav: (id: 
 
       {/* Footer */}
       <div style={{ padding: '14px 16px', borderTop: `1px solid ${GOLD20}`, flexShrink: 0 }}>
-        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 12 }}>
           {[['119','Quests'],['319','Collectibles'],['54','Trophies']].map(([n, l]) => (
             <div key={l} style={{ textAlign: 'center' }}>
               <div style={{ fontFamily: 'Georgia, serif', fontSize: 15, color: GOLD }}>{n}</div>
@@ -1100,6 +1171,28 @@ function Sidebar({ activeSection, onNav }: { activeSection: string; onNav: (id: 
             </div>
           ))}
         </div>
+        <button
+          onClick={() => setShowResetDialog(true)}
+          style={{
+            width: '100%', padding: '7px 10px', borderRadius: 7,
+            border: '1px solid rgba(239,68,68,0.25)',
+            background: 'rgba(239,68,68,0.06)', color: 'rgba(239,68,68,0.6)',
+            fontFamily: 'sans-serif', fontSize: 11, cursor: 'pointer',
+            letterSpacing: '0.04em', transition: 'all 0.15s',
+          }}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(239,68,68,0.5)';
+            (e.currentTarget as HTMLButtonElement).style.color = '#ef4444';
+            (e.currentTarget as HTMLButtonElement).style.background = 'rgba(239,68,68,0.12)';
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(239,68,68,0.25)';
+            (e.currentTarget as HTMLButtonElement).style.color = 'rgba(239,68,68,0.6)';
+            (e.currentTarget as HTMLButtonElement).style.background = 'rgba(239,68,68,0.06)';
+          }}
+        >
+          ↺ Start Fresh
+        </button>
       </div>
     </>
   );
