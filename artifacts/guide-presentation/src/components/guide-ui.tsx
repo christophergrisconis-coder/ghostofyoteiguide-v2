@@ -73,8 +73,9 @@ export function SectionBg({ img, overlay = 'rgba(5,5,15,0.88)', children }: {
 
 // ── Quest list row ─────────────────────────────────────────────────────────────
 
-export function QuestRow({ quest, index, selected, onClick, accentColor }: {
+export function QuestRow({ quest, index, selected, onClick, accentColor, checked = false, onToggle }: {
   quest: Quest; index: number; selected: boolean; onClick: () => void; accentColor: string;
+  checked?: boolean; onToggle?: (e: React.MouseEvent) => void;
 }) {
   const regionColor = REGION_COLOR[quest.region] || '#888';
   return (
@@ -83,21 +84,76 @@ export function QuestRow({ quest, index, selected, onClick, accentColor }: {
       style={{
         display: 'flex', alignItems: 'center', gap: 8, padding: '9px 12px',
         borderRadius: 8, marginBottom: 4, cursor: 'pointer',
-        background: selected ? `${accentColor}18` : 'rgba(255,255,255,0.03)',
-        border: `1px solid ${selected ? accentColor + '60' : 'rgba(255,255,255,0.06)'}`,
+        background: checked
+          ? `${accentColor}10`
+          : selected ? `${accentColor}18` : 'rgba(255,255,255,0.03)',
+        border: `1px solid ${selected ? accentColor + '60' : checked ? accentColor + '30' : 'rgba(255,255,255,0.06)'}`,
         transition: 'all 0.15s ease',
+        opacity: checked ? 0.72 : 1,
       }}
     >
+      {/* Checkbox */}
+      <button
+        onClick={onToggle}
+        aria-label={checked ? 'Mark incomplete' : 'Mark complete'}
+        style={{
+          flexShrink: 0, width: 18, height: 18, borderRadius: 4,
+          border: `1.5px solid ${checked ? accentColor : 'rgba(255,255,255,0.25)'}`,
+          background: checked ? accentColor : 'transparent',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          cursor: 'pointer', padding: 0, transition: 'all 0.15s ease',
+        }}
+      >
+        {checked && <span style={{ fontSize: 10, color: '#0a0a0f', lineHeight: 1, fontWeight: 700 }}>✓</span>}
+      </button>
+
       <span style={{ fontFamily: 'sans-serif', fontSize: 10, color: 'rgba(255,255,255,0.3)', width: 20, flexShrink: 0 }}>
         {String(index + 1).padStart(2, '0')}
       </span>
-      <span style={{ flex: 1, fontFamily: 'sans-serif', fontSize: 12, color: selected ? WHITE : 'rgba(240,237,232,0.8)', lineHeight: 1.3 }}>
+      <span style={{
+        flex: 1, fontFamily: 'sans-serif', fontSize: 12, lineHeight: 1.3,
+        color: selected ? WHITE : 'rgba(240,237,232,0.8)',
+        textDecoration: checked ? 'line-through' : 'none',
+      }}>
         {quest.title}
       </span>
       {quest.boss && <span style={{ fontSize: 10 }}>💀</span>}
       <span style={{ fontFamily: 'sans-serif', fontSize: 9, color: regionColor, background: `${regionColor}20`, padding: '1px 5px', borderRadius: 3, whiteSpace: 'nowrap', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
         {quest.region.split(' ')[0]}
       </span>
+    </div>
+  );
+}
+
+// ── Collectible checklist item ────────────────────────────────────────────────
+
+export function CollectibleCheckItem({ id, label, color, checked, onToggle }: {
+  id: string; label: string; color: string; checked: boolean; onToggle: () => void;
+}) {
+  return (
+    <div
+      onClick={onToggle}
+      style={{
+        display: 'flex', alignItems: 'center', gap: 6, padding: '4px 6px',
+        borderRadius: 5, cursor: 'pointer',
+        background: checked ? `${color}18` : 'rgba(255,255,255,0.02)',
+        transition: 'background 0.1s ease',
+      }}
+    >
+      <div style={{
+        width: 14, height: 14, borderRadius: 3, flexShrink: 0,
+        border: `1.5px solid ${checked ? color : 'rgba(255,255,255,0.2)'}`,
+        background: checked ? color : 'transparent',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        transition: 'all 0.12s ease',
+      }}>
+        {checked && <span style={{ fontSize: 9, color: '#0a0a0f', fontWeight: 700, lineHeight: 1 }}>✓</span>}
+      </div>
+      <span style={{
+        fontFamily: 'sans-serif', fontSize: 11, color: checked ? 'rgba(240,237,232,0.45)' : 'rgba(240,237,232,0.75)',
+        textDecoration: checked ? 'line-through' : 'none',
+        lineHeight: 1.3,
+      }}>{label}</span>
     </div>
   );
 }

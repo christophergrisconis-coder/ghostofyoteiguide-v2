@@ -1,13 +1,15 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useIsMobile } from './hooks/use-mobile';
 import {
-  Card, Tag, SectionTitle, GoldLine, MiniBar, TierDots, SectionBg, QuestRow, QuestDetail,
+  Card, Tag, SectionTitle, GoldLine, MiniBar, TierDots, SectionBg,
+  QuestRow, QuestDetail, CollectibleCheckItem,
 } from './components/guide-ui';
 import {
   GOLD, GOLD20, GOLD40, DARK, WHITE, DIM,
   IMGS, REGION_COLOR, ACT_COLOR,
   MAIN_STORY, SIDE_TALES, MYTHIC_TALES, SENSEI_TALES, BOUNTY_QUESTS, POST_STORY,
 } from './data/quests';
+import { ProgressContext, useProgressState, useProgress } from './hooks/use-progress';
 
 // ── Sidebar navigation config ─────────────────────────────────────────────────
 
@@ -118,10 +120,14 @@ function MainStorySection() {
   const [expandedActs, setExpandedActs] = useState<Record<string, boolean>>({
     'Prologue': true, 'Chapter 1': true, 'Chapter 2': true, 'Chapter 3': true,
   });
+  const { isChecked, toggle, countChecked } = useProgress();
 
   const flatList = MAIN_STORY;
   const selectedIndex = flatList.findIndex(q => q.id === selectedId);
   const selected = flatList[selectedIndex];
+  const allIds = flatList.map(q => q.id);
+  const doneCount = countChecked(allIds);
+  const pct = (doneCount / flatList.length) * 100;
 
   const byAct: Record<string, typeof MAIN_STORY> = {};
   for (const q of flatList) { if (!byAct[q.act!]) byAct[q.act!] = []; byAct[q.act!].push(q); }
@@ -133,8 +139,8 @@ function MainStorySection() {
         <Tag label="Main Story" color="rgba(201,168,76,0.15)" />
         <SectionTitle>Main Story Quests</SectionTitle>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '8px 0 20px' }}>
-          <div style={{ flex: 1 }}><MiniBar pct={0} /></div>
-          <span style={{ fontFamily: 'sans-serif', fontSize: 12, color: GOLD }}>0 / 10</span>
+          <div style={{ flex: 1 }}><MiniBar pct={pct} /></div>
+          <span style={{ fontFamily: 'sans-serif', fontSize: 12, color: GOLD }}>{doneCount} / {flatList.length}</span>
         </div>
         <div className="quest-browser">
           {/* Left: grouped quest list */}
@@ -151,14 +157,17 @@ function MainStorySection() {
                       style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', borderRadius: 6, background: `${color}15`, border: `1px solid ${color}30`, cursor: 'pointer', marginBottom: expanded ? 6 : 0 }}
                     >
                       <span style={{ fontFamily: 'sans-serif', fontSize: 10, fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '0.08em', flex: 1, textAlign: 'left' }}>{act}</span>
-                      <span style={{ fontSize: 10, color, opacity: 0.7 }}>{quests.length} quests</span>
+                      <span style={{ fontSize: 10, color, opacity: 0.7 }}>{countChecked(quests.map(q => q.id))} / {quests.length}</span>
                       <span style={{ fontSize: 10, color, opacity: 0.5 }}>{expanded ? '▲' : '▼'}</span>
                     </button>
                     {expanded && quests.map((q) => {
                       const globalIndex = flatList.findIndex(x => x.id === q.id);
                       return (
                         <QuestRow key={q.id} quest={q} index={globalIndex} selected={q.id === selectedId}
-                          onClick={() => setSelectedId(q.id)} accentColor={color} />
+                          onClick={() => setSelectedId(q.id)} accentColor={color}
+                          checked={isChecked(q.id)}
+                          onToggle={(e) => { e.stopPropagation(); toggle(q.id); }}
+                        />
                       );
                     })}
                   </div>
@@ -188,20 +197,25 @@ function MainStorySection() {
 function SideTalesSection() {
   const [selectedId, setSelectedId] = useState(SIDE_TALES[0].id);
   const [regionFilter, setRegionFilter] = useState<string>('All');
+  const { isChecked, toggle, countChecked } = useProgress();
   const regions = ['All', ...Object.keys(REGION_COLOR)];
 
   const filtered = regionFilter === 'All' ? SIDE_TALES : SIDE_TALES.filter(q => q.region === regionFilter);
   const selectedIndex = filtered.findIndex(q => q.id === selectedId);
   const selected = filtered[selectedIndex] || filtered[0];
+  const allIds = SIDE_TALES.map(q => q.id);
+  const doneCount = countChecked(allIds);
+  const pct = (doneCount / SIDE_TALES.length) * 100;
+  const color = '#4A9B8E';
 
   return (
     <SectionBg img={IMGS.mob2} overlay="rgba(4,8,20,0.86)">
       <div style={{ padding: '60px 48px' }}>
-        <Tag label="Side Tales · 48 Quests" color="rgba(74,155,142,0.2)" textColor="#4A9B8E" />
+        <Tag label="Side Tales · 48 Quests" color="rgba(74,155,142,0.2)" textColor={color} />
         <SectionTitle>Side Tales</SectionTitle>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '8px 0 12px' }}>
-          <div style={{ flex: 1 }}><MiniBar pct={0} color="#4A9B8E" /></div>
-          <span style={{ fontFamily: 'sans-serif', fontSize: 12, color: '#4A9B8E' }}>0 / 48</span>
+          <div style={{ flex: 1 }}><MiniBar pct={pct} color={color} /></div>
+          <span style={{ fontFamily: 'sans-serif', fontSize: 12, color }}>{doneCount} / {SIDE_TALES.length}</span>
         </div>
         {/* Region filter */}
         <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 16 }}>
@@ -225,7 +239,10 @@ function SideTalesSection() {
             <div className="quest-scroll" style={{ flex: 1 }}>
               {filtered.map((q, i) => (
                 <QuestRow key={q.id} quest={q} index={i} selected={q.id === selectedId}
-                  onClick={() => setSelectedId(q.id)} accentColor={REGION_COLOR[q.region] || GOLD} />
+                  onClick={() => setSelectedId(q.id)} accentColor={REGION_COLOR[q.region] || GOLD}
+                  checked={isChecked(q.id)}
+                  onToggle={(e) => { e.stopPropagation(); toggle(q.id); }}
+                />
               ))}
             </div>
           </div>
@@ -249,9 +266,13 @@ function SideTalesSection() {
 
 function MythicTalesSection() {
   const [selectedId, setSelectedId] = useState(MYTHIC_TALES[0].id);
+  const { isChecked, toggle, countChecked } = useProgress();
   const selectedIndex = MYTHIC_TALES.findIndex(q => q.id === selectedId);
   const selected = MYTHIC_TALES[selectedIndex];
   const color = '#ef4444';
+  const allIds = MYTHIC_TALES.map(q => q.id);
+  const doneCount = countChecked(allIds);
+  const pct = (doneCount / MYTHIC_TALES.length) * 100;
 
   return (
     <SectionBg img={IMGS.mob3} overlay="rgba(8,4,18,0.88)">
@@ -259,15 +280,18 @@ function MythicTalesSection() {
         <Tag label="Mythic Tales · 7 Quests" color="rgba(139,26,26,0.2)" textColor={color} />
         <SectionTitle>Mythic Tales</SectionTitle>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '8px 0 20px' }}>
-          <div style={{ flex: 1 }}><MiniBar pct={0} color={color} /></div>
-          <span style={{ fontFamily: 'sans-serif', fontSize: 12, color }}>0 / 7</span>
+          <div style={{ flex: 1 }}><MiniBar pct={pct} color={color} /></div>
+          <span style={{ fontFamily: 'sans-serif', fontSize: 12, color }}>{doneCount} / {MYTHIC_TALES.length}</span>
         </div>
         <div className="quest-browser">
           <div style={{ flex: '0 0 44%', minWidth: 0 }}>
             <div className="quest-scroll" style={{ height: '100%' }}>
               {MYTHIC_TALES.map((q, i) => (
                 <QuestRow key={q.id} quest={q} index={i} selected={q.id === selectedId}
-                  onClick={() => setSelectedId(q.id)} accentColor={color} />
+                  onClick={() => setSelectedId(q.id)} accentColor={color}
+                  checked={isChecked(q.id)}
+                  onToggle={(e) => { e.stopPropagation(); toggle(q.id); }}
+                />
               ))}
             </div>
           </div>
@@ -291,9 +315,13 @@ function MythicTalesSection() {
 
 function SenseiTalesSection() {
   const [selectedId, setSelectedId] = useState(SENSEI_TALES[0].id);
+  const { isChecked, toggle, countChecked } = useProgress();
   const selectedIndex = SENSEI_TALES.findIndex(q => q.id === selectedId);
   const selected = SENSEI_TALES[selectedIndex];
   const color = '#7B68EE';
+  const allIds = SENSEI_TALES.map(q => q.id);
+  const doneCount = countChecked(allIds);
+  const pct = (doneCount / SENSEI_TALES.length) * 100;
 
   return (
     <SectionBg img={IMGS.blog6} overlay="rgba(6,4,18,0.88)">
@@ -304,15 +332,18 @@ function SenseiTalesSection() {
           Each Sensei Tale unlocks a companion ally. Complete all 20 before attempting the true ending.
         </p>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '8px 0 20px' }}>
-          <div style={{ flex: 1 }}><MiniBar pct={0} color={color} /></div>
-          <span style={{ fontFamily: 'sans-serif', fontSize: 12, color }}>0 / 20</span>
+          <div style={{ flex: 1 }}><MiniBar pct={pct} color={color} /></div>
+          <span style={{ fontFamily: 'sans-serif', fontSize: 12, color }}>{doneCount} / {SENSEI_TALES.length}</span>
         </div>
         <div className="quest-browser">
           <div style={{ flex: '0 0 44%', minWidth: 0 }}>
             <div className="quest-scroll" style={{ height: '100%' }}>
               {SENSEI_TALES.map((q, i) => (
                 <QuestRow key={q.id} quest={q} index={i} selected={q.id === selectedId}
-                  onClick={() => setSelectedId(q.id)} accentColor={color} />
+                  onClick={() => setSelectedId(q.id)} accentColor={color}
+                  checked={isChecked(q.id)}
+                  onToggle={(e) => { e.stopPropagation(); toggle(q.id); }}
+                />
               ))}
             </div>
           </div>
@@ -336,9 +367,13 @@ function SenseiTalesSection() {
 
 function BountyQuestsSection() {
   const [selectedId, setSelectedId] = useState(BOUNTY_QUESTS[0].id);
+  const { isChecked, toggle, countChecked } = useProgress();
   const selectedIndex = BOUNTY_QUESTS.findIndex(q => q.id === selectedId);
   const selected = BOUNTY_QUESTS[selectedIndex];
   const color = '#B8860B';
+  const allIds = BOUNTY_QUESTS.map(q => q.id);
+  const doneCount = countChecked(allIds);
+  const pct = (doneCount / BOUNTY_QUESTS.length) * 100;
 
   return (
     <SectionBg img={IMGS.blog4} overlay="rgba(8,6,4,0.88)">
@@ -349,15 +384,18 @@ function BountyQuestsSection() {
           Activate from bounty boards in each region. Nayoro Blades (bnty_23–31) must be done in order.
         </p>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '8px 0 20px' }}>
-          <div style={{ flex: 1 }}><MiniBar pct={0} color={color} /></div>
-          <span style={{ fontFamily: 'sans-serif', fontSize: 12, color }}>0 / 31</span>
+          <div style={{ flex: 1 }}><MiniBar pct={pct} color={color} /></div>
+          <span style={{ fontFamily: 'sans-serif', fontSize: 12, color }}>{doneCount} / {BOUNTY_QUESTS.length}</span>
         </div>
         <div className="quest-browser">
           <div style={{ flex: '0 0 44%', minWidth: 0 }}>
             <div className="quest-scroll" style={{ height: '100%' }}>
               {BOUNTY_QUESTS.map((q, i) => (
                 <QuestRow key={q.id} quest={q} index={i} selected={q.id === selectedId}
-                  onClick={() => setSelectedId(q.id)} accentColor={color} />
+                  onClick={() => setSelectedId(q.id)} accentColor={color}
+                  checked={isChecked(q.id)}
+                  onToggle={(e) => { e.stopPropagation(); toggle(q.id); }}
+                />
               ))}
             </div>
           </div>
@@ -381,9 +419,13 @@ function BountyQuestsSection() {
 
 function PostStorySection() {
   const [selectedId, setSelectedId] = useState(POST_STORY[0].id);
+  const { isChecked, toggle, countChecked } = useProgress();
   const selectedIndex = POST_STORY.findIndex(q => q.id === selectedId);
   const selected = POST_STORY[selectedIndex];
   const color = '#9B59B6';
+  const allIds = POST_STORY.map(q => q.id);
+  const doneCount = countChecked(allIds);
+  const pct = (doneCount / POST_STORY.length) * 100;
 
   return (
     <SectionBg img={IMGS.blog5} overlay="rgba(6,4,14,0.88)">
@@ -391,8 +433,8 @@ function PostStorySection() {
         <Tag label="Post-Story · 3 Quests" color="rgba(155,89,182,0.2)" textColor={color} />
         <SectionTitle>Epilogue Quests</SectionTitle>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '8px 0 12px' }}>
-          <div style={{ flex: 1 }}><MiniBar pct={0} color={color} /></div>
-          <span style={{ fontFamily: 'sans-serif', fontSize: 12, color }}>0 / 3</span>
+          <div style={{ flex: 1 }}><MiniBar pct={pct} color={color} /></div>
+          <span style={{ fontFamily: 'sans-serif', fontSize: 12, color }}>{doneCount} / {POST_STORY.length}</span>
         </div>
         <Card style={{ marginBottom: 20, padding: '12px 18px', background: 'rgba(155,89,182,0.08)', borderColor: 'rgba(155,89,182,0.3)' }}>
           <p style={{ fontFamily: 'sans-serif', fontSize: 12, color: DIM, lineHeight: 1.4 }}>
@@ -404,7 +446,10 @@ function PostStorySection() {
             <div className="quest-scroll" style={{ height: '100%' }}>
               {POST_STORY.map((q, i) => (
                 <QuestRow key={q.id} quest={q} index={i} selected={q.id === selectedId}
-                  onClick={() => setSelectedId(q.id)} accentColor={color} />
+                  onClick={() => setSelectedId(q.id)} accentColor={color}
+                  checked={isChecked(q.id)}
+                  onToggle={(e) => { e.stopPropagation(); toggle(q.id); }}
+                />
               ))}
             </div>
           </div>
@@ -426,42 +471,95 @@ function PostStorySection() {
 
 // ── Section: Collectibles ─────────────────────────────────────────────────────
 
+// Stable collectible ID generators
+const COLL_GROUPS = [
+  { label: 'Sumi-e Paintings',        key: 'sumi',    icon: '🎨', count: 60, color: '#4A9B8E', trophy: "An Artist's Eye"    },
+  { label: 'Ainu Sacred Sites',       key: 'ainu',    icon: '🌿', count: 80, color: '#4A9B6F', trophy: 'Ainu Wanderer'      },
+  { label: 'Clan Trophies',           key: 'clan',    icon: '🏴', count: 68, color: '#8B1A1A', trophy: 'Relic Hunter'       },
+  { label: 'Ancient Maps',            key: 'maps',    icon: '🗺️', count: 55, color: '#9B59B6', trophy: 'Cartographer'       },
+  { label: 'Hot Springs',             key: 'springs', icon: '♨️', count: 16, color: '#4682B4', trophy: 'Well of Spirit'     },
+  { label: 'Bamboo Strikes',          key: 'bamboo',  icon: '🎍', count: 15, color: '#B8860B', trophy: 'The Bamboo Path'    },
+  { label: 'Shrine Climbs',           key: 'shrines', icon: '⛩️', count: 13, color: '#C9A84C', trophy: 'Body, Mind & Spirit' },
+  { label: 'Nine-Tails Puzzle Boxes', key: 'boxes',   icon: '🦊', count: 12, color: '#8B4513', trophy: 'Nine-Tails Champion' },
+] as const;
+
+export const COLL_TOTAL = COLL_GROUPS.reduce((s, g) => s + g.count, 0); // 319
+
+function collIds(key: string, count: number) {
+  return Array.from({ length: count }, (_, i) => `coll_${key}_${i + 1}`);
+}
+
 function CollectiblesSection() {
-  const groups = [
-    { label: 'Sumi-e Paintings',       icon: '🎨', count: 60,  color: '#4A9B8E', trophy: "An Artist's Eye"    },
-    { label: 'Ainu Sacred Sites',      icon: '🌿', count: 80,  color: '#4A9B6F', trophy: 'Ainu Wanderer'      },
-    { label: 'Clan Trophies',          icon: '🏴', count: 68,  color: '#8B1A1A', trophy: 'Relic Hunter'       },
-    { label: 'Ancient Maps',           icon: '🗺️', count: 55,  color: '#9B59B6', trophy: 'Cartographer'       },
-    { label: 'Hot Springs',            icon: '♨️', count: 16,  color: '#4682B4', trophy: 'Well of Spirit'     },
-    { label: 'Bamboo Strikes',         icon: '🎍', count: 15,  color: '#B8860B', trophy: 'The Bamboo Path'    },
-    { label: 'Shrine Climbs',          icon: '⛩️', count: 13,  color: '#C9A84C', trophy: 'Body, Mind & Spirit' },
-    { label: 'Nine-Tails Puzzle Boxes',icon: '🦊', count: 12,  color: '#8B4513', trophy: 'Nine-Tails Champion' },
-  ];
+  const { isChecked, toggle, countChecked } = useProgress();
+  const [expandedKey, setExpandedKey] = useState<string | null>(null);
+
+  const totalDone = COLL_GROUPS.reduce((s, g) => s + countChecked(collIds(g.key, g.count)), 0);
+  const totalPct = (totalDone / COLL_TOTAL) * 100;
+  const color = '#4A9B8E';
 
   return (
     <SectionBg img={IMGS.blog2} overlay="rgba(4,10,20,0.88)">
       <div style={{ padding: '60px 48px' }}>
-        <Tag label="Collectibles · 319 Total" color="rgba(74,155,142,0.2)" textColor="#4A9B8E" />
+        <Tag label="Collectibles · 319 Total" color="rgba(74,155,142,0.2)" textColor={color} />
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 20 }}>
           <SectionTitle>Collectibles</SectionTitle>
           <span style={{ fontFamily: 'sans-serif', fontSize: 13, color: DIM }}>All available in free-roam · 0 missable</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '8px 0 24px' }}>
-          <div style={{ flex: 1 }}><MiniBar pct={0} color="#4A9B8E" /></div>
-          <span style={{ fontFamily: 'sans-serif', fontSize: 13, color: '#4A9B8E', fontWeight: 700 }}>0 / 319</span>
+          <div style={{ flex: 1 }}><MiniBar pct={totalPct} color={color} /></div>
+          <span style={{ fontFamily: 'sans-serif', fontSize: 13, color, fontWeight: 700 }}>{totalDone} / {COLL_TOTAL}</span>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12, marginBottom: 20 }}>
-          {groups.map(g => (
-            <Card key={g.label} style={{ padding: '16px 18px', borderColor: `${g.color}40` }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-                <span style={{ fontSize: 22 }}>{g.icon}</span>
-                <div style={{ flex: 1 }}><div style={{ fontFamily: 'sans-serif', fontSize: 12, color: WHITE, lineHeight: 1.3 }}>{g.label}</div></div>
-                <div style={{ fontFamily: 'sans-serif', fontSize: 20, fontWeight: 700, color: g.color }}>{g.count}</div>
-              </div>
-              <MiniBar pct={0} color={g.color} />
-              <div style={{ marginTop: 10, fontFamily: 'sans-serif', fontSize: 10, color: DIM }}>🏆 {g.trophy}</div>
-            </Card>
-          ))}
+          {COLL_GROUPS.map(g => {
+            const ids = collIds(g.key, g.count);
+            const done = countChecked(ids);
+            const pct = (done / g.count) * 100;
+            const isOpen = expandedKey === g.key;
+            return (
+              <Card key={g.key} style={{ padding: '16px 18px', borderColor: `${g.color}40` }}>
+                {/* Header — click to expand/collapse checklist */}
+                <div
+                  onClick={() => setExpandedKey(isOpen ? null : g.key)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                    <span style={{ fontSize: 20 }}>{g.icon}</span>
+                    <div style={{ flex: 1, fontFamily: 'sans-serif', fontSize: 11, color: WHITE, lineHeight: 1.3 }}>{g.label}</div>
+                    <div style={{ fontFamily: 'sans-serif', fontSize: 13, fontWeight: 700, color: g.color }}>{done}/{g.count}</div>
+                  </div>
+                  <MiniBar pct={pct} color={g.color} />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
+                    <div style={{ fontFamily: 'sans-serif', fontSize: 10, color: DIM }}>🏆 {g.trophy}</div>
+                    <div style={{ fontFamily: 'sans-serif', fontSize: 10, color: g.color, opacity: 0.7 }}>{isOpen ? '▲ hide' : '▼ check off'}</div>
+                  </div>
+                </div>
+                {/* Per-item checklist */}
+                {isOpen && (
+                  <div style={{ marginTop: 10, borderTop: `1px solid ${g.color}25`, paddingTop: 10, maxHeight: 220, overflowY: 'auto' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 2 }}>
+                      {ids.map((id, i) => (
+                        <CollectibleCheckItem
+                          key={id} id={id}
+                          label={`#${String(i + 1).padStart(2, '0')}`}
+                          color={g.color}
+                          checked={isChecked(id)}
+                          onToggle={() => toggle(id)}
+                        />
+                      ))}
+                    </div>
+                    {done < g.count && (
+                      <button
+                        onClick={() => ids.forEach(id => { if (!isChecked(id)) toggle(id); })}
+                        style={{ marginTop: 8, width: '100%', padding: '5px', borderRadius: 5, border: `1px solid ${g.color}40`, background: `${g.color}14`, color: g.color, fontFamily: 'sans-serif', fontSize: 10, cursor: 'pointer' }}
+                      >
+                        Mark all {g.count} done
+                      </button>
+                    )}
+                  </div>
+                )}
+              </Card>
+            );
+          })}
         </div>
         <Card style={{ padding: '14px 22px', background: 'rgba(201,168,76,0.06)' }}>
           <div style={{ display: 'flex', gap: 28, flexWrap: 'wrap', marginBottom: 10 }}>
@@ -695,7 +793,19 @@ function MissablesSection() {
 
 // ── Section: Progress ─────────────────────────────────────────────────────────
 
+// All quests grouped by region for the Progress section
+const ALL_QUESTS_BY_REGION: Record<string, string[]> = (() => {
+  const all = [...MAIN_STORY, ...SIDE_TALES, ...MYTHIC_TALES, ...SENSEI_TALES, ...BOUNTY_QUESTS, ...POST_STORY];
+  const map: Record<string, string[]> = {};
+  for (const q of all) {
+    if (!map[q.region]) map[q.region] = [];
+    map[q.region].push(q.id);
+  }
+  return map;
+})();
+
 function ProgressSection() {
+  const { countChecked } = useProgress();
   const regions = [
     { name: 'Yotei Grasslands', abbr: 'YG', color: '#4A9B8E', quests: 22, collectibles: 62, activities: 14 },
     { name: 'Ishikari Plain',   abbr: 'IP', color: '#4682B4', quests: 18, collectibles: 55, activities: 11 },
@@ -713,34 +823,46 @@ function ProgressSection() {
         <SectionTitle>Progress Tracking</SectionTitle>
         <GoldLine />
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16 }}>
-          {regions.map(r => (
-            <Card key={r.abbr} style={{ borderColor: `${r.color}40` }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 14 }}>
-                <svg width={70} height={70} style={{ flexShrink: 0 }}>
-                  <circle cx={35} cy={35} r={R} fill="none" strokeWidth={5} className="ring-track" />
-                  <circle cx={35} cy={35} r={R} fill="none" strokeWidth={5} className="ring-fill" strokeDasharray={C} strokeDashoffset={C} transform="rotate(-90 35 35)" />
-                  <text x={35} y={39} textAnchor="middle" fill={r.color} fontSize={14} fontFamily="sans-serif" fontWeight="bold">0%</text>
-                </svg>
-                <div>
-                  <div style={{ fontFamily: 'sans-serif', fontSize: 9, letterSpacing: '0.1em', textTransform: 'uppercase', color: r.color, fontWeight: 700, marginBottom: 4 }}>{r.abbr}</div>
-                  <div style={{ fontFamily: 'Georgia, serif', fontSize: 14, color: WHITE, lineHeight: 1.3 }}>{r.name}</div>
-                </div>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
-                {[
-                  { label: 'Quests',       val: r.quests,       color: GOLD    },
-                  { label: 'Collectibles', val: r.collectibles, color: r.color },
-                  { label: 'Activities',   val: r.activities,   color: '#888'  },
-                ].map(row => (
-                  <div key={row.label} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontFamily: 'sans-serif', fontSize: 11, color: DIM, width: 80 }}>{row.label}</span>
-                    <div style={{ flex: 1 }}><MiniBar pct={0} color={row.color} /></div>
-                    <span style={{ fontFamily: 'sans-serif', fontSize: 11, color: row.color, width: 28, textAlign: 'right' }}>{row.val}</span>
+          {regions.map(r => {
+            const regionQuestIds = ALL_QUESTS_BY_REGION[r.name] || [];
+            const questDone = countChecked(regionQuestIds);
+            const questPct = regionQuestIds.length > 0 ? (questDone / regionQuestIds.length) * 100 : 0;
+            // Overall ring = quest completion for this region
+            const ringPct = questPct;
+            const ringOffset = C - (C * ringPct / 100);
+            return (
+              <Card key={r.abbr} style={{ borderColor: `${r.color}40` }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 14 }}>
+                  <svg width={70} height={70} style={{ flexShrink: 0 }}>
+                    <circle cx={35} cy={35} r={R} fill="none" strokeWidth={5} className="ring-track" />
+                    <circle cx={35} cy={35} r={R} fill="none" strokeWidth={5} stroke={r.color} strokeDasharray={C} strokeDashoffset={ringOffset} transform="rotate(-90 35 35)" strokeLinecap="round" />
+                    <text x={35} y={39} textAnchor="middle" fill={r.color} fontSize={13} fontFamily="sans-serif" fontWeight="bold">{Math.round(ringPct)}%</text>
+                  </svg>
+                  <div>
+                    <div style={{ fontFamily: 'sans-serif', fontSize: 9, letterSpacing: '0.1em', textTransform: 'uppercase', color: r.color, fontWeight: 700, marginBottom: 4 }}>{r.abbr}</div>
+                    <div style={{ fontFamily: 'Georgia, serif', fontSize: 14, color: WHITE, lineHeight: 1.3 }}>{r.name}</div>
                   </div>
-                ))}
-              </div>
-            </Card>
-          ))}
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontFamily: 'sans-serif', fontSize: 11, color: DIM, width: 80 }}>Quests</span>
+                    <div style={{ flex: 1 }}><MiniBar pct={questPct} color={GOLD} /></div>
+                    <span style={{ fontFamily: 'sans-serif', fontSize: 11, color: GOLD, width: 40, textAlign: 'right' }}>{questDone}/{regionQuestIds.length}</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontFamily: 'sans-serif', fontSize: 11, color: DIM, width: 80 }}>Collectibles</span>
+                    <div style={{ flex: 1 }}><MiniBar pct={0} color={r.color} /></div>
+                    <span style={{ fontFamily: 'sans-serif', fontSize: 11, color: r.color, width: 40, textAlign: 'right' }}>{r.collectibles}</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontFamily: 'sans-serif', fontSize: 11, color: DIM, width: 80 }}>Activities</span>
+                    <div style={{ flex: 1 }}><MiniBar pct={0} color="#888" /></div>
+                    <span style={{ fontFamily: 'sans-serif', fontSize: 11, color: '#888', width: 40, textAlign: 'right' }}>{r.activities}</span>
+                  </div>
+                </div>
+              </Card>
+            );
+          })}
         </div>
       </div>
     </SectionBg>
@@ -749,21 +871,33 @@ function ProgressSection() {
 
 // ── Section: Dashboard ────────────────────────────────────────────────────────
 
+const QUEST_CATEGORIES = [
+  { label: 'Main Story',    ids: MAIN_STORY.map(q => q.id),    color: '#C9A84C' },
+  { label: 'Side Tales',    ids: SIDE_TALES.map(q => q.id),    color: '#4A9B8E' },
+  { label: 'Mythic Tales',  ids: MYTHIC_TALES.map(q => q.id),  color: '#8B1A1A' },
+  { label: 'Sensei Tales',  ids: SENSEI_TALES.map(q => q.id),  color: '#7B68EE' },
+  { label: 'Bounty Quests', ids: BOUNTY_QUESTS.map(q => q.id), color: '#B8860B' },
+  { label: 'Post-Story',    ids: POST_STORY.map(q => q.id),    color: '#9B59B6' },
+] as const;
+
+const TOTAL_QUESTS = QUEST_CATEGORIES.reduce((s, c) => s + c.ids.length, 0); // 119
+
 function DashboardSection() {
-  const categories = [
-    { label: 'Main Story',    count: 10, color: '#C9A84C' },
-    { label: 'Side Tales',    count: 48, color: '#4A9B8E' },
-    { label: 'Mythic Tales',  count: 7,  color: '#8B1A1A' },
-    { label: 'Sensei Tales',  count: 20, color: '#7B68EE' },
-    { label: 'Bounty Quests', count: 31, color: '#B8860B' },
-    { label: 'Post-Story',    count: 3,  color: '#9B59B6' },
-  ];
+  const { countChecked } = useProgress();
+
   const trophyTiers = [
     { tier: 'Platinum', icon: '🏅', count: 1,  color: '#E5E4E2' },
     { tier: 'Gold',     icon: '🥇', count: 7,  color: '#FFD700' },
     { tier: 'Silver',   icon: '🥈', count: 18, color: '#C0C0C0' },
     { tier: 'Bronze',   icon: '🥉', count: 28, color: '#CD7F32' },
   ];
+
+  const questsDone = QUEST_CATEGORIES.reduce((s, c) => s + countChecked([...c.ids]), 0);
+  const questsPct = (questsDone / TOTAL_QUESTS) * 100;
+
+  const collAllIds = COLL_GROUPS.flatMap(g => collIds(g.key, g.count));
+  const collDone = countChecked(collAllIds);
+  const collPct = (collDone / COLL_TOTAL) * 100;
 
   return (
     <SectionBg img={IMGS.mob5} overlay="rgba(4,6,16,0.90)">
@@ -773,30 +907,34 @@ function DashboardSection() {
         <GoldLine />
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 14, marginBottom: 18 }}>
           {[
-            { label: 'Quests',       val: '0 / 119', sub: '6 categories', color: GOLD       },
-            { label: 'Collectibles', val: '0 / 319', sub: '8 groups',     color: '#4A9B8E'  },
-            { label: 'Trophies',     val: '0 / 54',  sub: '1 Platinum',   color: '#E5E4E2'  },
+            { label: 'Quests',       done: questsDone, total: TOTAL_QUESTS, sub: '6 categories', color: GOLD,      pct: questsPct },
+            { label: 'Collectibles', done: collDone,   total: COLL_TOTAL,   sub: '8 groups',     color: '#4A9B8E', pct: collPct  },
+            { label: 'Trophies',     done: 0,          total: 54,           sub: '1 Platinum',   color: '#E5E4E2', pct: 0        },
           ].map(s => (
             <Card key={s.label} style={{ textAlign: 'center', padding: '18px 22px' }}>
-              <div style={{ fontFamily: 'Georgia, serif', fontSize: 30, color: s.color }}>{s.val}</div>
+              <div style={{ fontFamily: 'Georgia, serif', fontSize: 28, color: s.color }}>{s.done} / {s.total}</div>
               <div style={{ fontFamily: 'sans-serif', fontSize: 11, color: GOLD, textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: 4 }}>{s.label}</div>
               <div style={{ fontFamily: 'sans-serif', fontSize: 11, color: DIM, marginTop: 2 }}>{s.sub}</div>
-              <MiniBar pct={0} color={s.color} />
+              <MiniBar pct={s.pct} color={s.color} />
             </Card>
           ))}
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: 14 }}>
           <Card>
             <h3 style={{ fontFamily: 'Georgia, serif', fontSize: 15, color: GOLD, marginBottom: 16 }}>Quest Categories</h3>
-            {categories.map(c => (
-              <div key={c.label} style={{ marginBottom: 12 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
-                  <span style={{ fontFamily: 'sans-serif', fontSize: 12, color: WHITE }}>{c.label}</span>
-                  <span style={{ fontFamily: 'sans-serif', fontSize: 12, color: c.color }}>0 / {c.count}</span>
+            {QUEST_CATEGORIES.map(c => {
+              const done = countChecked([...c.ids]);
+              const pct = (done / c.ids.length) * 100;
+              return (
+                <div key={c.label} style={{ marginBottom: 12 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
+                    <span style={{ fontFamily: 'sans-serif', fontSize: 12, color: WHITE }}>{c.label}</span>
+                    <span style={{ fontFamily: 'sans-serif', fontSize: 12, color: c.color }}>{done} / {c.ids.length}</span>
+                  </div>
+                  <MiniBar pct={pct} color={c.color} />
                 </div>
-                <MiniBar pct={0} color={c.color} />
-              </div>
-            ))}
+              );
+            })}
           </Card>
           <Card>
             <h3 style={{ fontFamily: 'Georgia, serif', fontSize: 15, color: GOLD, marginBottom: 16 }}>Trophy Breakdown</h3>
@@ -935,6 +1073,7 @@ export default function App() {
   const [activeSection, setActiveSection] = useState('overview');
   const [mobileOpen, setMobileOpen] = useState(false);
   const isMobile = useIsMobile();
+  const progressValue = useProgressState();
 
   // Track active section via IntersectionObserver
   useEffect(() => {
@@ -959,6 +1098,7 @@ export default function App() {
   }, [isMobile]);
 
   return (
+    <ProgressContext.Provider value={progressValue}>
     <div style={{ display: 'flex', minHeight: '100vh', background: DARK }}>
       {/* Desktop fixed sidebar */}
       {!isMobile && (
@@ -998,5 +1138,6 @@ export default function App() {
         ))}
       </main>
     </div>
+    </ProgressContext.Provider>
   );
 }
