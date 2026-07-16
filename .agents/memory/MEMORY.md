@@ -1,0 +1,1 @@
+- [Data architecture](data-architecture.md) — all guide counts/totals must derive from src/data/ files; never hardcode in components or NAV.

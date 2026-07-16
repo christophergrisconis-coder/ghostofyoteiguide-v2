@@ -10,20 +10,29 @@ import {
   IMGS, REGION_COLOR, ACT_COLOR,
   MAIN_STORY, SIDE_TALES, MYTHIC_TALES, SENSEI_TALES, BOUNTY_QUESTS, POST_STORY,
 } from './data/quests';
+import {
+  COLLECTIBLE_CATEGORIES, COLLECTIBLE_TOTAL, ALL_COLLECTIBLE_IDS, COLLECTIBLES_BY_REGION,
+} from './data/collectibles';
+import {
+  ACTIVITY_CATEGORIES, ACTIVITY_TOTAL, ALL_ACTIVITY_IDS, ACTIVITIES_BY_REGION,
+} from './data/activities';
+import { WEAPONS, ARMOUR, CHARMS } from './data/equipment';
+import { REGIONS } from './data/regions';
 import { ProgressContext, useProgressState, useProgress } from './hooks/use-progress';
 
 // ── Sidebar navigation config ─────────────────────────────────────────────────
 
+// ── NAV counts derived from data — never hardcoded ───────────────────────────
 const NAV = [
   { id: 'overview',      label: 'Overview',       icon: '📖', group: 'guide'   },
-  { id: 'main-story',    label: 'Main Story',      icon: '⚔️',  group: 'quests', count: 10 },
-  { id: 'side-tales',    label: 'Side Tales',      icon: '📜',  group: 'quests', count: 48 },
-  { id: 'mythic-tales',  label: 'Mythic Tales',    icon: '🔱',  group: 'quests', count: 7  },
-  { id: 'sensei-tales',  label: 'Sensei Tales',    icon: '🧑‍🏫', group: 'quests', count: 20 },
-  { id: 'bounty-quests', label: 'Bounty Quests',   icon: '🎯',  group: 'quests', count: 31 },
-  { id: 'post-story',    label: 'Post-Story',      icon: '🌸',  group: 'quests', count: 3  },
-  { id: 'collectibles',  label: 'Collectibles',    icon: '🗺️',  group: 'world'  },
-  { id: 'activities',    label: 'Activities',      icon: '🏃',  group: 'world'  },
+  { id: 'main-story',    label: 'Main Story',      icon: '⚔️',  group: 'quests', count: MAIN_STORY.length    },
+  { id: 'side-tales',    label: 'Side Tales',      icon: '📜',  group: 'quests', count: SIDE_TALES.length    },
+  { id: 'mythic-tales',  label: 'Mythic Tales',    icon: '🔱',  group: 'quests', count: MYTHIC_TALES.length  },
+  { id: 'sensei-tales',  label: 'Sensei Tales',    icon: '🧑‍🏫', group: 'quests', count: SENSEI_TALES.length  },
+  { id: 'bounty-quests', label: 'Bounty Quests',   icon: '🎯',  group: 'quests', count: BOUNTY_QUESTS.length },
+  { id: 'post-story',    label: 'Post-Story',      icon: '🌸',  group: 'quests', count: POST_STORY.length    },
+  { id: 'collectibles',  label: 'Collectibles',    icon: '🗺️',  group: 'world',  count: COLLECTIBLE_TOTAL   },
+  { id: 'activities',    label: 'Activities',      icon: '🏃',  group: 'world',  count: ACTIVITY_TOTAL      },
   { id: 'equipment',     label: 'Equipment',       icon: '🗡️',  group: 'world'  },
   { id: 'missables',     label: 'Missables',       icon: '⚠️',  group: 'world'  },
   { id: 'progress',      label: 'Progress',        icon: '📊',  group: 'status' },
@@ -54,10 +63,10 @@ function HeroSection() {
         </div>
         <div style={{ animation: 'fadeUp 0.7s ease 0.8s both' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, color: 'rgba(240,237,232,0.45)', fontFamily: 'sans-serif', fontSize: 13, letterSpacing: '0.1em' }}>
-            <span>119 Quests</span><span style={{ color: GOLD40 }}>•</span>
-            <span>319 Collectibles</span><span style={{ color: GOLD40 }}>•</span>
+            <span>{MAIN_STORY.length + SIDE_TALES.length + MYTHIC_TALES.length + SENSEI_TALES.length + BOUNTY_QUESTS.length + POST_STORY.length} Quests</span><span style={{ color: GOLD40 }}>•</span>
+            <span>{COLLECTIBLE_TOTAL} Collectibles</span><span style={{ color: GOLD40 }}>•</span>
             <span>54 Trophies</span><span style={{ color: GOLD40 }}>•</span>
-            <span>6 Regions</span>
+            <span>{REGIONS.length} Regions</span>
           </div>
         </div>
         <div style={{ position: 'absolute', bottom: 40, animation: 'fadeUp 0.7s ease 1.1s both' }}>
@@ -472,107 +481,70 @@ function PostStorySection() {
 
 // ── Section: Collectibles ─────────────────────────────────────────────────────
 
-// Stable collectible ID generators
-const COLL_GROUPS = [
-  { label: 'Sumi-e Paintings',        key: 'sumi',    icon: '🎨', count: 60, color: '#4A9B8E', trophy: "An Artist's Eye"    },
-  { label: 'Ainu Sacred Sites',       key: 'ainu',    icon: '🌿', count: 80, color: '#4A9B6F', trophy: 'Ainu Wanderer'      },
-  { label: 'Clan Trophies',           key: 'clan',    icon: '🏴', count: 68, color: '#8B1A1A', trophy: 'Relic Hunter'       },
-  { label: 'Ancient Maps',            key: 'maps',    icon: '🗺️', count: 55, color: '#9B59B6', trophy: 'Cartographer'       },
-  { label: 'Hot Springs',             key: 'springs', icon: '♨️', count: 16, color: '#4682B4', trophy: 'Well of Spirit'     },
-  { label: 'Bamboo Strikes',          key: 'bamboo',  icon: '🎍', count: 15, color: '#B8860B', trophy: 'The Bamboo Path'    },
-  { label: 'Shrine Climbs',           key: 'shrines', icon: '⛩️', count: 13, color: '#C9A84C', trophy: 'Body, Mind & Spirit' },
-  { label: 'Nine-Tails Puzzle Boxes', key: 'boxes',   icon: '🦊', count: 12, color: '#8B4513', trophy: 'Nine-Tails Champion' },
-] as const;
-
-export const COLL_TOTAL = COLL_GROUPS.reduce((s, g) => s + g.count, 0); // 319
-
-function collIds(key: string, count: number) {
-  return Array.from({ length: count }, (_, i) => `coll_${key}_${i + 1}`);
-}
-
-// ── Activities data ────────────────────────────────────────────────────────────
-
-const ACT_GROUPS = [
-  { icon: '⚔️', key: 'dueling',     name: 'Dueling Circles',        desc: 'Challenge wandering swordsmen to earn Technique Points',          count: 25, color: '#C9A84C' },
-  { icon: '🎋', key: 'haiku',       name: 'Haiku Stations',          desc: 'Compose haiku at scenic viewpoints — rewards cosmetic dyes',      count: 20, color: '#4A9B8E' },
-  { icon: '🏘️', key: 'settlements', name: 'Liberated Settlements',   desc: 'Free each village from Yotei Six occupation — unlocks merchants', count: 18, color: '#4A9B6F' },
-  { icon: '🛒', key: 'merchants',   name: 'Merchant Stalls',         desc: 'Craft material vendors — stock resets after each major region',   count: 6,  color: '#B8860B' },
-  { icon: '🐾', key: 'sanctuaries', name: 'Animal Sanctuaries',      desc: 'Pet and photograph wildlife for Spirit Growth bonus',             count: 12, color: '#7B68EE' },
-  { icon: '🗡️', key: 'vanity',      name: 'Vanity Challenges',       desc: 'Complete combat style challenges for cosmetic armour pieces',     count: 8,  color: '#4682B4' },
-] as const;
-
-export const ACT_TOTAL = ACT_GROUPS.reduce((s, g) => s + g.count, 0); // 89
-
-function actIds(key: string, count: number) {
-  return Array.from({ length: count }, (_, i) => `act_${key}_${i + 1}`);
-}
-
-const ALL_ACT_IDS = ACT_GROUPS.flatMap(g => actIds(g.key, g.count));
-
 function CollectiblesSection() {
   const { isChecked, toggle, countChecked } = useProgress();
   const [expandedKey, setExpandedKey] = useState<string | null>(null);
 
-  const totalDone = COLL_GROUPS.reduce((s, g) => s + countChecked(collIds(g.key, g.count)), 0);
-  const totalPct = (totalDone / COLL_TOTAL) * 100;
+  const totalDone = countChecked(ALL_COLLECTIBLE_IDS);
+  const totalPct = (totalDone / COLLECTIBLE_TOTAL) * 100;
   const color = '#4A9B8E';
 
   return (
     <SectionBg img={IMGS.blog2} overlay="rgba(4,10,20,0.88)">
       <div style={{ padding: '60px 48px' }}>
-        <Tag label="Collectibles · 319 Total" color="rgba(74,155,142,0.2)" textColor={color} />
+        <Tag label={`Collectibles · ${COLLECTIBLE_TOTAL} Total`} color="rgba(74,155,142,0.2)" textColor={color} />
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 20 }}>
           <SectionTitle>Collectibles</SectionTitle>
           <span style={{ fontFamily: 'sans-serif', fontSize: 13, color: DIM }}>All available in free-roam · 0 missable</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '8px 0 24px' }}>
           <div style={{ flex: 1 }}><MiniBar pct={totalPct} color={color} /></div>
-          <span style={{ fontFamily: 'sans-serif', fontSize: 13, color, fontWeight: 700 }}>{totalDone} / {COLL_TOTAL}</span>
+          <span style={{ fontFamily: 'sans-serif', fontSize: 13, color, fontWeight: 700 }}>{totalDone} / {COLLECTIBLE_TOTAL}</span>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12, marginBottom: 20 }}>
-          {COLL_GROUPS.map(g => {
-            const ids = collIds(g.key, g.count);
+          {COLLECTIBLE_CATEGORIES.map(cat => {
+            const ids = cat.items.map(item => item.id);
             const done = countChecked(ids);
-            const pct = (done / g.count) * 100;
-            const isOpen = expandedKey === g.key;
+            const pct = (done / cat.items.length) * 100;
+            const isOpen = expandedKey === cat.key;
             return (
-              <Card key={g.key} style={{ padding: '16px 18px', borderColor: `${g.color}40` }}>
+              <Card key={cat.key} style={{ padding: '16px 18px', borderColor: `${cat.color}40` }}>
                 {/* Header — click to expand/collapse checklist */}
                 <div
-                  onClick={() => setExpandedKey(isOpen ? null : g.key)}
+                  onClick={() => setExpandedKey(isOpen ? null : cat.key)}
                   style={{ cursor: 'pointer' }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                    <span style={{ fontSize: 20 }}>{g.icon}</span>
-                    <div style={{ flex: 1, fontFamily: 'sans-serif', fontSize: 11, color: WHITE, lineHeight: 1.3 }}>{g.label}</div>
-                    <div style={{ fontFamily: 'sans-serif', fontSize: 13, fontWeight: 700, color: g.color }}>{done}/{g.count}</div>
+                    <span style={{ fontSize: 20 }}>{cat.icon}</span>
+                    <div style={{ flex: 1, fontFamily: 'sans-serif', fontSize: 11, color: WHITE, lineHeight: 1.3 }}>{cat.label}</div>
+                    <div style={{ fontFamily: 'sans-serif', fontSize: 13, fontWeight: 700, color: cat.color }}>{done}/{cat.items.length}</div>
                   </div>
-                  <MiniBar pct={pct} color={g.color} />
+                  <MiniBar pct={pct} color={cat.color} />
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
-                    <div style={{ fontFamily: 'sans-serif', fontSize: 10, color: DIM }}>🏆 {g.trophy}</div>
-                    <div style={{ fontFamily: 'sans-serif', fontSize: 10, color: g.color, opacity: 0.7 }}>{isOpen ? '▲ hide' : '▼ check off'}</div>
+                    <div style={{ fontFamily: 'sans-serif', fontSize: 10, color: DIM }}>🏆 {cat.trophy}</div>
+                    <div style={{ fontFamily: 'sans-serif', fontSize: 10, color: cat.color, opacity: 0.7 }}>{isOpen ? '▲ hide' : '▼ check off'}</div>
                   </div>
                 </div>
-                {/* Per-item checklist */}
+                {/* Per-item checklist — real IDs and names from data model */}
                 {isOpen && (
-                  <div style={{ marginTop: 10, borderTop: `1px solid ${g.color}25`, paddingTop: 10, maxHeight: 220, overflowY: 'auto' }}>
+                  <div style={{ marginTop: 10, borderTop: `1px solid ${cat.color}25`, paddingTop: 10, maxHeight: 220, overflowY: 'auto' }}>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 2 }}>
-                      {ids.map((id, i) => (
+                      {cat.items.map(item => (
                         <CollectibleCheckItem
-                          key={id} id={id}
-                          label={`#${String(i + 1).padStart(2, '0')}`}
-                          color={g.color}
-                          checked={isChecked(id)}
-                          onToggle={() => toggle(id)}
+                          key={item.id} id={item.id}
+                          label={item.name + (item.placeholder ? ' ⚠' : '')}
+                          color={cat.color}
+                          checked={isChecked(item.id)}
+                          onToggle={() => toggle(item.id)}
                         />
                       ))}
                     </div>
-                    {done < g.count && (
+                    {done < cat.items.length && (
                       <button
                         onClick={() => ids.forEach(id => { if (!isChecked(id)) toggle(id); })}
-                        style={{ marginTop: 8, width: '100%', padding: '5px', borderRadius: 5, border: `1px solid ${g.color}40`, background: `${g.color}14`, color: g.color, fontFamily: 'sans-serif', fontSize: 10, cursor: 'pointer' }}
+                        style={{ marginTop: 8, width: '100%', padding: '5px', borderRadius: 5, border: `1px solid ${cat.color}40`, background: `${cat.color}14`, color: cat.color, fontFamily: 'sans-serif', fontSize: 10, cursor: 'pointer' }}
                       >
-                        Mark all {g.count} done
+                        Mark all {cat.items.length} done
                       </button>
                     )}
                   </div>
@@ -583,8 +555,8 @@ function CollectiblesSection() {
         </div>
         <Card style={{ padding: '14px 22px', background: 'rgba(201,168,76,0.06)' }}>
           <div style={{ display: 'flex', gap: 28, flexWrap: 'wrap', marginBottom: 10 }}>
-            {['Yotei Grasslands','Ishikari Plain','Teshio Ridge','Tokachi Range','Nayoro Wilds','Oshima Coast'].map(r => (
-              <div key={r} style={{ fontFamily: 'sans-serif', fontSize: 12, color: DIM }}>📍 {r}</div>
+            {REGIONS.map(r => (
+              <div key={r.name} style={{ fontFamily: 'sans-serif', fontSize: 12, color: DIM }}>📍 {r.name}</div>
             ))}
           </div>
           <p style={{ fontFamily: 'sans-serif', fontSize: 12, color: DIM, lineHeight: 1.5 }}>
@@ -602,8 +574,8 @@ function ActivitiesSection() {
   const { isChecked, toggle, countChecked } = useProgress();
   const [expandedKey, setExpandedKey] = useState<string | null>(null);
 
-  const totalDone = ACT_GROUPS.reduce((s, g) => s + countChecked(actIds(g.key, g.count)), 0);
-  const totalPct = (totalDone / ACT_TOTAL) * 100;
+  const totalDone = countChecked(ALL_ACTIVITY_IDS);
+  const totalPct = (totalDone / ACTIVITY_TOTAL) * 100;
   const color = '#4A9B8E';
 
   return (
@@ -612,59 +584,59 @@ function ActivitiesSection() {
         <Tag label="World Activities" color="rgba(74,155,142,0.2)" textColor={color} />
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 20 }}>
           <SectionTitle>Activities &amp; World Content</SectionTitle>
-          <span style={{ fontFamily: 'sans-serif', fontSize: 13, color: DIM }}>89 total activities</span>
+          <span style={{ fontFamily: 'sans-serif', fontSize: 13, color: DIM }}>{ACTIVITY_TOTAL} total activities</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '8px 0 24px' }}>
           <div style={{ flex: 1 }}><MiniBar pct={totalPct} color={color} /></div>
-          <span style={{ fontFamily: 'sans-serif', fontSize: 13, color, fontWeight: 700 }}>{totalDone} / {ACT_TOTAL}</span>
+          <span style={{ fontFamily: 'sans-serif', fontSize: 13, color, fontWeight: 700 }}>{totalDone} / {ACTIVITY_TOTAL}</span>
         </div>
         <div style={{ display: 'flex', gap: 24 }}>
           <div style={{ flex: '0 0 56%' }}>
-            {ACT_GROUPS.map(g => {
-              const ids = actIds(g.key, g.count);
+            {ACTIVITY_CATEGORIES.map(cat => {
+              const ids = cat.items.map(item => item.id);
               const done = countChecked(ids);
-              const pct = (done / g.count) * 100;
-              const isOpen = expandedKey === g.key;
+              const pct = (done / cat.items.length) * 100;
+              const isOpen = expandedKey === cat.key;
               return (
-                <div key={g.key} style={{ marginBottom: 10, borderRadius: 8, background: 'rgba(255,255,255,0.04)', border: `1px solid ${isOpen ? g.color + '50' : 'rgba(255,255,255,0.07)'}`, overflow: 'hidden' }}>
+                <div key={cat.key} style={{ marginBottom: 10, borderRadius: 8, background: 'rgba(255,255,255,0.04)', border: `1px solid ${isOpen ? cat.color + '50' : 'rgba(255,255,255,0.07)'}`, overflow: 'hidden' }}>
                   {/* Header row — click to expand */}
                   <div
-                    onClick={() => setExpandedKey(isOpen ? null : g.key)}
+                    onClick={() => setExpandedKey(isOpen ? null : cat.key)}
                     style={{ display: 'flex', gap: 14, padding: '14px 16px', alignItems: 'flex-start', cursor: 'pointer' }}
                   >
-                    <span style={{ fontSize: 24, flexShrink: 0 }}>{g.icon}</span>
+                    <span style={{ fontSize: 24, flexShrink: 0 }}>{cat.icon}</span>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5 }}>
-                        <span style={{ fontFamily: 'sans-serif', fontSize: 14, color: WHITE, fontWeight: 500 }}>{g.name}</span>
+                        <span style={{ fontFamily: 'sans-serif', fontSize: 14, color: WHITE, fontWeight: 500 }}>{cat.name}</span>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0, marginLeft: 8 }}>
-                          <span style={{ fontFamily: 'sans-serif', fontSize: 12, fontWeight: 700, color: g.color }}>{done} / {g.count}</span>
-                          <span style={{ fontFamily: 'sans-serif', fontSize: 10, color: g.color, opacity: 0.7 }}>{isOpen ? '▲' : '▼'}</span>
+                          <span style={{ fontFamily: 'sans-serif', fontSize: 12, fontWeight: 700, color: cat.color }}>{done} / {cat.items.length}</span>
+                          <span style={{ fontFamily: 'sans-serif', fontSize: 10, color: cat.color, opacity: 0.7 }}>{isOpen ? '▲' : '▼'}</span>
                         </div>
                       </div>
-                      <p style={{ fontFamily: 'sans-serif', fontSize: 12, color: DIM, lineHeight: 1.4, marginBottom: 6 }}>{g.desc}</p>
-                      <MiniBar pct={pct} color={g.color} />
+                      <p style={{ fontFamily: 'sans-serif', fontSize: 12, color: DIM, lineHeight: 1.4, marginBottom: 6 }}>{cat.desc}</p>
+                      <MiniBar pct={pct} color={cat.color} />
                     </div>
                   </div>
-                  {/* Expandable checklist */}
+                  {/* Expandable checklist — real IDs from data model */}
                   {isOpen && (
-                    <div style={{ borderTop: `1px solid ${g.color}25`, padding: '10px 16px 14px', background: 'rgba(0,0,0,0.2)' }}>
+                    <div style={{ borderTop: `1px solid ${cat.color}25`, padding: '10px 16px 14px', background: 'rgba(0,0,0,0.2)' }}>
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 4, marginBottom: 8 }}>
-                        {ids.map((id, i) => (
+                        {cat.items.map(item => (
                           <CollectibleCheckItem
-                            key={id} id={id}
-                            label={`#${String(i + 1).padStart(2, '0')}`}
-                            color={g.color}
-                            checked={isChecked(id)}
-                            onToggle={() => toggle(id)}
+                            key={item.id} id={item.id}
+                            label={item.name}
+                            color={cat.color}
+                            checked={isChecked(item.id)}
+                            onToggle={() => toggle(item.id)}
                           />
                         ))}
                       </div>
-                      {done < g.count && (
+                      {done < cat.items.length && (
                         <button
                           onClick={() => ids.forEach(id => { if (!isChecked(id)) toggle(id); })}
-                          style={{ width: '100%', padding: '5px', borderRadius: 5, border: `1px solid ${g.color}40`, background: `${g.color}14`, color: g.color, fontFamily: 'sans-serif', fontSize: 10, cursor: 'pointer' }}
+                          style={{ width: '100%', padding: '5px', borderRadius: 5, border: `1px solid ${cat.color}40`, background: `${cat.color}14`, color: cat.color, fontFamily: 'sans-serif', fontSize: 10, cursor: 'pointer' }}
                         >
-                          Mark all {g.count} done
+                          Mark all {cat.items.length} done
                         </button>
                       )}
                     </div>
@@ -701,31 +673,7 @@ function ActivitiesSection() {
 function EquipmentSection() {
   const [tab, setTab] = useState(0);
   const tabs = ['⚔️ Weapons', '🛡️ Armour', '💎 Charms'];
-  const weapons = [
-    { name: 'Starting Katana',     tier: 1, note: 'Prologue reward — balanced starter' },
-    { name: "Rider's Edge",        tier: 2, note: 'Upgrade via Ishikari blacksmith (Copper + Iron)' },
-    { name: 'Crescent Blade',      tier: 2, note: 'Crafted after Saito Brothers quest (Steel + Resin)' },
-    { name: 'Ghost Blade',         tier: 3, note: 'Crafted post-story (Rare Iron + Haunted Wood)' },
-    { name: 'Mountain God Katana', tier: 4, note: 'Reward from myth_02 — highest base damage' },
-    { name: "Dragon's Fang",       tier: 5, note: 'Reward from ms_10 — unlocks final stance' },
-  ];
-  const armour = [
-    { name: 'Ghost Kimono',         region: 'Prologue',         note: 'Starting armour — balanced stats' },
-    { name: "Traveller's Cloak",    region: 'Yotei Grasslands', note: 'Crafted at grasslands settlement' },
-    { name: "Ronin's Guard",        region: 'Ishikari Plain',   note: 'Merchant in liberated Ishikari town' },
-    { name: 'Mountain Shroud',      region: 'Teshio Ridge',     note: 'Shrine Climb #7 reward' },
-    { name: 'Ghost Armour Tier II', region: 'Ch.2 reward',      note: 'Saito Brothers quest completion' },
-    { name: 'Spirit Weave',         region: 'Post-story',       note: 'Crafted with Dragon materials' },
-  ];
-  const charms = [
-    { name: 'Harvest Charm',        slot: 1, note: 'Attack boost after resting — side tale reward' },
-    { name: 'Nine-Tails Fox Charm', slot: 2, note: 'Puzzle Box #1 — stealth invisibility window' },
-    { name: 'Mountain God Charm',   slot: 3, note: 'myth_02 reward — lightning resistance' },
-    { name: 'Bear Hide Amulet',     slot: 4, note: 'myth_04 reward — health regeneration on kill' },
-    { name: 'Crescent Moon Token',  slot: 5, note: 'myth_06 reward — bow damage amplified' },
-    { name: "Atsu's Spirit Seal",   slot: 6, note: 'Shrine Climb #13 (final) — all stances buffed' },
-  ];
-  const data = [weapons, armour, charms];
+  const data = [WEAPONS, ARMOUR, CHARMS];
   const cols = [['Name','Tier','Notes'],['Name','Region','Notes'],['Name','Slot','Notes']];
 
   return (
@@ -746,9 +694,12 @@ function EquipmentSection() {
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1.5fr 3fr', gap: 12, marginBottom: 12, borderBottom: `1px solid ${GOLD40}`, paddingBottom: 8 }}>
             {cols[tab].map(h => <span key={h} style={{ fontFamily: 'sans-serif', fontSize: 11, color: GOLD, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{h}</span>)}
           </div>
-          {data[tab].map((row: any, i: number) => (
-            <div key={i} style={{ display: 'grid', gridTemplateColumns: '2fr 1.5fr 3fr', gap: 12, padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,0.06)', alignItems: 'center' }}>
-              <span style={{ fontFamily: 'sans-serif', fontSize: 13, color: WHITE }}>{row.name}</span>
+          {(data[tab] as any[]).map((row, i) => (
+            <div key={row.id ?? i} style={{ display: 'grid', gridTemplateColumns: '2fr 1.5fr 3fr', gap: 12, padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,0.06)', alignItems: 'center' }}>
+              <span style={{ fontFamily: 'sans-serif', fontSize: 13, color: WHITE }}>
+                {row.name}
+                {row.placeholder && <span style={{ fontSize: 9, color: '#B8860B', marginLeft: 5 }}>⚠ unverified</span>}
+              </span>
               <span style={{ display: 'flex', alignItems: 'center' }}>
                 {tab === 0 ? <TierDots filled={row.tier} /> : <span style={{ fontFamily: 'sans-serif', fontSize: 12, color: DIM }}>{tab === 1 ? row.region : `Slot ${row.slot}`}</span>}
               </span>
@@ -845,19 +796,7 @@ const ALL_QUESTS_BY_REGION: Record<string, string[]> = (() => {
 
 function ProgressSection() {
   const { countChecked } = useProgress();
-  const regions = [
-    { name: 'Yotei Grasslands', abbr: 'YG', color: '#4A9B8E', quests: 22, collectibles: 62, activities: 14 },
-    { name: 'Ishikari Plain',   abbr: 'IP', color: '#4682B4', quests: 18, collectibles: 55, activities: 11 },
-    { name: 'Teshio Ridge',     abbr: 'TR', color: '#7B68EE', quests: 16, collectibles: 48, activities: 9  },
-    { name: 'Tokachi Range',    abbr: 'TK', color: '#B8860B', quests: 21, collectibles: 58, activities: 12 },
-    { name: 'Nayoro Wilds',     abbr: 'NW', color: '#4A9B6F', quests: 19, collectibles: 52, activities: 10 },
-    { name: 'Oshima Coast',     abbr: 'OC', color: '#4A7A9B', quests: 23, collectibles: 44, activities: 13 },
-  ];
   const R = 28; const C = 2 * Math.PI * R;
-
-  // Total activity completion to distribute across regions proportionally
-  const totalActDone = countChecked(ALL_ACT_IDS);
-  const totalActPct = ACT_TOTAL > 0 ? totalActDone / ACT_TOTAL : 0;
 
   return (
     <SectionBg img={IMGS.ps2} overlay="rgba(4,6,18,0.88)">
@@ -866,16 +805,24 @@ function ProgressSection() {
         <SectionTitle>Progress Tracking</SectionTitle>
         <GoldLine />
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16 }}>
-          {regions.map(r => {
-            const regionQuestIds = ALL_QUESTS_BY_REGION[r.name] || [];
-            const questDone = countChecked(regionQuestIds);
-            const questPct = regionQuestIds.length > 0 ? (questDone / regionQuestIds.length) * 100 : 0;
-            // Activity progress: scale global completion % to this region's activity count
-            const actDone = Math.round(totalActPct * r.activities);
-            const actPct = r.activities > 0 ? (actDone / r.activities) * 100 : 0;
-            // Overall ring = average of quest + activity completion
-            const ringPct = (questPct + actPct) / 2;
+          {REGIONS.map(r => {
+            // All IDs derived from data — no hardcoded counts
+            const questIds       = ALL_QUESTS_BY_REGION[r.name] || [];
+            const collectibleIds = COLLECTIBLES_BY_REGION[r.name] || [];
+            const activityIds    = ACTIVITIES_BY_REGION[r.name] || [];
+
+            const questDone = countChecked(questIds);
+            const collDone  = countChecked(collectibleIds);
+            const actDone   = countChecked(activityIds);
+
+            const questPct = questIds.length       > 0 ? (questDone / questIds.length)       * 100 : 0;
+            const collPct  = collectibleIds.length  > 0 ? (collDone  / collectibleIds.length)  * 100 : 0;
+            const actPct   = activityIds.length     > 0 ? (actDone   / activityIds.length)     * 100 : 0;
+
+            // Ring = average of all three content types
+            const ringPct    = (questPct + collPct + actPct) / 3;
             const ringOffset = C - (C * ringPct / 100);
+
             return (
               <Card key={r.abbr} style={{ borderColor: `${r.color}40` }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 14 }}>
@@ -893,17 +840,17 @@ function ProgressSection() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <span style={{ fontFamily: 'sans-serif', fontSize: 11, color: DIM, width: 80 }}>Quests</span>
                     <div style={{ flex: 1 }}><MiniBar pct={questPct} color={GOLD} /></div>
-                    <span style={{ fontFamily: 'sans-serif', fontSize: 11, color: GOLD, width: 40, textAlign: 'right' }}>{questDone}/{regionQuestIds.length}</span>
+                    <span style={{ fontFamily: 'sans-serif', fontSize: 11, color: GOLD, width: 40, textAlign: 'right' }}>{questDone}/{questIds.length}</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <span style={{ fontFamily: 'sans-serif', fontSize: 11, color: DIM, width: 80 }}>Collectibles</span>
-                    <div style={{ flex: 1 }}><MiniBar pct={0} color={r.color} /></div>
-                    <span style={{ fontFamily: 'sans-serif', fontSize: 11, color: r.color, width: 40, textAlign: 'right' }}>{r.collectibles}</span>
+                    <div style={{ flex: 1 }}><MiniBar pct={collPct} color={r.color} /></div>
+                    <span style={{ fontFamily: 'sans-serif', fontSize: 11, color: r.color, width: 40, textAlign: 'right' }}>{collDone}/{collectibleIds.length}</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <span style={{ fontFamily: 'sans-serif', fontSize: 11, color: DIM, width: 80 }}>Activities</span>
                     <div style={{ flex: 1 }}><MiniBar pct={actPct} color="#4A9B8E" /></div>
-                    <span style={{ fontFamily: 'sans-serif', fontSize: 11, color: '#4A9B8E', width: 40, textAlign: 'right' }}>{actDone}/{r.activities}</span>
+                    <span style={{ fontFamily: 'sans-serif', fontSize: 11, color: '#4A9B8E', width: 40, textAlign: 'right' }}>{actDone}/{activityIds.length}</span>
                   </div>
                 </div>
               </Card>
@@ -917,6 +864,7 @@ function ProgressSection() {
 
 // ── Section: Dashboard ────────────────────────────────────────────────────────
 
+// ── Quest category IDs — derived from data arrays, never hardcoded ────────────
 const QUEST_CATEGORIES = [
   { label: 'Main Story',    ids: MAIN_STORY.map(q => q.id),    color: '#C9A84C' },
   { label: 'Side Tales',    ids: SIDE_TALES.map(q => q.id),    color: '#4A9B8E' },
@@ -924,9 +872,9 @@ const QUEST_CATEGORIES = [
   { label: 'Sensei Tales',  ids: SENSEI_TALES.map(q => q.id),  color: '#7B68EE' },
   { label: 'Bounty Quests', ids: BOUNTY_QUESTS.map(q => q.id), color: '#B8860B' },
   { label: 'Post-Story',    ids: POST_STORY.map(q => q.id),    color: '#9B59B6' },
-] as const;
+];
 
-const TOTAL_QUESTS = QUEST_CATEGORIES.reduce((s, c) => s + c.ids.length, 0); // 119
+const TOTAL_QUESTS = QUEST_CATEGORIES.reduce((s, c) => s + c.ids.length, 0);
 
 function DashboardSection() {
   const { countChecked } = useProgress();
@@ -938,15 +886,15 @@ function DashboardSection() {
     { tier: 'Bronze',   icon: '🥉', count: 28, color: '#CD7F32' },
   ];
 
-  const questsDone = QUEST_CATEGORIES.reduce((s, c) => s + countChecked([...c.ids]), 0);
-  const questsPct = (questsDone / TOTAL_QUESTS) * 100;
+  // All counts derived from data — no hardcoded totals
+  const questsDone = QUEST_CATEGORIES.reduce((s, c) => s + countChecked(c.ids), 0);
+  const questsPct  = TOTAL_QUESTS > 0 ? (questsDone / TOTAL_QUESTS) * 100 : 0;
 
-  const collAllIds = COLL_GROUPS.flatMap(g => collIds(g.key, g.count));
-  const collDone = countChecked(collAllIds);
-  const collPct = (collDone / COLL_TOTAL) * 100;
+  const collDone = countChecked(ALL_COLLECTIBLE_IDS);
+  const collPct  = COLLECTIBLE_TOTAL > 0 ? (collDone / COLLECTIBLE_TOTAL) * 100 : 0;
 
-  const actDone = countChecked(ALL_ACT_IDS);
-  const actPct = (actDone / ACT_TOTAL) * 100;
+  const actDone = countChecked(ALL_ACTIVITY_IDS);
+  const actPct  = ACTIVITY_TOTAL > 0 ? (actDone / ACTIVITY_TOTAL) * 100 : 0;
 
   return (
     <SectionBg img={IMGS.mob5} overlay="rgba(4,6,16,0.90)">
@@ -957,8 +905,8 @@ function DashboardSection() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14, marginBottom: 18 }}>
           {[
             { label: 'Quests',       done: questsDone, total: TOTAL_QUESTS, sub: '6 categories', color: GOLD,      pct: questsPct },
-            { label: 'Collectibles', done: collDone,   total: COLL_TOTAL,   sub: '8 groups',     color: '#4A9B8E', pct: collPct  },
-            { label: 'Activities',   done: actDone,    total: ACT_TOTAL,    sub: '6 types',      color: '#4682B4', pct: actPct   },
+            { label: 'Collectibles', done: collDone,   total: COLLECTIBLE_TOTAL, sub: '8 groups', color: '#4A9B8E', pct: collPct  },
+            { label: 'Activities',   done: actDone,    total: ACTIVITY_TOTAL,    sub: '6 types',  color: '#4682B4', pct: actPct   },
             { label: 'Trophies',     done: 0,          total: 54,           sub: '1 Platinum',   color: '#E5E4E2', pct: 0        },
           ].map(s => (
             <Card key={s.label} style={{ textAlign: 'center', padding: '18px 22px' }}>
