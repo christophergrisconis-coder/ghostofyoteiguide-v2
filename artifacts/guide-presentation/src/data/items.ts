@@ -118,11 +118,13 @@ export const ITEMS: Item[] = [
     name: 'Ancient Map Fragment',
     type: 'quest_item',
     rarity: 'uncommon',
-    description: 'A fragment of an ancient regional map, found in the aftermath of the Tokachi summit intelligence operation. Reveals nearby collectible locations when examined.',
+    // Name confirmed from ms_02 reward text. In-game use unconfirmed — see Q-ITM-2.
+    // Note: ms_02 also rewards Stone Stance unlock separately; that is NOT this item's effect.
+    description: 'A fragment of an ancient regional map, found in the aftermath of the Tokachi summit intelligence operation. Exact in-game use unconfirmed (Q-ITM-2).',
     locations: [
-      { region: 'Tokachi Range', subArea: 'Tokachi Mountain Pass', sourceType: 'quest_reward', notes: 'Reward from ms_02 (Shogun of the North).' },
+      { region: 'Tokachi Range', subArea: 'Tokachi Mountain Pass', sourceType: 'quest_reward', notes: 'Reward from ms_02 (Shogun of the North). Name confirmed; use effect unconfirmed.' },
     ],
-    usedFor: ['Reveals nearby Sumi-e Painting viewpoints in Tokachi Range'],
+    usedFor: ['Exact use unconfirmed — may reveal collectible locations in Tokachi Range (Q-ITM-2)'],
     requiredForQuests: [],
     requiredForCrafting: [],
     placeholder: true,

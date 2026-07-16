@@ -18,7 +18,8 @@ export const WEAPONS: Weapon[] = [
     id: 'wpn_riders_edge',
     name: "Rider's Edge",
     tier: 2,
-    note: 'Chapter 1 reward from ms_04. Upgrade at Ishikari blacksmith. Requires Copper ×2, Iron ×1 (material names placeholder)',
+    // Quest source confirmed from ms_04 reward text. Upgrade cost speculative — see Q-EQP-1.
+    note: "Chapter 1 reward from ms_04. Upgraded at Ishikari blacksmith. Exact material type and quantity unconfirmed (Q-EQP-1).",
     questId: 'ms_04',
     placeholder: true,
     verified: false,
@@ -27,7 +28,8 @@ export const WEAPONS: Weapon[] = [
     id: 'wpn_crescent_blade',
     name: 'Crescent Blade',
     tier: 2,
-    note: 'Crafted after Saito Brothers quest (ms_08). Material requirements placeholder.',
+    // Quest source confirmed from ms_08 reward text. Crafting cost speculative — see Q-EQP-2.
+    note: 'Crafted after Saito Brothers quest (ms_08). Exact material requirements unconfirmed (Q-EQP-2).',
     questId: 'ms_08',
     placeholder: true,
     verified: false,
@@ -36,7 +38,8 @@ export const WEAPONS: Weapon[] = [
     id: 'wpn_ghost_blade',
     name: 'Ghost Blade',
     tier: 3,
-    note: 'Crafted post-story. Material requirements placeholder.',
+    // No confirmed quest source. Existence inferred from narrative context. See Q-EQP-3 and Q-EQP-4.
+    note: 'Post-story Tier 3 katana. Quest source and crafting materials unconfirmed (Q-EQP-3, Q-EQP-4).',
     questId: undefined,
     placeholder: true,
     verified: false,
@@ -78,7 +81,8 @@ export const ARMOUR: Armour[] = [
     id: 'arm_travellers_cloak',
     name: "Traveller's Cloak",
     region: 'Yotei Grasslands',
-    note: 'Crafted at a grasslands settlement after liberation. Exact settlement and material cost placeholder.',
+    // Settlement name and crafting materials unconfirmed — see Q-EQP-5 and Q-EQP-6.
+    note: "Crafted at an unconfirmed liberated Yotei Grasslands settlement. Settlement name and material cost unconfirmed (Q-EQP-5, Q-EQP-6).",
     questId: undefined,
     placeholder: true,
     verified: false,
@@ -87,7 +91,8 @@ export const ARMOUR: Armour[] = [
     id: 'arm_ronins_guard',
     name: "Ronin's Guard",
     region: 'Ishikari Plain',
-    note: 'Available from merchant in a liberated Ishikari town. Exact town placeholder.',
+    // Exact town and cost unconfirmed — see Q-EQP-7.
+    note: 'Purchased from a liberated Ishikari Plain merchant. Exact town name and Mon cost unconfirmed (Q-EQP-7).',
     questId: undefined,
     placeholder: true,
     verified: false,
@@ -96,7 +101,8 @@ export const ARMOUR: Armour[] = [
     id: 'arm_mountain_shroud',
     name: 'Mountain Shroud',
     region: 'Teshio Ridge',
-    note: 'Reward from Shrine Climb #7 in Teshio Ridge. Exact shrine location placeholder.',
+    // Shrine #7 identity unknown — the 13 shrine climbs are all placeholder. See Q-EQP-8, Q-COLL-9.
+    note: 'Reward from Shrine Climb #7 in Teshio Ridge. Shrine identity and location unconfirmed (Q-EQP-8 — depends on Q-COLL-9).',
     questId: undefined,
     placeholder: true,
     verified: false,

@@ -29,8 +29,26 @@ function generateItems(
 
 // ── Collectible categories ─────────────────────────────────────────────────────
 // Counts per category confirmed from PlayStation official materials and in-game
-// trophy descriptions. Region distributions are approximate placeholders until
-// Task #100 verifies exact per-region counts from the shipped game.
+// trophy descriptions. Region distributions are approximate placeholders.
+//
+// ⚠ ALL INDIVIDUAL ITEM NAMES AND SUB-AREAS ARE PLACEHOLDER.
+// They use the format "Category #NN" until real in-game names are verified.
+//
+// Open questions before any entry can be set verified: true:
+//   Q-COLL-1:  Exact names of all 60 Sumi-e Painting viewpoints
+//   Q-COLL-2:  Exact sub-area and approach for each painting
+//   Q-COLL-3:  Confirmed per-region split for each category
+//   Q-COLL-4:  Exact names and cultural descriptions of all 80 Ainu Sacred Sites
+//   Q-COLL-5:  Names, clan affiliations, descriptions of all 68 Clan Trophies
+//   Q-COLL-6:  Names and descriptions of all 55 Ancient Maps
+//   Q-COLL-7:  Exact locations of all 16 Hot Springs
+//   Q-COLL-8:  Names and difficulty ratings of all 15 Bamboo Strikes
+//   Q-COLL-9:  Names and locations of all 13 Shrine Climbs
+//              (Critical: which is #13? — it rewards Atsu's Spirit Seal charm)
+//   Q-COLL-10: Exact sub-area locations of all 12 Nine-Tails Puzzle Boxes
+//              and what reward each box grants beyond the Charm in box #1
+//
+// See VERIFICATION_REPORT.md for the full open-questions list.
 
 export const COLLECTIBLE_CATEGORIES: CollectibleCategory[] = [
   {

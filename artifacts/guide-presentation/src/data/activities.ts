@@ -29,7 +29,25 @@ function generateActivityItems(
 
 // ── Activity categories ────────────────────────────────────────────────────────
 // Counts per category confirmed from PlayStation official materials.
-// Region distributions are approximate placeholders until Task #100 verifies.
+// Region distributions are approximate placeholders.
+//
+// ⚠ ALL INDIVIDUAL ITEM NAMES AND SUB-AREAS ARE PLACEHOLDER.
+// They use the format "Category #NN" until real in-game names are verified.
+//
+// Open questions before any entry can be set verified: true:
+//   Q-ACT-1: Names and difficulty ratings of all 25 Dueling Circle opponents;
+//             how many Technique Points each awards
+//   Q-ACT-2: Exact viewpoint names for all 20 Haiku Stations;
+//             which cosmetic dye each rewards
+//   Q-ACT-3: Exact names of all 18 liberated settlements;
+//             what merchant/quest triggers each liberation unlocks
+//   Q-ACT-4: Each merchant's name, exact location, and item price list (Mon)
+//   Q-ACT-5: Animal types and exact locations of all 12 Animal Sanctuaries;
+//             Spirit Growth bonus value per visit
+//   Q-ACT-6: Combat style required for each of the 8 Vanity Challenges;
+//             which cosmetic armour piece each rewards
+//
+// See VERIFICATION_REPORT.md for the full open-questions list.
 
 export const ACTIVITY_CATEGORIES: ActivityCategory[] = [
   {
