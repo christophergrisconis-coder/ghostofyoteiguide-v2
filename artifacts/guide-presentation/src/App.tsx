@@ -18,6 +18,10 @@ import {
 } from './data/activities';
 import { WEAPONS, ARMOUR, CHARMS } from './data/equipment';
 import { REGIONS } from './data/regions';
+import {
+  ITEMS, ITEM_TOTAL, ITEM_TYPE_LABELS, SOURCE_TYPE_LABELS, SOURCE_TYPE_ICONS, RARITY_COLORS,
+  type ItemType,
+} from './data/items';
 import { ProgressContext, useProgressState, useProgress } from './hooks/use-progress';
 
 // ── Sidebar navigation config ─────────────────────────────────────────────────
@@ -34,6 +38,7 @@ const NAV = [
   { id: 'collectibles',  label: 'Collectibles',    icon: '🗺️',  group: 'world',  count: COLLECTIBLE_TOTAL   },
   { id: 'activities',    label: 'Activities',      icon: '🏃',  group: 'world',  count: ACTIVITY_TOTAL      },
   { id: 'equipment',     label: 'Equipment',       icon: '🗡️',  group: 'world'  },
+  { id: 'items',         label: 'Items',            icon: '🎒',  group: 'world',  count: ITEM_TOTAL },
   { id: 'missables',     label: 'Missables',       icon: '⚠️',  group: 'world'  },
   { id: 'progress',      label: 'Progress',        icon: '📊',  group: 'status' },
   { id: 'dashboard',     label: 'Dashboard',       icon: '🏅',  group: 'status' },
@@ -717,6 +722,346 @@ function EquipmentSection() {
   );
 }
 
+// ── Section: Items ────────────────────────────────────────────────────────────
+
+const ITEM_TYPE_COLORS: Record<string, string> = {
+  crafting_material:   '#4A9B8E',
+  quest_item:          '#C9A84C',
+  upgrade_material:    '#8B5CF6',
+  merchant_item:       '#4682B4',
+  collectible_related: '#B8860B',
+};
+
+function ItemsSection() {
+  const [query, setQuery] = useState('');
+  const [typeFilter, setTypeFilter] = useState<ItemType | 'all'>('all');
+  const [regionFilter, setRegionFilter] = useState<string>('all');
+  const [selectedId, setSelectedId] = useState<string | null>(ITEMS[0]?.id ?? null);
+
+  // All filter options derived from data
+  const allTypes = Object.keys(ITEM_TYPE_LABELS) as ItemType[];
+  const allRegions = [...new Set(ITEMS.flatMap(item => item.locations.map(loc => loc.region)))].sort();
+
+  // Filter logic
+  const filtered = ITEMS.filter(item => {
+    const matchQuery   = query.trim() === '' || item.name.toLowerCase().includes(query.toLowerCase());
+    const matchType    = typeFilter === 'all' || item.type === typeFilter;
+    const matchRegion  = regionFilter === 'all' || item.locations.some(loc => loc.region === regionFilter);
+    return matchQuery && matchType && matchRegion;
+  });
+
+  // Keep selected in sync when filters change
+  const selectedItem = filtered.find(i => i.id === selectedId) ?? filtered[0] ?? null;
+
+  const color = '#C9A84C';
+  const dim = 'rgba(240,237,232,0.65)';
+
+  return (
+    <SectionBg img={IMGS.blog3} overlay="rgba(4,8,20,0.90)">
+      <div style={{ padding: '60px 48px' }}>
+        <Tag label={`Item Location Search · ${ITEM_TOTAL} Items`} color="rgba(201,168,76,0.15)" />
+        <SectionTitle><span style={{ color: GOLD }}>Item</span> Location Search</SectionTitle>
+        <GoldLine />
+        <p style={{ fontFamily: 'sans-serif', fontSize: 12, color: DIM, marginBottom: 20, lineHeight: 1.5, maxWidth: 600 }}>
+          Find where any item is obtained, what it is used for, and which quests or crafting recipes require it. Items marked ⚠ are unverified against the shipped game.
+        </p>
+
+        {/* Search bar */}
+        <div style={{ marginBottom: 14 }}>
+          <input
+            type="text"
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            placeholder="Search items by name…"
+            style={{
+              width: '100%', boxSizing: 'border-box',
+              padding: '10px 16px', borderRadius: 8,
+              border: `1px solid ${GOLD}40`,
+              background: 'rgba(10,10,20,0.72)', color: WHITE,
+              fontFamily: 'sans-serif', fontSize: 13,
+              outline: 'none',
+            }}
+          />
+        </div>
+
+        {/* Type filters */}
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
+          {(['all', ...allTypes] as const).map(t => {
+            const active = t === typeFilter;
+            const col = t === 'all' ? GOLD : ITEM_TYPE_COLORS[t];
+            return (
+              <button key={t} onClick={() => setTypeFilter(t)}
+                style={{
+                  padding: '4px 10px', borderRadius: 4, cursor: 'pointer',
+                  border: `1px solid ${col}40`, fontFamily: 'sans-serif',
+                  fontSize: 9, fontWeight: 700, letterSpacing: '0.05em',
+                  textTransform: 'uppercase',
+                  background: active ? `${col}25` : 'transparent',
+                  color: active ? col : 'rgba(240,237,232,0.4)',
+                  transition: 'all 0.15s',
+                }}>
+                {t === 'all' ? 'All Types' : ITEM_TYPE_LABELS[t]}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Region filters */}
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 20 }}>
+          {(['all', ...allRegions] as const).map(r => {
+            const active = r === regionFilter;
+            const regionCol = r === 'all' ? '#4682B4' : (REGION_COLOR[r] || '#4682B4');
+            return (
+              <button key={r} onClick={() => setRegionFilter(r)}
+                style={{
+                  padding: '4px 10px', borderRadius: 4, cursor: 'pointer',
+                  border: `1px solid ${regionCol}40`, fontFamily: 'sans-serif',
+                  fontSize: 9, fontWeight: 700, letterSpacing: '0.04em',
+                  textTransform: 'uppercase',
+                  background: active ? `${regionCol}25` : 'transparent',
+                  color: active ? regionCol : 'rgba(240,237,232,0.4)',
+                  transition: 'all 0.15s',
+                }}>
+                {r === 'all' ? 'All Regions' : r.split(' ')[0]}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Split layout: list + detail */}
+        <div className="quest-browser">
+          {/* Left: item list */}
+          <div style={{ flex: '0 0 40%', display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+            <p style={{ fontFamily: 'sans-serif', fontSize: 11, color: DIM, marginBottom: 10 }}>
+              {filtered.length} of {ITEM_TOTAL} items
+            </p>
+            <div className="quest-scroll" style={{ flex: 1 }}>
+              {filtered.length === 0 ? (
+                <div style={{ padding: '24px 16px', textAlign: 'center', color: DIM, fontFamily: 'sans-serif', fontSize: 13 }}>
+                  No items match your search.
+                </div>
+              ) : filtered.map(item => {
+                const isSelected = item.id === selectedItem?.id;
+                const typeColor = ITEM_TYPE_COLORS[item.type] || GOLD;
+                const rarityColor = RARITY_COLORS[item.rarity];
+                return (
+                  <div
+                    key={item.id}
+                    onClick={() => setSelectedId(item.id)}
+                    style={{
+                      display: 'flex', alignItems: 'flex-start', gap: 10,
+                      padding: '10px 12px', borderRadius: 8, marginBottom: 4,
+                      cursor: 'pointer',
+                      background: isSelected ? `${typeColor}18` : 'rgba(255,255,255,0.03)',
+                      border: `1px solid ${isSelected ? typeColor + '60' : 'rgba(255,255,255,0.06)'}`,
+                      transition: 'all 0.15s ease',
+                    }}
+                  >
+                    {/* Rarity pip */}
+                    <div style={{
+                      width: 8, height: 8, borderRadius: '50%', marginTop: 4, flexShrink: 0,
+                      background: rarityColor,
+                      boxShadow: isSelected ? `0 0 6px ${rarityColor}` : 'none',
+                    }} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
+                        <span style={{
+                          fontFamily: 'sans-serif', fontSize: 12,
+                          color: isSelected ? WHITE : 'rgba(240,237,232,0.85)',
+                          fontWeight: isSelected ? 600 : 400,
+                          flex: 1, minWidth: 0,
+                          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                        }}>
+                          {item.name}
+                        </span>
+                        {item.placeholder && (
+                          <span title="Unverified" style={{ fontSize: 10, color: '#F59E0B', flexShrink: 0 }}>⚠</span>
+                        )}
+                      </div>
+                      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                        <span style={{
+                          fontFamily: 'sans-serif', fontSize: 9, fontWeight: 700,
+                          color: typeColor, background: `${typeColor}15`,
+                          padding: '1px 5px', borderRadius: 3,
+                          textTransform: 'uppercase', letterSpacing: '0.04em',
+                        }}>
+                          {ITEM_TYPE_LABELS[item.type]}
+                        </span>
+                        <span style={{
+                          fontFamily: 'sans-serif', fontSize: 9,
+                          color: dim, padding: '1px 5px',
+                          background: 'rgba(255,255,255,0.04)', borderRadius: 3,
+                          textTransform: 'capitalize',
+                        }}>
+                          {item.rarity}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Right: item detail */}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            {!selectedItem ? (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: DIM, fontFamily: 'sans-serif', fontSize: 13 }}>
+                Select an item to see its locations and uses
+              </div>
+            ) : (
+              <div style={{ background: 'rgba(10,10,20,0.72)', backdropFilter: 'blur(12px)', border: `1px solid ${GOLD}40`, borderRadius: 12, padding: '20px 24px', height: '100%', boxSizing: 'border-box', overflowY: 'auto' }}>
+                {/* Header */}
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 14 }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 6 }}>
+                      <h3 style={{ fontFamily: 'Georgia, serif', fontSize: 20, color: WHITE, lineHeight: 1.2, margin: 0 }}>
+                        {selectedItem.name}
+                      </h3>
+                      {selectedItem.placeholder && (
+                        <span style={{
+                          fontFamily: 'sans-serif', fontSize: 10, fontWeight: 700,
+                          color: '#F59E0B', background: 'rgba(245,158,11,0.15)',
+                          border: '1px solid rgba(245,158,11,0.3)',
+                          padding: '2px 8px', borderRadius: 4,
+                          textTransform: 'uppercase', letterSpacing: '0.06em',
+                        }}>
+                          ⚠ Unverified
+                        </span>
+                      )}
+                    </div>
+                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                      <span style={{
+                        fontFamily: 'sans-serif', fontSize: 10, fontWeight: 700,
+                        color: ITEM_TYPE_COLORS[selectedItem.type],
+                        background: `${ITEM_TYPE_COLORS[selectedItem.type]}15`,
+                        padding: '2px 8px', borderRadius: 4, textTransform: 'uppercase', letterSpacing: '0.05em',
+                      }}>
+                        {ITEM_TYPE_LABELS[selectedItem.type]}
+                      </span>
+                      <span style={{
+                        fontFamily: 'sans-serif', fontSize: 10,
+                        color: RARITY_COLORS[selectedItem.rarity],
+                        background: `${RARITY_COLORS[selectedItem.rarity]}15`,
+                        padding: '2px 8px', borderRadius: 4, textTransform: 'capitalize',
+                      }}>
+                        {selectedItem.rarity}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Description */}
+                <p style={{ fontFamily: 'sans-serif', fontSize: 12, color: DIM, lineHeight: 1.55, marginBottom: 18 }}>
+                  {selectedItem.description}
+                </p>
+
+                {/* Locations */}
+                <div style={{ marginBottom: 18 }}>
+                  <p style={{ fontFamily: 'sans-serif', fontSize: 10, color: GOLD, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>
+                    📍 Where to Find It
+                  </p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {selectedItem.locations.map((loc, i) => {
+                      const regionColor = REGION_COLOR[loc.region] || '#4A9B8E';
+                      return (
+                        <div key={i} style={{
+                          padding: '10px 14px', borderRadius: 8,
+                          background: `${regionColor}0d`,
+                          border: `1px solid ${regionColor}25`,
+                        }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
+                            <span style={{
+                              fontFamily: 'sans-serif', fontSize: 10, fontWeight: 700,
+                              color: regionColor, textTransform: 'uppercase', letterSpacing: '0.04em',
+                            }}>
+                              {loc.region}
+                              {loc.subArea ? ` — ${loc.subArea}` : ''}
+                            </span>
+                            <span style={{
+                              fontFamily: 'sans-serif', fontSize: 9,
+                              color: DIM, background: 'rgba(255,255,255,0.06)',
+                              padding: '1px 6px', borderRadius: 3,
+                            }}>
+                              {SOURCE_TYPE_ICONS[loc.sourceType]} {SOURCE_TYPE_LABELS[loc.sourceType]}
+                            </span>
+                          </div>
+                          <p style={{ fontFamily: 'sans-serif', fontSize: 11, color: DIM, lineHeight: 1.45, margin: 0 }}>
+                            {loc.notes}
+                          </p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Uses */}
+                {selectedItem.usedFor.length > 0 && (
+                  <div style={{ marginBottom: 14 }}>
+                    <p style={{ fontFamily: 'sans-serif', fontSize: 10, color: GOLD, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>
+                      🔧 Used For
+                    </p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                      {selectedItem.usedFor.map((use, i) => (
+                        <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontFamily: 'sans-serif', fontSize: 12, color: DIM, lineHeight: 1.4 }}>
+                          <span style={{ color: GOLD, fontSize: 8, marginTop: 5, flexShrink: 0 }}>◆</span>
+                          {use}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Quest links */}
+                {selectedItem.requiredForQuests.length > 0 && (
+                  <div style={{ marginBottom: 14 }}>
+                    <p style={{ fontFamily: 'sans-serif', fontSize: 10, color: GOLD, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>
+                      ⚔️ Required For Quests
+                    </p>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                      {selectedItem.requiredForQuests.map(qId => (
+                        <span key={qId} style={{
+                          fontFamily: 'sans-serif', fontSize: 10,
+                          color: GOLD, background: 'rgba(201,168,76,0.12)',
+                          border: `1px solid ${GOLD}30`,
+                          padding: '2px 8px', borderRadius: 4,
+                        }}>
+                          {qId}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Crafting links */}
+                {selectedItem.requiredForCrafting.length > 0 && (
+                  <div>
+                    <p style={{ fontFamily: 'sans-serif', fontSize: 10, color: GOLD, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>
+                      🔨 Required For Crafting
+                    </p>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                      {selectedItem.requiredForCrafting.map(recipe => (
+                        <span key={recipe} style={{
+                          fontFamily: 'sans-serif', fontSize: 10,
+                          color: '#8B5CF6', background: 'rgba(139,92,246,0.12)',
+                          border: '1px solid rgba(139,92,246,0.3)',
+                          padding: '2px 8px', borderRadius: 4,
+                        }}>
+                          {recipe}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </SectionBg>
+  );
+}
+
 // ── Section: Missables ────────────────────────────────────────────────────────
 
 function MissablesSection() {
@@ -1163,6 +1508,7 @@ const SECTIONS = [
   { id: 'collectibles',  Component: CollectiblesSection  },
   { id: 'activities',    Component: ActivitiesSection    },
   { id: 'equipment',     Component: EquipmentSection     },
+  { id: 'items',         Component: ItemsSection         },
   { id: 'missables',     Component: MissablesSection     },
   { id: 'progress',      Component: ProgressSection      },
   { id: 'dashboard',     Component: DashboardSection     },
