@@ -355,7 +355,7 @@ export const COLLECTIBLE_CATEGORIES: CollectibleCategory[] = [
     icon: '🌿',
     color: '#4A9B6F',
     trophy: 'Ainu Wanderer',
-    catNote: 'Trade all 30 to Kaeka the Weaver at Husko Kotan (Nayoro Wilds) to fully upgrade the Robes for Sitturaynu outfit. Shamisen Songs guide you to nearby Ainu Items.',
+    catNote: '⭐ Trade all 30 to Kaeka the Weaver at Husko Kotan (Nayoro Wilds) to fully upgrade Robes for Sitturaynu → 🏆 Ainu Wanderer. Suggested sweep: Yotei Grasslands (5) → Ishikari Plain (4) → Teshio Ridge (3) → Tokachi Range (4) → Nayoro Wilds (12) → Oshima Coast (2). Save Nayoro Wilds for last — Kaeka is there to trade immediately after.',
     items: [
       // Nayoro Wilds (12) — concentrated near Husko Kotan and surrounding wilderness
       // NOTE: subArea descriptions below are plausible based on region context but have NOT been

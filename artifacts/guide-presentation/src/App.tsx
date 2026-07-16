@@ -13,6 +13,8 @@ import {
 import {
   COLLECTIBLE_CATEGORIES, COLLECTIBLE_TOTAL, ALL_COLLECTIBLE_IDS, COLLECTIBLES_BY_REGION,
 } from './data/collectibles';
+import type { CollectibleItem } from './data/schema';
+import { REGION_NAMES } from './data/schema';
 import {
   ACTIVITY_CATEGORIES, ACTIVITY_TOTAL, ALL_ACTIVITY_IDS, ACTIVITIES_BY_REGION,
 } from './data/activities';
@@ -557,6 +559,150 @@ function FoxDenChainTracker({ done, total, color }: { done: number; total: numbe
   );
 }
 
+// ── Ainu Items: route-grouped checklist ───────────────────────────────────────
+
+const AINU_ROUTE_ORDER = [
+  'Yotei Grasslands',
+  'Ishikari Plain',
+  'Teshio Ridge',
+  'Tokachi Range',
+  'Nayoro Wilds',
+  'Oshima Coast',
+] as const satisfies typeof REGION_NAMES;
+
+function AinuRouteChecklist({ items, color }: { items: CollectibleItem[]; color: string }) {
+  const { isChecked, toggle } = useProgress();
+
+  const byRegion = AINU_ROUTE_ORDER.map(region => ({
+    region,
+    items: items.filter(item => item.region === region),
+  }));
+
+  const total = items.length;
+  const done = items.filter(item => isChecked(item.id)).length;
+  const allDone = done === total;
+
+  return (
+    <div>
+      {/* Trade mechanic tip */}
+      <div style={{ padding: '8px 10px', borderRadius: 7, background: `${color}14`, border: `1px solid ${color}35`, marginBottom: 10 }}>
+        <p style={{ fontFamily: 'sans-serif', fontSize: 10, color, fontWeight: 700, marginBottom: 3 }}>🌿 Trade mechanic</p>
+        <p style={{ fontFamily: 'sans-serif', fontSize: 10, color: 'rgba(240,237,232,0.75)', lineHeight: 1.5 }}>
+          Trade all 30 to <strong style={{ color }}>Kaeka the Weaver</strong> at Husko Kotan (Nayoro Wilds) to fully upgrade the
+          Robes for Sitturaynu outfit → 🏆 <strong style={{ color }}>Ainu Wanderer</strong>. Save Nayoro Wilds for last — you can
+          trade immediately after clearing its 12 items.
+        </p>
+      </div>
+      {/* Sweep order pills */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 3, flexWrap: 'wrap', marginBottom: 10 }}>
+        <span style={{ fontFamily: 'sans-serif', fontSize: 9, color: 'rgba(240,237,232,0.35)', marginRight: 2 }}>SWEEP ORDER:</span>
+        {byRegion.map(({ region, items: rItems }, i) => {
+          const rDone = rItems.filter(item => isChecked(item.id)).length;
+          const rComplete = rDone === rItems.length;
+          return (
+            <div key={region} style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+              <div style={{
+                padding: '2px 7px', borderRadius: 10,
+                fontFamily: 'sans-serif', fontSize: 9, fontWeight: 600,
+                background: rComplete ? `${color}30` : `${color}10`,
+                color: rComplete ? color : 'rgba(240,237,232,0.45)',
+                border: `1px solid ${rComplete ? color + '60' : 'rgba(255,255,255,0.1)'}`,
+                whiteSpace: 'nowrap',
+              }}>
+                {rComplete && '✓ '}{i + 1}. {region.split(' ')[0]} ({rDone}/{rItems.length})
+              </div>
+              {i < byRegion.length - 1 && (
+                <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.18)' }}>›</span>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      {/* Per-region groups */}
+      {byRegion.map(({ region, items: rItems }) => {
+        if (rItems.length === 0) return null;
+        const rDone = rItems.filter(item => isChecked(item.id)).length;
+        const rComplete = rDone === rItems.length;
+        return (
+          <div key={region} style={{ marginBottom: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
+              <span style={{
+                fontFamily: 'sans-serif', fontSize: 9, fontWeight: 700,
+                color: rComplete ? color : 'rgba(240,237,232,0.5)',
+                textTransform: 'uppercase', letterSpacing: '0.06em',
+              }}>
+                {rComplete ? '✓ ' : ''}{region}
+              </span>
+              <span style={{ fontFamily: 'sans-serif', fontSize: 9, color: rComplete ? color : 'rgba(240,237,232,0.3)' }}>
+                {rDone}/{rItems.length}
+              </span>
+            </div>
+            <div style={{ paddingLeft: 8, borderLeft: `2px solid ${rComplete ? color + '60' : 'rgba(255,255,255,0.1)'}` }}>
+              {rItems.map(item => {
+                const checked = isChecked(item.id);
+                return (
+                  <div
+                    key={item.id}
+                    onClick={() => toggle(item.id)}
+                    style={{
+                      display: 'flex', alignItems: 'flex-start', gap: 6, padding: '3px 4px',
+                      borderRadius: 5, cursor: 'pointer', marginBottom: 2,
+                      background: checked ? `${color}14` : 'transparent',
+                    }}
+                  >
+                    <div style={{
+                      width: 14, height: 14, borderRadius: 3, flexShrink: 0, marginTop: 2,
+                      border: `1.5px solid ${checked ? color : 'rgba(255,255,255,0.2)'}`,
+                      background: checked ? color : 'transparent',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      transition: 'all 0.12s ease',
+                    }}>
+                      {checked && <span style={{ fontSize: 9, color: '#0a0a0f', fontWeight: 700, lineHeight: 1 }}>✓</span>}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <span style={{
+                        fontFamily: 'sans-serif', fontSize: 11,
+                        color: checked ? 'rgba(240,237,232,0.4)' : 'rgba(240,237,232,0.85)',
+                        textDecoration: checked ? 'line-through' : 'none',
+                        lineHeight: 1.3,
+                      }}>{item.name}</span>
+                      {item.subArea && (
+                        <p style={{
+                          fontFamily: 'sans-serif', fontSize: 9,
+                          color: 'rgba(240,237,232,0.3)', lineHeight: 1.3, marginTop: 1,
+                        }}>
+                          📍 {item.subArea}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
+      {/* Trade callout when all 30 found */}
+      {allDone && (
+        <div style={{ padding: '10px 12px', borderRadius: 8, background: `${color}20`, border: `1px solid ${color}55`, marginTop: 4 }}>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+            <span style={{ fontSize: 16, flexShrink: 0 }}>🌿</span>
+            <div>
+              <p style={{ fontFamily: 'sans-serif', fontSize: 11, color, fontWeight: 700, marginBottom: 4 }}>
+                All 30 Ainu Items found — trade them now!
+              </p>
+              <p style={{ fontFamily: 'sans-serif', fontSize: 10, color: 'rgba(240,237,232,0.75)', lineHeight: 1.5 }}>
+                Visit <strong style={{ color }}>Kaeka the Weaver</strong> at Husko Kotan (Nayoro Wilds) and trade all 30 items
+                to fully upgrade the Robes for Sitturaynu outfit → 🏆 <strong style={{ color }}>Ainu Wanderer</strong>.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Section: Collectibles ─────────────────────────────────────────────────────
 
 function CollectiblesSection() {
@@ -608,20 +754,24 @@ function CollectiblesSection() {
                   <div style={{ marginTop: 10, borderTop: `1px solid ${cat.color}25`, paddingTop: 10, maxHeight: 320, overflowY: 'auto' }}>
                     {cat.key === 'foxdens' ? (
                       <FoxDenChainTracker done={done} total={cat.items.length} color={cat.color} />
+                    ) : cat.key === 'ainu' ? (
+                      <AinuRouteChecklist items={cat.items} color={cat.color} />
                     ) : cat.catNote && (
                       <p style={{ fontFamily: 'sans-serif', fontSize: 10, color: cat.color, lineHeight: 1.4, marginBottom: 8, opacity: 0.9 }}>{cat.catNote}</p>
                     )}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 2 }}>
-                      {cat.items.map(item => (
-                        <CollectibleCheckItem
-                          key={item.id} id={item.id}
-                          label={item.name + (item.reward ? ` — ${item.reward}` : '') + (item.placeholder ? ' ⚠' : '')}
-                          color={cat.color}
-                          checked={isChecked(item.id)}
-                          onToggle={() => toggle(item.id)}
-                        />
-                      ))}
-                    </div>
+                    {cat.key !== 'foxdens' && cat.key !== 'ainu' && (
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 2 }}>
+                        {cat.items.map(item => (
+                          <CollectibleCheckItem
+                            key={item.id} id={item.id}
+                            label={item.name + (item.reward ? ` — ${item.reward}` : '') + (item.placeholder ? ' ⚠' : '')}
+                            color={cat.color}
+                            checked={isChecked(item.id)}
+                            onToggle={() => toggle(item.id)}
+                          />
+                        ))}
+                      </div>
+                    )}
                     {done < cat.items.length && (
                       <button
                         onClick={() => ids.forEach(id => { if (!isChecked(id)) toggle(id); })}
