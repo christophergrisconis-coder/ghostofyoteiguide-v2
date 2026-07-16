@@ -1,5 +1,5 @@
 # Ghost of Yōtei Guide — Data Verification Report
-**Updated:** 2026-07-16 (Task #110 — Ainu Item sub-area descriptions reviewed; marked unconfirmed)
+**Updated:** 2026-07-16 (Task #112 — Altars of Reflection sub-area descriptions added for all 61 entries)
 
 ---
 
@@ -24,7 +24,7 @@
 | Bamboo Strikes | 15 | 0 | 15 | Count verified; names unknown |
 | Shrine Climbs | 13 | 0 | 13 | Count verified; names unknown |
 | Hot Springs | 16 | 0 | 16 | Count verified; names unknown |
-| Altars of Reflection | 61 | 61 | 0 | ✅ All 61 altar names verified by region |
+| Altars of Reflection | 61 | 61 | 0 | ✅ All 61 altar names and sub-area locations added |
 | Pillars of the Fallen | 20 | 20 | 0 | ✅ All 20 pillar names verified by region |
 | Ainu Items | 30 | 0 | 0 | Names + regions verified; subArea descriptions unconfirmed (verified: false) |
 | Zeni Hajiki | 8 | 8 | 0 | ✅ All 8 locations, rewards, and requirements verified |
@@ -118,7 +118,7 @@ Kaeka the Weaver (Nayoro Wilds, Husko Kotan — confirmed sub-area), Ginji the A
 | Bamboo Strikes | 15 | Names and difficulty ratings |
 | Shrine Climbs | 13 | Names and which is #13 (Spirit Seal) |
 | Hot Springs | 16 | Names and exact locations |
-| Altars of Reflection | 61 | ✅ All 61 altar names verified by region; sub-areas still needed |
+| Altars of Reflection | 61 | ✅ All 61 altar names and sub-area locations added |
 | Pillars of the Fallen | 20 | ✅ All 20 pillar names verified by region; sub-areas still needed |
 | Ainu Items | 30 | Names and regions verified ✅; sub-area descriptions written from region context only — **not confirmed against gameplay** (all 30 carry `verified: false`) |
 | Zeni Hajiki | 8 | ✅ Fully confirmed |
