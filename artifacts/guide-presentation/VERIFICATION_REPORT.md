@@ -26,7 +26,7 @@
 | Hot Springs | 16 | 0 | 16 | Count verified; names unknown |
 | Altars of Reflection | 61 | 0 | 61 | Count verified; names unknown |
 | Pillars of the Fallen | 20 | 0 | 20 | Count verified; names unknown |
-| Ainu Items | 30 | 30 | 0 | ✅ All 30 names verified |
+| Ainu Items | 30 | 30 | 0 | ✅ All 30 names + region + subArea locations filled in |
 | Zeni Hajiki | 8 | 8 | 0 | ✅ All 8 locations, rewards, and requirements verified |
 | **Collectibles total** | **229** | **49** | **180** | 49 fully verified individual records |
 | Dueling Trees | 6 | 0 | 6 | Count verified; opponent names unknown |
@@ -116,7 +116,7 @@ Kaeka the Weaver (Nayoro Wilds, Husko Kotan — confirmed sub-area), Ginji the A
 | Hot Springs | 16 | Names and exact locations |
 | Altars of Reflection | 61 | All names and sub-areas |
 | Pillars of the Fallen | 20 | All names and sub-areas |
-| Ainu Items | 30 | ✅ Names confirmed — need per-item region locations |
+| Ainu Items | 30 | ✅ Names, regions, and sub-area locations all filled in |
 | Zeni Hajiki | 8 | ✅ Fully confirmed |
 
 ### Activities — names unknown
