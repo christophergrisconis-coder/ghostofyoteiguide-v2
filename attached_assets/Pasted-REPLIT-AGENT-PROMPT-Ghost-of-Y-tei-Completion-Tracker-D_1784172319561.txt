@@ -1,0 +1,88 @@
+REPLIT AGENT PROMPT — Ghost of Yōtei Completion Tracker: Data Architecture Rebuild + Item Location Feature
+
+ROLE AND MINDSET
+You are performing a careful audit-then-rebuild of an existing Ghost of Yōtei completion tracker. The current app has a polished UI but the underlying quest/activity/category data is incomplete and partly mock/demo content, hardcoded in ways that make it look more finished than it actually is. Your job is to make this app honest, correct, and expandable — not to make it look more finished. Do not optimize styling first. Priority order: real data structure → real progress logic and filters → real category mapping → styling last.
+
+PHASE 1 — AUDIT (do this before changing anything)
+1. Inspect the full codebase, starting with App.tsx and all related data/config/source files.
+2. Identify every location where the following are hardcoded instead of derived from a data model: quest data, activity totals, categories, filters, progress counts, item references, labels, dashboard stats, and percentages.
+3. Classify each piece of logic as either (a) real, reusable logic worth keeping, or (b) one-off mock/demo content that needs to be replaced with a proper data-driven system.
+4. Produce a written summary of findings: what's real, what's fake/hardcoded, what's missing entirely, and what your rebuild plan is. Present this summary before making any code changes.
+
+PHASE 2 — DATA ARCHITECTURE REBUILD
+Refactor the project so all content data is cleanly separated from UI components. Build a scalable schema/data layer covering:
+- Main story missions
+- Side tales
+- Mythic tales
+- Sensei tales / companion arcs
+- Bounties
+- Post-story content
+- Collectibles
+- Activities
+- Equipment
+- Missables
+- Dashboard/progress summaries
+- Item locations
+- Crafting materials
+- Quest-required items
+
+Requirements:
+- Make region support fully data-driven; ensure all major Ghost of Yōtei regions are represented in the schema, adding any that are currently missing.
+- Derive all totals, percentages, section counts, filter options, dashboard stats, and progress summaries from the data model — never hardcode these values.
+- Tie every toggle/checklist/checkbox to real state that correctly updates category totals and overall progress.
+- Keep missable status data-driven, not hardcoded per-component.
+- Preserve the current UI/visual design wherever possible, but correctness takes priority over visual preservation if there's a conflict.
+- Do not invent canon quest content to fill gaps. If official full quest data isn't available, structure the project as:
+  1. Production-ready schema and UI logic (fully functional, real)
+  2. Clearly labeled placeholder/demo dataset (marked as placeholder in both data and UI, never presented as complete canon)
+  3. Obvious, documented import-ready slots for future real quest data
+- Favor a clean data-layer rebuild over patching around existing hardcoded values.
+- Keep all code modular, readable, and easy to extend with new content later.
+
+PHASE 3 — NEW FEATURE: ITEM LOCATION SYSTEM
+Build a real, functional Item Location search/filter system (not decorative UI).
+
+Functional requirements:
+- Search by full item name and partial item name (live filtering, not static).
+- Filter by item type: crafting material, quest item, upgrade material, merchant item, collectible-related item.
+- Filter by region.
+- Show what each item is used for.
+- Show whether an item is required for: a quest, crafting, an upgrade, or multiple recipes/uses.
+- Link each item to any related quest, activity, region, or source entry elsewhere in the app.
+- Show where each item is found: region, sub-area, enemy drop, merchant, reward, collectible location, mission reward, crafting source.
+- Support multiple locations per item and multiple uses per item.
+
+Item data model — build a reusable schema with fields including:
+id, name, type, rarity, description, regions, locations, sourceType, usedFor, requiredForQuests, requiredForCrafting, relatedQuests, relatedActivities, notes, and a placeholder flag for unverified entries.
+
+- Keep item data fully separate from UI components so new items can be added later without touching component code.
+- All search/filter results must come from real underlying data — no fake search bar with static/dummy labels.
+- If item locations aren't fully confirmed publicly, still build the complete search architecture, populated with clearly marked placeholder/import-ready data rather than invented canon locations.
+
+UI requirements for this feature:
+- Add a real sidebar section or tab for Item Locations, fitting the existing app structure.
+- Live-filtering search input.
+- Filters for item type and region.
+- Item detail panel/result card showing: item name, item type, description, found in, used for, related quest/crafting requirement, and placeholder/verified status where applicable.
+- Match the existing visual style. The feature must be genuinely usable, not decorative.
+
+PHASE 4 — VERIFICATION (required before declaring anything done)
+Before finishing, explicitly verify and report on each of the following:
+- Every sidebar section corresponds to real underlying data.
+- All filters are generated from real data, not hardcoded lists.
+- Totals and percentages are computed correctly from the data model.
+- No displayed counts are fake or static.
+- Progress updates correctly when items/checkboxes are toggled.
+- Dashboard numbers match the underlying dataset exactly.
+- The Item Location search works from real item records.
+- Search by name works (full and partial).
+- Filter by item type works.
+- Filter by region works.
+- Item detail results correctly show where an item is found and what it's used for.
+- Any missing content is either properly added or clearly labeled as placeholder — nothing is silently faked.
+
+OUTPUT BEHAVIOR
+1. First, post your audit summary and rebuild plan.
+2. Then make the code changes.
+3. Then post a final verification summary describing exactly what is actually working, what is real data vs. placeholder, and what remains incomplete.
+4. Do not claim the app is fully complete unless the data and logic genuinely support that claim. Honesty about placeholder/incomplete content is required at every stage.
