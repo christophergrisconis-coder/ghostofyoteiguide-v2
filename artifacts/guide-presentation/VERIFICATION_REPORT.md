@@ -1,5 +1,5 @@
 # Ghost of Yōtei Guide — Data Verification Report
-**Updated:** 2026-07-16 (Task #108 — Altars, Pillars, Sumi-e names verified)
+**Updated:** 2026-07-16 (Task #110 — Ainu Item sub-area descriptions reviewed; marked unconfirmed)
 
 ---
 
@@ -26,9 +26,9 @@
 | Hot Springs | 16 | 0 | 16 | Count verified; names unknown |
 | Altars of Reflection | 61 | 61 | 0 | ✅ All 61 altar names verified by region |
 | Pillars of the Fallen | 20 | 20 | 0 | ✅ All 20 pillar names verified by region |
-| Ainu Items | 30 | 30 | 0 | ✅ All 30 names + region + subArea locations filled in |
+| Ainu Items | 30 | 0 | 0 | Names + regions verified; subArea descriptions unconfirmed (verified: false) |
 | Zeni Hajiki | 8 | 8 | 0 | ✅ All 8 locations, rewards, and requirements verified |
-| **Collectibles total** | **229** | **148** | **81** | 148 fully verified individual records |
+| **Collectibles total** | **229** | **118** | **81** | 118 fully verified individual records (Ainu subAreas downgraded) |
 | Dueling Trees | 6 | 0 | 6 | Count verified; opponent names unknown |
 | Shamisen Songs | 8 | 0 | 8 | Count verified; musician locations unknown |
 | Yotei Six Camps | 22 | 0 | 22 | Count verified; individual camp names unknown |
@@ -65,8 +65,12 @@ Complete — see individual quest entries. Do not alter quest data.
 
 **Completion chain:** All 11 → Hunting Camp Hideout at Sanctuary Grove (NE Teshio Ridge, via Sarufutsu Lighthouse) → fox statue door puzzle → Fox Mask → Guardian of Inari trophy.
 
-### Ainu Items (30 of 30 verified names)
-Repunkur Canteen, Ninkari, Raoma, Makiri, Ninketeyep, Mukkuri, Ikupasuy, Ku-e-shinok Ring, Cispo, Clothes for the Dead, Traded Furs, Kiray, Tepkeri, Tamasai, Kuwari, Tanpakuop, Karop, Kuyoy, Newsar-kamuy, Tesma, Marek, Hos, Sitopera, Sinta, Menokomakir, Matampus, Mat Loom, Lacquerware, Niesike, Citarpe Cape.
+### Ainu Items — names and regions verified; sub-areas unconfirmed
+All 30 item names verified: Repunkur Canteen, Ninkari, Raoma, Makiri, Ninketeyep, Mukkuri, Ikupasuy, Ku-e-shinok Ring, Cispo, Clothes for the Dead, Traded Furs, Kiray, Tepkeri, Tamasai, Kuwari, Tanpakuop, Karop, Kuyoy, Newsar-kamuy, Tesma, Marek, Hos, Sitopera, Sinta, Menokomakir, Matampus, Mat Loom, Lacquerware, Niesike, Citarpe Cape.
+
+Region assignments (Nayoro Wilds 12, Yotei Grasslands 5, Ishikari Plain 4, Tokachi Range 4, Teshio Ridge 3, Oshima Coast 2) are verified.
+
+⚠ **Sub-area descriptions are unconfirmed.** The landmark hints in each item's `subArea` field were written from region context only — not cross-checked against in-game footage or a community guide. All 30 carry `verified: false` until each sub-area is confirmed. Do not present these hints as definitive locations.
 
 Trade all 30 to **Kaeka the Weaver** at Husko Kotan (Nayoro Wilds) for Robes for Sitturaynu upgrades.
 
@@ -116,7 +120,7 @@ Kaeka the Weaver (Nayoro Wilds, Husko Kotan — confirmed sub-area), Ginji the A
 | Hot Springs | 16 | Names and exact locations |
 | Altars of Reflection | 61 | ✅ All 61 altar names verified by region; sub-areas still needed |
 | Pillars of the Fallen | 20 | ✅ All 20 pillar names verified by region; sub-areas still needed |
-| Ainu Items | 30 | ✅ Names, regions, and sub-area locations all filled in |
+| Ainu Items | 30 | Names and regions verified ✅; sub-area descriptions written from region context only — **not confirmed against gameplay** (all 30 carry `verified: false`) |
 | Zeni Hajiki | 8 | ✅ Fully confirmed |
 
 ### Activities — names unknown

@@ -35,7 +35,11 @@ function generateItems(
 // categories are approximate — sub-area assignments need in-game confirmation.
 //
 // Categories with verified: true individual records:
-//   Fox Dens (11), Ainu Items (30), Zeni Hajiki (8)
+//   Fox Dens (11), Zeni Hajiki (8)
+//
+// Ainu Items (30): names and regions verified; subArea descriptions written from region
+//   context only — NOT confirmed against in-game footage. All 30 carry verified: false
+//   until sub-area locations are cross-checked against gameplay or a community guide.
 //
 // All other categories use generated placeholder names.
 // None of the 229 collectibles are missable — all are accessible in free-roam.
@@ -354,41 +358,43 @@ export const COLLECTIBLE_CATEGORIES: CollectibleCategory[] = [
     catNote: 'Trade all 30 to Kaeka the Weaver at Husko Kotan (Nayoro Wilds) to fully upgrade the Robes for Sitturaynu outfit. Shamisen Songs guide you to nearby Ainu Items.',
     items: [
       // Nayoro Wilds (12) — concentrated near Husko Kotan and surrounding wilderness
-      { id: 'coll_ainu_1',  name: 'Repunkur Canteen',    region: 'Nayoro Wilds',     subArea: 'Husko Kotan village — near the central hearth',                   placeholder: false, verified: true, missable: false },
-      { id: 'coll_ainu_2',  name: 'Ninkari',             region: 'Nayoro Wilds',     subArea: 'River crossing north of Husko Kotan — on the bank rocks',         placeholder: false, verified: true, missable: false },
-      { id: 'coll_ainu_3',  name: 'Raoma',               region: 'Nayoro Wilds',     subArea: 'Forest trail east of Husko Kotan — fallen log cache',             placeholder: false, verified: true, missable: false },
-      { id: 'coll_ainu_4',  name: 'Makiri',              region: 'Nayoro Wilds',     subArea: 'Abandoned camp southeast of Husko Kotan — inside the old hut',    placeholder: false, verified: true, missable: false },
-      { id: 'coll_ainu_5',  name: 'Ninketeyep',          region: 'Nayoro Wilds',     subArea: 'Hilltop shrine, northwest Nayoro Wilds — offering platform',      placeholder: false, verified: true, missable: false },
-      { id: 'coll_ainu_6',  name: 'Mukkuri',             region: 'Nayoro Wilds',     subArea: 'Riverside reeds, southern Nayoro Wilds — beside the small dock',  placeholder: false, verified: true, missable: false },
-      { id: 'coll_ainu_7',  name: 'Ikupasuy',            region: 'Nayoro Wilds',     subArea: 'Sacred tree clearing, central Nayoro Wilds — at the tree base',   placeholder: false, verified: true, missable: false },
-      { id: 'coll_ainu_8',  name: 'Ku-e-shinok Ring',   region: 'Nayoro Wilds',     subArea: 'Burial mound, eastern Nayoro Wilds — on the stone slab',          placeholder: false, verified: true, missable: false },
-      { id: 'coll_ainu_9',  name: 'Cispo',               region: 'Nayoro Wilds',     subArea: 'Fishing village ruins, coastal Nayoro Wilds — inside the smokehouse', placeholder: false, verified: true, missable: false },
-      { id: 'coll_ainu_10', name: 'Clothes for the Dead', region: 'Nayoro Wilds',   subArea: 'Ancestral cemetery near old settlement — draped over the grave marker', placeholder: false, verified: true, missable: false },
-      { id: 'coll_ainu_11', name: 'Traded Furs',         region: 'Nayoro Wilds',     subArea: 'Merchant crossroads, western Nayoro Wilds — stacked beside the stall', placeholder: false, verified: true, missable: false },
-      { id: 'coll_ainu_12', name: 'Kiray',               region: 'Nayoro Wilds',     subArea: 'Cave entrance, northern Nayoro Wilds — wedged in the rock shelf',  placeholder: false, verified: true, missable: false },
+      // NOTE: subArea descriptions below are plausible based on region context but have NOT been
+      // confirmed against in-game footage or a community guide. All marked verified: false until confirmed.
+      { id: 'coll_ainu_1',  name: 'Repunkur Canteen',    region: 'Nayoro Wilds',     subArea: 'Husko Kotan village — near the central hearth',                   placeholder: false, verified: false, missable: false },
+      { id: 'coll_ainu_2',  name: 'Ninkari',             region: 'Nayoro Wilds',     subArea: 'River crossing north of Husko Kotan — on the bank rocks',         placeholder: false, verified: false, missable: false },
+      { id: 'coll_ainu_3',  name: 'Raoma',               region: 'Nayoro Wilds',     subArea: 'Forest trail east of Husko Kotan — fallen log cache',             placeholder: false, verified: false, missable: false },
+      { id: 'coll_ainu_4',  name: 'Makiri',              region: 'Nayoro Wilds',     subArea: 'Abandoned camp southeast of Husko Kotan — inside the old hut',    placeholder: false, verified: false, missable: false },
+      { id: 'coll_ainu_5',  name: 'Ninketeyep',          region: 'Nayoro Wilds',     subArea: 'Hilltop shrine, northwest Nayoro Wilds — offering platform',      placeholder: false, verified: false, missable: false },
+      { id: 'coll_ainu_6',  name: 'Mukkuri',             region: 'Nayoro Wilds',     subArea: 'Riverside reeds, southern Nayoro Wilds — beside the small dock',  placeholder: false, verified: false, missable: false },
+      { id: 'coll_ainu_7',  name: 'Ikupasuy',            region: 'Nayoro Wilds',     subArea: 'Sacred tree clearing, central Nayoro Wilds — at the tree base',   placeholder: false, verified: false, missable: false },
+      { id: 'coll_ainu_8',  name: 'Ku-e-shinok Ring',   region: 'Nayoro Wilds',     subArea: 'Burial mound, eastern Nayoro Wilds — on the stone slab',          placeholder: false, verified: false, missable: false },
+      { id: 'coll_ainu_9',  name: 'Cispo',               region: 'Nayoro Wilds',     subArea: 'Fishing village ruins, coastal Nayoro Wilds — inside the smokehouse', placeholder: false, verified: false, missable: false },
+      { id: 'coll_ainu_10', name: 'Clothes for the Dead', region: 'Nayoro Wilds',   subArea: 'Ancestral cemetery near old settlement — draped over the grave marker', placeholder: false, verified: false, missable: false },
+      { id: 'coll_ainu_11', name: 'Traded Furs',         region: 'Nayoro Wilds',     subArea: 'Merchant crossroads, western Nayoro Wilds — stacked beside the stall', placeholder: false, verified: false, missable: false },
+      { id: 'coll_ainu_12', name: 'Kiray',               region: 'Nayoro Wilds',     subArea: 'Cave entrance, northern Nayoro Wilds — wedged in the rock shelf',  placeholder: false, verified: false, missable: false },
       // Yotei Grasslands (5)
-      { id: 'coll_ainu_13', name: 'Tepkeri',             region: 'Yotei Grasslands', subArea: 'Yotei foothills — near the mountain trail shrine',                placeholder: false, verified: true, missable: false },
-      { id: 'coll_ainu_14', name: 'Tamasai',             region: 'Yotei Grasslands', subArea: 'Riverside meadow, central Yotei Grasslands — beside the willow tree', placeholder: false, verified: true, missable: false },
-      { id: 'coll_ainu_15', name: 'Kuwari',              region: 'Yotei Grasslands', subArea: 'Abandoned homestead, eastern Yotei Grasslands — inside the storage shed', placeholder: false, verified: true, missable: false },
-      { id: 'coll_ainu_16', name: 'Tanpakuop',           region: 'Yotei Grasslands', subArea: 'Hilltop lookout, western Yotei Grasslands — on the wooden platform', placeholder: false, verified: true, missable: false },
-      { id: 'coll_ainu_17', name: 'Karop',               region: 'Yotei Grasslands', subArea: 'Forest edge, southern Yotei Grasslands — beneath the large cedar', placeholder: false, verified: true, missable: false },
+      { id: 'coll_ainu_13', name: 'Tepkeri',             region: 'Yotei Grasslands', subArea: 'Yotei foothills — near the mountain trail shrine',                placeholder: false, verified: false, missable: false },
+      { id: 'coll_ainu_14', name: 'Tamasai',             region: 'Yotei Grasslands', subArea: 'Riverside meadow, central Yotei Grasslands — beside the willow tree', placeholder: false, verified: false, missable: false },
+      { id: 'coll_ainu_15', name: 'Kuwari',              region: 'Yotei Grasslands', subArea: 'Abandoned homestead, eastern Yotei Grasslands — inside the storage shed', placeholder: false, verified: false, missable: false },
+      { id: 'coll_ainu_16', name: 'Tanpakuop',           region: 'Yotei Grasslands', subArea: 'Hilltop lookout, western Yotei Grasslands — on the wooden platform', placeholder: false, verified: false, missable: false },
+      { id: 'coll_ainu_17', name: 'Karop',               region: 'Yotei Grasslands', subArea: 'Forest edge, southern Yotei Grasslands — beneath the large cedar', placeholder: false, verified: false, missable: false },
       // Ishikari Plain (4)
-      { id: 'coll_ainu_18', name: 'Kuyoy',               region: 'Ishikari Plain',   subArea: 'Ishikari riverbank settlement — inside the largest dwelling',      placeholder: false, verified: true, missable: false },
-      { id: 'coll_ainu_19', name: 'Newsar-kamuy',        region: 'Ishikari Plain',   subArea: 'Shrine ruins, north Ishikari Plain — at the broken torii gate',   placeholder: false, verified: true, missable: false },
-      { id: 'coll_ainu_20', name: 'Tesma',               region: 'Ishikari Plain',   subArea: 'Trading post outskirts, western Ishikari Plain — hidden under the counter', placeholder: false, verified: true, missable: false },
-      { id: 'coll_ainu_21', name: 'Marek',               region: 'Ishikari Plain',   subArea: 'Farmstead ruins, eastern Ishikari Plain — in the collapsed barn',  placeholder: false, verified: true, missable: false },
+      { id: 'coll_ainu_18', name: 'Kuyoy',               region: 'Ishikari Plain',   subArea: 'Ishikari riverbank settlement — inside the largest dwelling',      placeholder: false, verified: false, missable: false },
+      { id: 'coll_ainu_19', name: 'Newsar-kamuy',        region: 'Ishikari Plain',   subArea: 'Shrine ruins, north Ishikari Plain — at the broken torii gate',   placeholder: false, verified: false, missable: false },
+      { id: 'coll_ainu_20', name: 'Tesma',               region: 'Ishikari Plain',   subArea: 'Trading post outskirts, western Ishikari Plain — hidden under the counter', placeholder: false, verified: false, missable: false },
+      { id: 'coll_ainu_21', name: 'Marek',               region: 'Ishikari Plain',   subArea: 'Farmstead ruins, eastern Ishikari Plain — in the collapsed barn',  placeholder: false, verified: false, missable: false },
       // Tokachi Range (4)
-      { id: 'coll_ainu_22', name: 'Hos',                 region: 'Tokachi Range',    subArea: 'Mountain pass, western Tokachi Range — beside the waystone',       placeholder: false, verified: true, missable: false },
-      { id: 'coll_ainu_23', name: 'Sitopera',            region: 'Tokachi Range',    subArea: 'Alpine camp, central Tokachi Range — inside the hunter\'s tent',   placeholder: false, verified: true, missable: false },
-      { id: 'coll_ainu_24', name: 'Sinta',               region: 'Tokachi Range',    subArea: 'Snowfield cave, eastern Tokachi Range — near the back wall',       placeholder: false, verified: true, missable: false },
-      { id: 'coll_ainu_25', name: 'Menokomakir',         region: 'Tokachi Range',    subArea: 'Summit approach, northern Tokachi Range — on the cliff ledge',     placeholder: false, verified: true, missable: false },
+      { id: 'coll_ainu_22', name: 'Hos',                 region: 'Tokachi Range',    subArea: 'Mountain pass, western Tokachi Range — beside the waystone',       placeholder: false, verified: false, missable: false },
+      { id: 'coll_ainu_23', name: 'Sitopera',            region: 'Tokachi Range',    subArea: 'Alpine camp, central Tokachi Range — inside the hunter\'s tent',   placeholder: false, verified: false, missable: false },
+      { id: 'coll_ainu_24', name: 'Sinta',               region: 'Tokachi Range',    subArea: 'Snowfield cave, eastern Tokachi Range — near the back wall',       placeholder: false, verified: false, missable: false },
+      { id: 'coll_ainu_25', name: 'Menokomakir',         region: 'Tokachi Range',    subArea: 'Summit approach, northern Tokachi Range — on the cliff ledge',     placeholder: false, verified: false, missable: false },
       // Teshio Ridge (3)
-      { id: 'coll_ainu_26', name: 'Matampus',            region: 'Teshio Ridge',     subArea: 'Frozen lake shore, Teshio Ridge — embedded in the ice-covered dock', placeholder: false, verified: true, missable: false },
-      { id: 'coll_ainu_27', name: 'Mat Loom',            region: 'Teshio Ridge',     subArea: 'Weaver\'s hut ruins, central Teshio Ridge — on the old loom frame', placeholder: false, verified: true, missable: false },
-      { id: 'coll_ainu_28', name: 'Lacquerware',         region: 'Teshio Ridge',     subArea: 'Old workshop, southern Teshio Ridge — inside the painted chest',   placeholder: false, verified: true, missable: false },
+      { id: 'coll_ainu_26', name: 'Matampus',            region: 'Teshio Ridge',     subArea: 'Frozen lake shore, Teshio Ridge — embedded in the ice-covered dock', placeholder: false, verified: false, missable: false },
+      { id: 'coll_ainu_27', name: 'Mat Loom',            region: 'Teshio Ridge',     subArea: 'Weaver\'s hut ruins, central Teshio Ridge — on the old loom frame', placeholder: false, verified: false, missable: false },
+      { id: 'coll_ainu_28', name: 'Lacquerware',         region: 'Teshio Ridge',     subArea: 'Old workshop, southern Teshio Ridge — inside the painted chest',   placeholder: false, verified: false, missable: false },
       // Oshima Coast (2)
-      { id: 'coll_ainu_29', name: 'Niesike',             region: 'Oshima Coast',     subArea: 'Coastal cliff path, Oshima Coast — tucked in the sea-cave alcove', placeholder: false, verified: true, missable: false },
-      { id: 'coll_ainu_30', name: 'Citarpe Cape',        region: 'Oshima Coast',     subArea: 'Benten Port outskirts — draped on the fence post near the gate',   placeholder: false, verified: true, missable: false },
+      { id: 'coll_ainu_29', name: 'Niesike',             region: 'Oshima Coast',     subArea: 'Coastal cliff path, Oshima Coast — tucked in the sea-cave alcove', placeholder: false, verified: false, missable: false },
+      { id: 'coll_ainu_30', name: 'Citarpe Cape',        region: 'Oshima Coast',     subArea: 'Benten Port outskirts — draped on the fence post near the gate',   placeholder: false, verified: false, missable: false },
     ],
   },
 
