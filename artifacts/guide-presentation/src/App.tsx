@@ -17,6 +17,8 @@ import {
   ACTIVITY_CATEGORIES, ACTIVITY_TOTAL, ALL_ACTIVITY_IDS, ACTIVITIES_BY_REGION,
 } from './data/activities';
 import { WEAPONS, ARMOUR, CHARMS } from './data/equipment';
+import { RESOURCES, RESOURCE_TOTAL } from './data/resources';
+import { MERCHANTS, MERCHANT_TOTAL, VENDOR_TYPE_LABELS } from './data/merchants';
 import { REGIONS } from './data/regions';
 import {
   ITEMS, ITEM_TOTAL, ITEM_TYPE_LABELS, SOURCE_TYPE_LABELS, SOURCE_TYPE_ICONS, RARITY_COLORS,
@@ -39,6 +41,8 @@ const NAV = [
   { id: 'activities',    label: 'Activities',      icon: '🏃',  group: 'world',  count: ACTIVITY_TOTAL      },
   { id: 'equipment',     label: 'Equipment',       icon: '🗡️',  group: 'world'  },
   { id: 'items',         label: 'Items',            icon: '🎒',  group: 'world',  count: ITEM_TOTAL },
+  { id: 'resources',     label: 'Resources',        icon: '⚗️',  group: 'world',  count: RESOURCE_TOTAL },
+  { id: 'merchants',     label: 'Merchants',        icon: '🛒',  group: 'world',  count: MERCHANT_TOTAL },
   { id: 'missables',     label: 'Missables',       icon: '⚠️',  group: 'world'  },
   { id: 'progress',      label: 'Progress',        icon: '📊',  group: 'status' },
   { id: 'dashboard',     label: 'Dashboard',       icon: '🏅',  group: 'status' },
@@ -92,7 +96,7 @@ function OverviewSection() {
     },
     {
       icon: '🗺️', title: 'Collectibles & World',
-      items: ['319 collectibles across 8 groups and 6 regions','Regional clearing strategy to minimise backtracking','Hot Springs, Bamboo Strikes & Shrine Climbs share one trophy','All collectibles accessible in free-roam after credits'],
+      items: [`${COLLECTIBLE_TOTAL} collectibles across 13 categories and 6 regions`,'Regional clearing strategy to minimise backtracking','Fox Dens, Shrine Climbs & Zeni Hajiki each unlock unique charms or trophies','All collectibles accessible in free-roam after credits — zero missables'],
     },
     {
       icon: '🏅', title: 'Trophy & Progress',
@@ -532,12 +536,15 @@ function CollectiblesSection() {
                 </div>
                 {/* Per-item checklist — real IDs and names from data model */}
                 {isOpen && (
-                  <div style={{ marginTop: 10, borderTop: `1px solid ${cat.color}25`, paddingTop: 10, maxHeight: 220, overflowY: 'auto' }}>
+                  <div style={{ marginTop: 10, borderTop: `1px solid ${cat.color}25`, paddingTop: 10, maxHeight: 280, overflowY: 'auto' }}>
+                    {cat.catNote && (
+                      <p style={{ fontFamily: 'sans-serif', fontSize: 10, color: cat.color, lineHeight: 1.4, marginBottom: 8, opacity: 0.9 }}>{cat.catNote}</p>
+                    )}
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 2 }}>
                       {cat.items.map(item => (
                         <CollectibleCheckItem
                           key={item.id} id={item.id}
-                          label={item.name + (item.placeholder ? ' ⚠' : '')}
+                          label={item.name + (item.reward ? ` — ${item.reward}` : '') + (item.placeholder ? ' ⚠' : '')}
                           color={cat.color}
                           checked={isChecked(item.id)}
                           onToggle={() => toggle(item.id)}
@@ -625,11 +632,14 @@ function ActivitiesSection() {
                   {/* Expandable checklist — real IDs from data model */}
                   {isOpen && (
                     <div style={{ borderTop: `1px solid ${cat.color}25`, padding: '10px 16px 14px', background: 'rgba(0,0,0,0.2)' }}>
+                      {cat.catNote && (
+                        <p style={{ fontFamily: 'sans-serif', fontSize: 10, color: cat.color, lineHeight: 1.4, marginBottom: 8, opacity: 0.9 }}>{cat.catNote}</p>
+                      )}
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 4, marginBottom: 8 }}>
                         {cat.items.map(item => (
                           <CollectibleCheckItem
                             key={item.id} id={item.id}
-                            label={item.name}
+                            label={item.name + (item.placeholder ? ' ⚠' : '')}
                             color={cat.color}
                             checked={isChecked(item.id)}
                             onToggle={() => toggle(item.id)}
@@ -654,11 +664,11 @@ function ActivitiesSection() {
             <Card style={{ flex: 1 }}>
               <h3 style={{ fontFamily: 'Georgia, serif', fontSize: 15, color: GOLD, marginBottom: 14 }}>World Completion Tips</h3>
               {[
-                { n: '1', tip: 'Liberate settlements first — merchants unlock crafting materials' },
-                { n: '2', tip: 'Complete dueling circles before finishing regional quests for bonus TP' },
-                { n: '3', tip: 'Haiku stations are tied to specific viewpoints — check Sumi-e list for overlap' },
-                { n: '4', tip: 'Animal sanctuaries refill Spirit — visit before major boss fights' },
-                { n: '5', tip: 'Vanity challenges can be replayed if failed on the first attempt' },
+                { n: '1', tip: 'Shamisen Songs reveal nearby collectibles on the map — clear them first in each region for fast sweeps' },
+                { n: '2', tip: 'Clear Yotei Six Camps early to unlock fast-travel hubs across all six regions' },
+                { n: '3', tip: 'Complete all 11 Fox Dens, then visit Hunting Camp Hideout (Teshio Ridge, via Sarufutsu Lighthouse) for the Fox Mask' },
+                { n: '4', tip: 'Win Zeni Hajiki twice at each table — first win gives only coins, second awards the charm and marks it complete' },
+                { n: '5', tip: '4 Sensei Tale ally posters look like bounties but are NOT counted toward the 31 Bounties' },
               ].map(item => (
                 <div key={item.n} style={{ display: 'flex', gap: 10, marginBottom: 10, alignItems: 'flex-start' }}>
                   <div style={{ width: 22, height: 22, borderRadius: '50%', background: GOLD20, border: `1px solid ${GOLD40}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'sans-serif', fontSize: 11, color: GOLD, fontWeight: 700, flexShrink: 0 }}>{item.n}</div>
@@ -1062,6 +1072,128 @@ function ItemsSection() {
   );
 }
 
+// ── Section: Resources ────────────────────────────────────────────────────────
+
+const RARITY_COLORS_RES: Record<string, string> = {
+  common:   '#9CA3AF',
+  uncommon: '#4A9B8E',
+  rare:     '#C9A84C',
+};
+
+function ResourcesSection() {
+  const color = '#4A9B8E';
+
+  return (
+    <SectionBg img={IMGS.blog2} overlay="rgba(4,12,20,0.90)">
+      <div style={{ padding: '60px 48px' }}>
+        <Tag label={`Resources · ${RESOURCE_TOTAL} Types`} color="rgba(74,155,142,0.2)" textColor={color} />
+        <SectionTitle><span style={{ color: GOLD }}>Resources</span> &amp; Materials</SectionTitle>
+        <GoldLine />
+        <p style={{ fontFamily: 'sans-serif', fontSize: 12, color: DIM, marginBottom: 20, lineHeight: 1.5, maxWidth: 700 }}>
+          Crafting and upgrade materials used throughout the game. All entries are verified from in-game sources.
+          Common resources respawn over time; rare resources are limited in each region.
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+          {RESOURCES.map(res => {
+            const rarityColor = RARITY_COLORS_RES[res.rarity] || GOLD;
+            return (
+              <Card key={res.id} style={{ padding: '14px 18px', borderColor: `${rarityColor}35` }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                  <span style={{ fontFamily: 'Georgia, serif', fontSize: 14, color: WHITE, flex: 1, lineHeight: 1.2 }}>{res.name}</span>
+                  <span style={{
+                    fontFamily: 'sans-serif', fontSize: 9, fontWeight: 700,
+                    color: rarityColor, background: `${rarityColor}20`,
+                    padding: '2px 6px', borderRadius: 3,
+                    textTransform: 'uppercase', letterSpacing: '0.04em',
+                    whiteSpace: 'nowrap',
+                  }}>{res.rarity}</span>
+                </div>
+                <p style={{ fontFamily: 'sans-serif', fontSize: 11, color: DIM, lineHeight: 1.4, marginBottom: 6 }}>
+                  <span style={{ color: GOLD, fontWeight: 700 }}>Found: </span>{res.howToGet}
+                </p>
+                <p style={{ fontFamily: 'sans-serif', fontSize: 11, color: DIM, lineHeight: 1.4 }}>
+                  <span style={{ color: rarityColor, fontWeight: 700 }}>Uses: </span>{res.uses}
+                </p>
+              </Card>
+            );
+          })}
+        </div>
+      </div>
+    </SectionBg>
+  );
+}
+
+// ── Section: Merchants ────────────────────────────────────────────────────────
+
+const VENDOR_ICONS: Record<string, string> = {
+  general:      '🛒',
+  blacksmith:   '⚔️',
+  bowyer:       '🏹',
+  dye_house:    '🎨',
+  ainu_trader:  '🌿',
+  musician:     '🎵',
+  mask_artisan: '🎭',
+  food_vendor:  '🍱',
+};
+
+function MerchantsSection() {
+  const color = '#B8860B';
+
+  return (
+    <SectionBg img={IMGS.blog3} overlay="rgba(8,6,4,0.90)">
+      <div style={{ padding: '60px 48px' }}>
+        <Tag label={`Merchants · ${MERCHANT_TOTAL} Vendors`} color="rgba(184,134,11,0.2)" textColor={color} />
+        <SectionTitle><span style={{ color: GOLD }}>Merchants</span> &amp; Traders</SectionTitle>
+        <GoldLine />
+        <p style={{ fontFamily: 'sans-serif', fontSize: 12, color: DIM, marginBottom: 20, lineHeight: 1.5, maxWidth: 700 }}>
+          All confirmed vendors and traders. Entries marked ⚠ have verified names but unconfirmed sub-area locations.
+          Dye houses unlock unique cosmetic colours for all armour sets.
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10 }}>
+          {MERCHANTS.map(merch => (
+            <Card key={merch.id} style={{ padding: '14px 18px', borderColor: merch.placeholder ? 'rgba(184,134,11,0.2)' : `${color}40` }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 8 }}>
+                <span style={{ fontSize: 20, flexShrink: 0 }}>{VENDOR_ICONS[merch.vendorType] || '🛒'}</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                    <span style={{ fontFamily: 'Georgia, serif', fontSize: 14, color: WHITE }}>{merch.name}</span>
+                    {merch.placeholder && <span style={{ fontSize: 9, color: '#B8860B' }}>⚠</span>}
+                  </div>
+                  <div style={{ display: 'flex', gap: 6, marginTop: 4, flexWrap: 'wrap' }}>
+                    <span style={{ fontFamily: 'sans-serif', fontSize: 10, color: DIM }}>
+                      📍 {merch.region}{merch.subArea ? ` · ${merch.subArea}` : ''}
+                    </span>
+                  </div>
+                  <span style={{
+                    display: 'inline-block', marginTop: 4,
+                    fontFamily: 'sans-serif', fontSize: 9, fontWeight: 700,
+                    color, background: `${color}15`,
+                    padding: '1px 6px', borderRadius: 3,
+                    textTransform: 'uppercase', letterSpacing: '0.04em',
+                  }}>{VENDOR_TYPE_LABELS[merch.vendorType] || merch.vendorType}</span>
+                </div>
+              </div>
+              {merch.inventory.length > 0 && (
+                <p style={{ fontFamily: 'sans-serif', fontSize: 11, color: DIM, lineHeight: 1.4, marginBottom: merch.notes ? 4 : 0 }}>
+                  <span style={{ color: GOLD, fontWeight: 700 }}>Sells: </span>{merch.inventory.join(', ')}
+                </p>
+              )}
+              {merch.unlockRequirement && (
+                <p style={{ fontFamily: 'sans-serif', fontSize: 10, color: 'rgba(240,237,232,0.5)', lineHeight: 1.3, marginTop: 4 }}>
+                  🔒 {merch.unlockRequirement}
+                </p>
+              )}
+              {merch.notes && (
+                <p style={{ fontFamily: 'sans-serif', fontSize: 11, color: DIM, lineHeight: 1.4, marginTop: 4 }}>{merch.notes}</p>
+              )}
+            </Card>
+          ))}
+        </div>
+      </div>
+    </SectionBg>
+  );
+}
+
 // ── Section: Missables ────────────────────────────────────────────────────────
 
 function MissablesSection() {
@@ -1250,8 +1382,8 @@ function DashboardSection() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14, marginBottom: 18 }}>
           {[
             { label: 'Quests',       done: questsDone, total: TOTAL_QUESTS, sub: '6 categories', color: GOLD,      pct: questsPct },
-            { label: 'Collectibles', done: collDone,   total: COLLECTIBLE_TOTAL, sub: '8 groups', color: '#4A9B8E', pct: collPct  },
-            { label: 'Activities',   done: actDone,    total: ACTIVITY_TOTAL,    sub: '6 types',  color: '#4682B4', pct: actPct   },
+            { label: 'Collectibles', done: collDone,   total: COLLECTIBLE_TOTAL, sub: '13 categories', color: '#4A9B8E', pct: collPct  },
+            { label: 'Activities',   done: actDone,    total: ACTIVITY_TOTAL,    sub: '8 types',       color: '#4682B4', pct: actPct   },
             { label: 'Trophies',     done: 0,          total: 54,           sub: '1 Platinum',   color: '#E5E4E2', pct: 0        },
           ].map(s => (
             <Card key={s.label} style={{ textAlign: 'center', padding: '18px 22px' }}>
@@ -1309,7 +1441,7 @@ function StrategySection() {
   const steps = [
     { n: '01', title: 'Main Story',            hours: '~8–10h',  desc: 'Follow the 10 main story quests in order. Boss fights unlock stances and abilities critical for side content.' },
     { n: '02', title: 'Regional Side Quests',  hours: '~18–22h', desc: 'Clear Side Tales, Sensei Tales, and Bounty Quests region-by-region as you unlock each area through story progress.' },
-    { n: '03', title: 'Collectibles by Region',hours: '~12–16h', desc: "Use the guide's regional hints to sweep each of the 6 regions for all 319 collectibles. Shrine Climbs first for charm slots." },
+    { n: '03', title: 'Collectibles by Region',hours: '~12–16h', desc: `Use the guide's regional hints to sweep each of the 6 regions for all ${COLLECTIBLE_TOTAL} collectibles. Fox Dens for charms, Shrine Climbs for charm slots first.` },
     { n: '04', title: 'Mythic Tales + Cleanup',hours: '~6–8h',   desc: 'Complete all 7 Mythic Tales (some require story completion). Then run the post-story cleanup checklist.' },
     { n: '05', title: 'Trophy Cleanup',        hours: '~2–4h',   desc: 'Cross-reference the trophy list against your progress. The Platinum unlocks automatically when all 53 other trophies are earned.' },
   ];
@@ -1461,7 +1593,7 @@ function Sidebar({ activeSection, onNav, collapsed, onToggle }: { activeSection:
       {/* Footer */}
       <div style={{ padding: '14px 16px', borderTop: `1px solid ${GOLD20}`, flexShrink: 0 }}>
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 12 }}>
-          {[['119','Quests'],['319','Collectibles'],['54','Trophies']].map(([n, l]) => (
+          {[['119','Quests'],[String(COLLECTIBLE_TOTAL),'Collectibles'],['54','Trophies']].map(([n, l]) => (
             <div key={l} style={{ textAlign: 'center' }}>
               <div style={{ fontFamily: 'Georgia, serif', fontSize: 15, color: GOLD }}>{n}</div>
               <div style={{ fontFamily: 'sans-serif', fontSize: 9, color: DIM, letterSpacing: '0.04em' }}>{l}</div>
@@ -1509,6 +1641,8 @@ const SECTIONS = [
   { id: 'activities',    Component: ActivitiesSection    },
   { id: 'equipment',     Component: EquipmentSection     },
   { id: 'items',         Component: ItemsSection         },
+  { id: 'resources',     Component: ResourcesSection     },
+  { id: 'merchants',     Component: MerchantsSection     },
   { id: 'missables',     Component: MissablesSection     },
   { id: 'progress',      Component: ProgressSection      },
   { id: 'dashboard',     Component: DashboardSection     },

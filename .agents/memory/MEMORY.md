@@ -1,1 +1,2 @@
 - [Data architecture](data-architecture.md) — all guide counts/totals must derive from src/data/ files; never hardcode in components or NAV.
+- [Verified data rebuild](verified-data-rebuild.md) — collectibles replaced with 13 real categories (229 total); activities with 8 real categories (93 total); new resources.ts and merchants.ts files added.
