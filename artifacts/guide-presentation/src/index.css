@@ -79,8 +79,15 @@ html, body, #root {
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  overflow-x: hidden;
   z-index: 50;
   backdrop-filter: blur(16px);
+  transition: width 0.25s ease;
+}
+
+.site-sidebar.collapsed {
+  width: 52px;
+  overflow-y: hidden;
 }
 
 .site-sidebar::-webkit-scrollbar { width: 3px; }
@@ -89,6 +96,66 @@ html, body, #root {
 .site-main {
   margin-left: 256px;
   min-height: 100vh;
+  transition: margin-left 0.25s ease;
+}
+
+.site-main.collapsed {
+  margin-left: 52px;
+}
+
+.sidebar-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 10px 12px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(201,168,76,0.12);
+  color: rgba(201,168,76,0.6);
+  cursor: pointer;
+  flex-shrink: 0;
+  font-size: 14px;
+  transition: color 0.15s ease;
+}
+
+.sidebar-toggle:hover {
+  color: #C9A84C;
+}
+
+.site-sidebar.collapsed .sidebar-toggle {
+  justify-content: center;
+}
+
+.site-sidebar.collapsed .nav-group-label,
+.site-sidebar.collapsed .nav-item span:not(:first-child),
+.site-sidebar.collapsed .sidebar-footer {
+  display: none;
+}
+
+.site-sidebar.collapsed .nav-item {
+  justify-content: center;
+  padding: 10px;
+}
+
+.site-sidebar.collapsed .sidebar-logo {
+  display: none;
+}
+
+.sidebar-logo-collapsed {
+  display: none;
+  padding: 16px 0;
+  text-align: center;
+  font-family: Georgia, serif;
+  font-size: 13px;
+  color: #C9A84C;
+  letter-spacing: 0.08em;
+  flex-shrink: 0;
+  border-bottom: 1px solid rgba(201,168,76,0.12);
+}
+
+.site-sidebar.collapsed .sidebar-logo-collapsed {
+  display: block;
 }
 
 .nav-item {

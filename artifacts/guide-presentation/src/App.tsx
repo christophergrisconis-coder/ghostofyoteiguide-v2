@@ -1110,7 +1110,7 @@ function ResetDialog({ onConfirm, onCancel }: { onConfirm: () => void; onCancel:
 
 // ── Sidebar ───────────────────────────────────────────────────────────────────
 
-function Sidebar({ activeSection, onNav }: { activeSection: string; onNav: (id: string) => void }) {
+function Sidebar({ activeSection, onNav, collapsed, onToggle }: { activeSection: string; onNav: (id: string) => void; collapsed: boolean; onToggle: () => void }) {
   const { reset } = useProgress();
   const [showResetDialog, setShowResetDialog] = useState(false);
 
@@ -1135,12 +1135,20 @@ function Sidebar({ activeSection, onNav }: { activeSection: string; onNav: (id: 
         />
       )}
 
-      {/* Logo header */}
-      <div style={{ padding: '24px 20px 18px', borderBottom: `1px solid ${GOLD20}`, flexShrink: 0 }}>
+      {/* Collapse toggle */}
+      <button className="sidebar-toggle" onClick={onToggle} title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
+        {collapsed ? '›' : '‹'}
+      </button>
+
+      {/* Logo header — hidden when collapsed */}
+      <div className="sidebar-logo" style={{ padding: '20px 20px 16px', borderBottom: `1px solid ${GOLD20}`, flexShrink: 0 }}>
         <p style={{ fontFamily: 'sans-serif', fontSize: 9, letterSpacing: '0.25em', color: GOLD, textTransform: 'uppercase', marginBottom: 6, opacity: 0.8 }}>Complete Guide</p>
         <h1 style={{ fontFamily: 'Georgia, serif', fontSize: 17, color: WHITE, lineHeight: 1.25, letterSpacing: '0.04em' }}>Ghost of Yōtei</h1>
         <p style={{ fontFamily: 'sans-serif', fontSize: 10, color: DIM, marginTop: 4, letterSpacing: '0.06em' }}>100% Completion</p>
       </div>
+
+      {/* Mini logo shown when collapsed */}
+      <div className="sidebar-logo-collapsed">鎧</div>
 
       {/* Navigation */}
       <nav style={{ padding: '12px 10px', flex: 1 }}>
@@ -1149,7 +1157,8 @@ function Sidebar({ activeSection, onNav }: { activeSection: string; onNav: (id: 
             <p className="nav-group-label">{group.label}</p>
             {NAV.filter(n => n.group === group.key).map(item => (
               <button key={item.id} className={`nav-item ${activeSection === item.id ? 'active' : ''}`}
-                onClick={() => onNav(item.id)}>
+                onClick={() => onNav(item.id)}
+                title={collapsed ? item.label : undefined}>
                 <span style={{ fontSize: 14, flexShrink: 0 }}>{item.icon}</span>
                 <span style={{ flex: 1 }}>{item.label}</span>
                 {'count' in item && item.count != null && (
@@ -1220,6 +1229,7 @@ const SECTIONS = [
 export default function App() {
   const [activeSection, setActiveSection] = useState('overview');
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const isMobile = useIsMobile();
   const progressValue = useProgressState();
 
@@ -1250,8 +1260,8 @@ export default function App() {
     <div style={{ display: 'flex', minHeight: '100vh', background: DARK }}>
       {/* Desktop fixed sidebar */}
       {!isMobile && (
-        <aside className="site-sidebar">
-          <Sidebar activeSection={activeSection} onNav={scrollTo} />
+        <aside className={`site-sidebar${sidebarCollapsed ? ' collapsed' : ''}`}>
+          <Sidebar activeSection={activeSection} onNav={scrollTo} collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(c => !c)} />
         </aside>
       )}
 
@@ -1260,13 +1270,13 @@ export default function App() {
         <>
           <div className="mobile-overlay" onClick={() => setMobileOpen(false)} />
           <aside className="site-sidebar mobile-sidebar">
-            <Sidebar activeSection={activeSection} onNav={scrollTo} />
+            <Sidebar activeSection={activeSection} onNav={scrollTo} collapsed={false} onToggle={() => setMobileOpen(false)} />
           </aside>
         </>
       )}
 
       {/* Main content */}
-      <main className="site-main">
+      <main className={`site-main${sidebarCollapsed && !isMobile ? ' collapsed' : ''}`}>
         {/* Mobile sticky header */}
         {isMobile && (
           <div className="mobile-header">
