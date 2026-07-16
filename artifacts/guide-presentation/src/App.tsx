@@ -488,6 +488,75 @@ function PostStorySection() {
   );
 }
 
+// ── Fox Den Chain Tracker ─────────────────────────────────────────────────────
+
+function FoxDenChainTracker({ done, total, color }: { done: number; total: number; color: string }) {
+  const allDone = done === total;
+  const steps = [
+    { label: `All ${total} Fox Dens`, active: true, done: allDone },
+    { label: 'Hunting Camp Hideout', active: allDone, done: false },
+    { label: 'Fox Statue Puzzle', active: allDone, done: false },
+    { label: 'Fox Mask', active: allDone, done: false },
+    { label: '🏆 Guardian of Inari', active: allDone, done: false },
+  ];
+  return (
+    <div style={{ marginBottom: 10 }}>
+      {/* Progress row */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+        <div style={{ flex: 1, height: 5, borderRadius: 3, background: 'rgba(255,255,255,0.08)' }}>
+          <div style={{ height: '100%', borderRadius: 3, background: color, width: `${(done / total) * 100}%`, transition: 'width 0.3s ease' }} />
+        </div>
+        <span style={{ fontFamily: 'sans-serif', fontSize: 11, color, fontWeight: 700, flexShrink: 0 }}>
+          {done} of {total} complete
+        </span>
+      </div>
+      {/* Chain steps */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 3, flexWrap: 'wrap', marginBottom: 8 }}>
+        {steps.map((step, i) => (
+          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+            <div style={{
+              padding: '2px 7px', borderRadius: 10,
+              fontFamily: 'sans-serif', fontSize: 9, fontWeight: 600,
+              background: step.done ? `${color}30` : step.active ? `${color}14` : 'rgba(255,255,255,0.04)',
+              color: step.done ? color : step.active ? `${color}CC` : 'rgba(240,237,232,0.25)',
+              border: `1px solid ${step.done ? color + '60' : step.active ? color + '35' : 'rgba(255,255,255,0.08)'}`,
+            }}>
+              {step.done && '✓ '}{step.label}
+            </div>
+            {i < steps.length - 1 && (
+              <span style={{ fontSize: 9, color: step.active ? `${color}70` : 'rgba(255,255,255,0.15)' }}>›</span>
+            )}
+          </div>
+        ))}
+      </div>
+      {/* Final-step callout — shown only when all dens are done */}
+      {allDone ? (
+        <div style={{ padding: '10px 12px', borderRadius: 8, background: `${color}18`, border: `1px solid ${color}55`, marginBottom: 4 }}>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+            <span style={{ fontSize: 16, flexShrink: 0 }}>🦊</span>
+            <div>
+              <p style={{ fontFamily: 'sans-serif', fontSize: 11, color, fontWeight: 700, marginBottom: 4 }}>
+                All Fox Dens complete — one final step!
+              </p>
+              <p style={{ fontFamily: 'sans-serif', fontSize: 10, color: 'rgba(240,237,232,0.75)', lineHeight: 1.5, marginBottom: 3 }}>
+                Travel to <strong style={{ color }}>Hunting Camp Hideout at Sanctuary Grove</strong> — northeast Teshio Ridge,
+                accessible via Sarufutsu Lighthouse.
+              </p>
+              <p style={{ fontFamily: 'sans-serif', fontSize: 10, color: 'rgba(240,237,232,0.75)', lineHeight: 1.5 }}>
+                Solve the fox statue door puzzle → receive the <strong style={{ color }}>Fox Mask</strong> → unlock <strong style={{ color }}>🏆 Guardian of Inari</strong>.
+              </p>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <p style={{ fontFamily: 'sans-serif', fontSize: 10, color: 'rgba(240,237,232,0.35)', lineHeight: 1.4, marginBottom: 4 }}>
+          Complete all {total} Fox Dens to unlock the final chain step at Hunting Camp Hideout (NE Teshio Ridge).
+        </p>
+      )}
+    </div>
+  );
+}
+
 // ── Section: Collectibles ─────────────────────────────────────────────────────
 
 function CollectiblesSection() {
@@ -536,8 +605,10 @@ function CollectiblesSection() {
                 </div>
                 {/* Per-item checklist — real IDs and names from data model */}
                 {isOpen && (
-                  <div style={{ marginTop: 10, borderTop: `1px solid ${cat.color}25`, paddingTop: 10, maxHeight: 280, overflowY: 'auto' }}>
-                    {cat.catNote && (
+                  <div style={{ marginTop: 10, borderTop: `1px solid ${cat.color}25`, paddingTop: 10, maxHeight: 320, overflowY: 'auto' }}>
+                    {cat.key === 'foxdens' ? (
+                      <FoxDenChainTracker done={done} total={cat.items.length} color={cat.color} />
+                    ) : cat.catNote && (
                       <p style={{ fontFamily: 'sans-serif', fontSize: 10, color: cat.color, lineHeight: 1.4, marginBottom: 8, opacity: 0.9 }}>{cat.catNote}</p>
                     )}
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 2 }}>
