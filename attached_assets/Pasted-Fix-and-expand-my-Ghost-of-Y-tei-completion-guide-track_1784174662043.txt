@@ -1,0 +1,402 @@
+Fix and expand my Ghost of Yōtei completion guide/tracker using the verified research below. Do not invent canon data beyond what is listed here. Where exact official data is still unverified, build the full architecture and use clearly labeled placeholder/import-ready records.
+
+CORE GOAL
+Rebuild the app into a real, expandable Ghost of Yōtei tracker with:
+- real data-driven structure
+- real progress/count logic
+- real region/category/item relationships
+- real searchable Item Locations feature
+- clear distinction between verified data and placeholder data
+
+DO THIS FIRST
+1. Audit the current codebase, especially App.tsx and any related data/config/source files.
+2. Identify all hardcoded quest/activity/item/category counts, labels, filters, and progress logic.
+3. Separate content data from UI.
+4. Prefer a clean rebuild of the data layer over patching brittle hardcoded UI.
+
+VERIFIED REGIONS
+The app must support these 6 regions:
+- Yotei Grasslands
+- Tokachi Range
+- Ishikari Plain
+- Nayoro Wilds
+- Teshio Ridge
+- Oshima Coast
+
+VERIFIED COLLECTIBLE / ACTIVITY COUNTS
+Use these as the researched baseline:
+- 12 Nine Tails Puzzle Boxes
+- 10 Special Places needed for trophies
+- 5 Mountain Reliquary Puzzles
+- 11 Fox Dens
+- 10 Wolf Dens
+- 18 Sumi-e Paintings
+- 15 Bamboo Strikes
+- 13 Shrine Climbs
+- 16 Hot Springs
+- 61 Altars of Reflection
+- 20 Pillars of the Fallen
+- 30 Ainu Items
+- 6 Dueling Trees
+- 8 Shamisen Songs
+- 12 Armor
+- 5 Melee Weapons
+- 4 Ranged Weapons
+- 5 Quickfire Weapons
+- 22 Yotei Six Camps
+- 31 Bounties
+- 8 Zeni Hajiki
+
+VERIFIED COMPLETION RULES
+- Collectibles are not missable and remain obtainable in free roam after the story.
+- Treat collectibles as non-missable unless a specific record is explicitly flagged otherwise by verified source data.
+- Some collectible types are not map-marked the same way, especially:
+  - Nine Tails Puzzle Boxes
+  - Special Places
+  - Armor
+  - Melee Weapons
+  - Ranged Weapons
+  - Quickfire Weapons
+
+VERIFIED COLLECTIBLE / ITEM FACTS
+- Ainu Items are a major collectible category.
+- Ainu Items are used to upgrade the Robes for Sitturaynu Outfit.
+- Ainu Items are traded to Kaeka the Weaver at Husko Kotan in Nayoro Wilds.
+- Lord Saito Missives are found in fortified Yotei Six Camps and mainly provide lore/backstory.
+- Shamisen Songs guide the player to:
+  - Hot Springs
+  - Yotei Six Camps
+  - Ainu Items
+  - Bamboo Strikes
+  - Wolf Dens
+  - Shrine Climbs
+- Upgraded Robes for Sitturaynu help guide the player to:
+  - Shamisen Songs
+  - Sumi-e
+  - Pillars of the Fallen
+
+VERIFIED AINU ITEM RECORDS
+Create 30 individual Ainu Item records using these names:
+1. Repunkur Canteen
+2. Ninkari
+3. Raoma
+4. Makiri
+5. Ninketeyep
+6. Mukkuri
+7. Ikupasuy
+8. Ku-e-shinok Ring
+9. Cispo
+10. Clothes for the Dead
+11. Traded Furs
+12. Kiray
+13. Tepkeri
+14. Tamasai
+15. Kuwari
+16. Tanpakuop
+17. Karop
+18. Kuyoy
+19. Newsar-kamuy
+20. Tesma
+21. Marek
+22. Hos
+23. Sitopera
+24. Sinta
+25. Menokomakir
+26. Matampus
+27. Mat Loom
+28. Lacquerware
+29. Niesike
+30. Citarpe Cape
+
+VERIFIED RESOURCES
+Build a real resource/item database with these verified resource records and uses:
+
+Base/common resources:
+- Coin
+  - How to get: turn in bounties, gamble at inns, loot defeated enemies, complete jobs
+  - Uses: purchase items
+- Flowers
+  - How to get: found across Ezo in fields, forests, valleys
+  - Uses: traded at merchants
+- Ghost Flowers
+  - How to get: mainly by completing quests, bounties, and unlocking Altars of Reflection in New Game Plus
+  - Uses: New Game Plus-related currency/progression
+- Sake
+  - How to get: found across Ezo, looted from dead enemies, purchased from merchants
+  - Uses: gain Spirit; craft fire ammo
+- Food
+  - How to get: found in the wilds of Ezo
+  - Uses: cooked at camp
+- Metal
+  - How to get: looted from enemies and Yotei Six camps, purchased from merchants, exploring mountainous terrain
+  - Uses: upgrade melee weapons, guns, and armor
+- Plants
+  - How to get: found across Ezo in forests and hillsides, or purchased from merchants
+  - Uses: craft ammunition while camping
+- Textiles
+  - How to get: purchased from merchants, found inside buildings, looted from enemies and animals
+  - Uses: upgrade armor and craft ammunition
+- Young Bamboo
+  - How to get: found in fields and forests of Ezo, or purchased from merchants
+  - Uses: upgrade bows and craft ammo
+
+Advanced/uncommon resources:
+- Black Powder
+  - How to get: purchased from merchants and looted from enemies who use ranged weapons
+  - Uses: craft ammunition and improve Quickfire weapons
+- Gun Parts
+  - How to get: looted from enemies in Yotei Six Camps at Tokachi Range and along the Oshima Coast
+  - Uses: upgrade melee weapons, ranged weapons, and armor
+- Oni Raider Mask Pieces
+  - How to get: found at Yotei Six Camps and from dead Oni Raiders, most commonly in Ishikari Plain
+  - Uses: upgrade melee weapons, ranged weapons, and armor
+- Shinobi Steel
+  - How to get: looted from enemies at Nine Tail Dens and from Shinobi in Teshio Ridge
+  - Uses: upgrade melee weapons, ranged weapons, and armor
+- Rare Metal / Precious Metals
+  - How to get: looted from high-ranking members of clan Saito or in Yotei Six Camps
+  - Uses: final-stage melee weapon upgrades and increased ammo carrying capacity
+- Rare Wood / Precious Woods
+  - How to get: found by exploring the wilds of Ezo
+  - Uses: final-stage bow upgrades and increased ammo carrying capacity
+
+VERIFIED MERCHANT / VENDOR FACTS
+Use a merchant schema and seed these known merchant/vendor references:
+- Kaeka the Weaver — Husko Kotan, Nayoro Wilds — associated with Ainu Item turn-ins and Robes for Sitturaynu upgrades
+- Ginji the Armorer — Yotei’s Shadow Inn
+- Ran the Bowyer — Yotei’s Shadow Inn
+- Ainu Merchant — Nayoro Wilds
+- Ishikari Market Dye Vendor — Ishikari Plain
+- Saburo the Mask Artisan — Ishikari Plain
+- Taro Vendor — Dead Man’s Tree
+- Oshima Coast Merchant
+- Teshio Ridge Merchant
+- White Dye House Vendor
+- Green Dye House Vendor
+- Blue Dye House Vendor
+- Red Crimson Dye Beach Vendor
+- Black Dye House Vendor — unlock tied to quest progress “The Kitsune”
+- Masujiro the Melodious — available in New Game Plus, directly northwest of Home, sells Gunner’s Sickle
+
+Additional verified merchant/resource behavior:
+- Merchant guides indicate resource-selling merchants can have narrow inventories focused on textiles, young bamboo, and black powder.
+- Dye Merchants are associated with outfit dyes, weapon kits, helmets, and masks.
+- Found in obscure locations in Ezo, often near bodies of water.
+
+VERIFIED ZENI HAJIKI LOCATIONS
+Create exact records for these 8 Zeni Hajiki locations, with their charm rewards and requirements:
+
+Yotei Grasslands
+1. Kuttara Gambling Den
+   - Reward: Charm of Abundant Drink
+   - Requirement: complete Side Tale “Sleight of Hand” to enter the gambling den
+
+Ishikari Plain
+2. Ishikari Market
+   - Reward: Charm of Fire Mastery
+   - Note: win twice at the gambling den to get the charm
+3. Oni’s Breath Inn
+   - Reward: Charm of Stolen Flame
+   - Requirement: complete Side Tale “Oni’s Breath Inn” to unlock the gambling table
+
+Tokachi Range
+4. Huranui’s Rest Inn
+   - Reward: Charm of Resourceful Protection
+   - Note: upstairs in the inn, go up the ladder
+
+Teshio Ridge
+5. Red Crane Inn
+   - Reward: Charm of Fatal Silence
+   - Note: ground floor, left side after entering front entrance
+6. Bifuka Sake House
+   - Reward: Charm of Quick Retrieval
+   - Note: right side on ground floor
+7. Nakajima Sake House
+   - Reward: Charm of Surprise Gift
+   - Note: gambling table outside on the terrace at the frozen lake
+
+Oshima Coast
+8. Benten Port
+   - Reward: Charm of Fiery Rage
+   - Note: upstairs in the gambling den, go up the ladder
+
+Also model these rules:
+- Zeni Hajiki is a coin-flicking minigame.
+- Defeating the opponent once gives coins.
+- Defeating the opponent again gives the charm and counts the activity as complete.
+- Some quest-related Zeni Hajiki games do not count toward activities because they do not give a charm.
+
+VERIFIED FOX DEN LOCATIONS
+Create exact records for these 11 Fox Dens and their charm rewards:
+
+Yotei Grasslands
+1. Lake View Fox Den — Charm of Uncanny Aim
+2. Flowing Water Fox Den — Charm of Assassin’s Resolve
+3. Grassy Hill Fox Den — Charm of Brutal Volley
+
+Ishikari Plain
+4. Fire Fox Den — Charm of Resolute Victory
+5. Twin Path Fox Den — Charm of Enduring Resolve
+
+Tokachi Range
+6. Warm Plains Fox Den — Charm of Archer’s Fortune
+7. Whispering Fox Den — Charm of Swift Reward
+
+Nayoro Wilds
+8. Clear Water Fox Den — Charm of Generous Opponents
+
+Teshio Ridge
+9. Winding River Fox Den — Charm of Opportunity
+10. High Wall Fox Den — Charm of Lingering Shadows
+
+Oshima Coast
+11. Blushing Forest Fox Den — Charm of the Prepared
+
+Also model this completion chain:
+- After completing all 11 Fox Dens, the player must go to Hunting Camp Hideout at Sanctuary Grove in northeast Teshio Ridge.
+- Access is via Sarufutsu Lighthouse.
+- The player solves the fox statue door puzzle and then receives the Fox Mask.
+- This unlocks the Guardian of Inari trophy.
+
+VERIFIED BOUNTY RECORDS
+Create individual verified bounty records for these named bounties:
+
+Yotei Grasslands
+- Smiling Yoshitomo
+- Crow Genzo
+- Muneji the Bone Crusher
+- The Three Terrors
+- Black Powder Ippei
+- Soma the Condemned
+
+Ishikari Plain
+- Blue Yamauba
+- Bloody Strings Hachibee
+- Toshi the Torch
+- Eijiro the Ruthless
+- Turtle Man Kamekichi
+- Shiro the Swindler
+
+Tokachi Range
+- Junpei the Snatcher
+- One-Eye Moritaka
+- Old Lady Yae
+- Bear Man Chikatoshi
+- Inokichi the Hungry
+- Iron Chuta
+
+Teshio Ridge
+- Houndmaster Toyotaro
+- Snowstorm Katagiri
+- Inagawa the Gambler
+- Nameless Killer
+- Black Night Kubo
+
+Oshima Coast
+- Wayward Oni Raiders
+- Eagle Eye Kondo
+- Iwa the Beautiful
+- A Brokered Trust
+- Tadaaki The Terrible
+- The Last Brother
+- The Tooth Breaker
+- Shinpachi the Armor Thief
+
+Also model these important exceptions:
+- Wanted posters for Takahashi the Yari Master and Ina The Bomb Maker are allies tied to sensei tales, not enemy bounties.
+- Wanted posters for Enomoto the Kusarigama Master and Hana the Farmer are allies tied to sensei tales, not enemy bounties.
+
+ITEM LOCATION FEATURE REQUIREMENTS
+Add a real searchable Item Locations section/tab/sidebar view with:
+- search by item name
+- partial-name search
+- filter by item type
+- filter by region
+- filter by verified/placeholder status
+- item detail panel/card
+- linked relationships to quests, activities, merchants, collectibles, upgrades, and crafting uses
+
+Required item schema:
+- id
+- name
+- type
+- rarity
+- description
+- region
+- subArea
+- locations
+- sourceType
+- merchantSource
+- enemySource
+- usedFor
+- relatedQuests
+- relatedActivities
+- relatedMerchants
+- upgradeUse
+- craftingUse
+- notes
+- verified
+- placeholder
+
+Required merchant schema:
+- id
+- name
+- region
+- subArea
+- vendorType
+- unlockRequirement
+- inventory
+- notes
+- verified
+- placeholder
+
+Required collectible/activity schema:
+- id
+- name
+- type
+- region
+- subArea
+- reward
+- requirement
+- mapMarked
+- missable
+- relatedQuest
+- verified
+- placeholder
+
+CRITICAL HONESTY RULE
+Do NOT invent official canon data for:
+- exact sub-area coordinates for every collectible not listed above
+- full merchant inventories not listed above
+- exact quest-required item dependencies not verified above
+- full crafting recipe trees not verified above
+- all exact item drop rates or enemy drop tables
+For those, create import-ready placeholder records with placeholder: true and verified: false.
+
+VISUAL / UX RULES
+- Keep the current visual style as much as possible.
+- Do not add fake buttons, fake counts, fake filters, or decorative search.
+- Every displayed total must come from real data.
+- Every filter must be generated from underlying records.
+- The item search must operate on real item/resource/collectible records.
+
+VERIFY BEFORE FINISHING
+Before finishing, verify that:
+- all 6 regions exist in the data model
+- collectible totals match the verified counts above
+- 30 individual Ainu Item records exist
+- the verified resource records exist with source/use data
+- the verified merchant records exist
+- Zeni Hajiki records exist with location/reward/requirement data
+- Fox Den records exist with location/reward data
+- verified bounty records exist
+- all dashboard counts are computed from data
+- Item Locations search works from real records
+- verified and placeholder records are visually distinguishable
+- the app does not claim full canon completeness where data remains uncertain
+
+OUTPUT FORMAT
+First summarize what you found in the current code and what you will change.
+Then implement the fix.
+Then provide a final verification summary of what is actually working.
+Do not claim the app is fully complete unless the data and logic truly support that claim.
