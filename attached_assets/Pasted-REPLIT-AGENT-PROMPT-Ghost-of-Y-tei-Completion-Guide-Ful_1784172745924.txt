@@ -1,0 +1,41 @@
+REPLIT AGENT PROMPT — Ghost of Yōtei Completion Guide: Full Data Completion Pass
+
+ROLE AND MINDSET
+You've completed the architecture rebuild (real schema, real progress logic, real filters, Item Location system). Now your job is to fill that architecture with actual, complete, accurate content until the guide is genuinely 100% — not visually complete, but factually complete and correct. Accuracy beats speed. A smaller dataset that is fully correct is better than a large dataset with guessed or invented entries.
+
+HARD RULE — NO INVENTED CONTENT
+You must never guess, fabricate, or "fill in" quest names, locations, item effects, drop sources, region names, rewards, or any other factual detail you are not confident is correct. If you are not certain about a piece of data:
+- Do NOT invent a plausible-sounding answer.
+- Do NOT silently leave it blank and move on.
+- STOP and ask me directly, listing exactly what information you need (e.g. "I need the confirmed name and reward for Mythic Tale #4 in Region X" or "I need the confirmed drop locations for [item name]").
+- Mark the entry as `placeholder: true` / `verified: false` in the data until I confirm it, and continue with other work while waiting.
+
+WORKFLOW
+1. Go section by section through the schema (main story missions, side tales, mythic tales, sensei tales/companion arcs, bounties, post-story, collectibles, activities, equipment, missables, crafting materials, quest-required items, item locations).
+2. For each section, list what data currently exists, what is placeholder/incomplete, and what is missing entirely.
+3. Fill in every entry you can verify with real, accurate, and descriptive detail — not just a name, but full descriptions, correct region/location tagging, correct requirements, correct rewards, correct crafting/quest links, and correct "used for"/"found in" data for items.
+4. For anything you cannot verify with confidence, compile a clear, organized question list for me (grouped by section) instead of guessing. Do not proceed to mark those sections complete.
+5. As I provide answers, integrate them into the data model immediately, remove the placeholder/unverified flags, and re-run the verification checks below.
+
+DATA QUALITY BAR
+Every completed entry must include, where applicable:
+- Accurate name and category placement
+- A real, descriptive summary (not a one-line stub)
+- Correct region/sub-area tagging
+- Correct prerequisites, rewards, and unlock conditions
+- Correct links to related quests, activities, items, or crafting recipes
+- Correct missable status, with the reason it's missable if applicable
+- For items specifically: accurate type, rarity, all known locations, all known uses, and all linked quests/crafting recipes
+
+VERIFICATION BEFORE CLAIMING COMPLETION
+Do not report the guide as 100% complete until you've confirmed:
+- Every section has zero entries still marked placeholder/unverified, OR every remaining placeholder is explicitly listed for me with what's needed to resolve it.
+- All totals, percentages, and dashboard stats recalculate correctly from the now-completed data.
+- All Item Location search/filter results reflect the completed item data.
+- No section silently contains guessed content presented as confirmed fact.
+
+OUTPUT BEHAVIOR
+1. Start with a section-by-section status report: complete / partial / missing, with counts.
+2. Do the completion work for everything you can verify.
+3. End with a clearly formatted list of open questions for anything you couldn't verify — organized by section, specific enough that I can answer quickly.
+4. Only state "100% complete" if every section is either fully verified or has zero unresolved placeholders. Otherwise, state the true completion percentage and what's outstanding.
