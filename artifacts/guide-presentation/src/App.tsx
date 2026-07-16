@@ -3,6 +3,7 @@ import { useIsMobile } from './hooks/use-mobile';
 import {
   Card, Tag, SectionTitle, GoldLine, MiniBar, TierDots, SectionBg,
   QuestRow, QuestDetail, CollectibleCheckItem,
+  StepCheckRow,
 } from './components/guide-ui';
 import {
   GOLD, GOLD20, GOLD40, DARK, WHITE, DIM,
@@ -799,7 +800,7 @@ function MissablesSection() {
             <Card>
               <h3 style={{ fontFamily: 'Georgia, serif', fontSize: 16, color: GOLD, marginBottom: 16 }}>Post-Story Cleanup Checklist</h3>
               {cleanup.map((item, i) => (
-                <div key={i} className="check-row"><div className="check-box" /><span className="check-text">{item}</span></div>
+                <StepCheckRow key={i} stepId={`post-story-cleanup-${i}`} label={item} />
               ))}
             </Card>
           </div>
@@ -818,13 +819,7 @@ function MissablesSection() {
                 { title: 'Yōtei at First Snow',   note: 'True ending — requires all Sensei Tales' },
               ].map((q, i) => (
                 <div key={i} style={{ marginBottom: 12 }}>
-                  <div className="check-row" style={{ borderBottom: 'none', paddingBottom: 0 }}>
-                    <div className="check-box" />
-                    <div>
-                      <div style={{ fontFamily: 'sans-serif', fontSize: 13, color: WHITE }}>{q.title}</div>
-                      <div style={{ fontFamily: 'sans-serif', fontSize: 11, color: DIM, marginTop: 2 }}>{q.note}</div>
-                    </div>
-                  </div>
+                  <StepCheckRow stepId={`post-story-quest-${i}`} label={`${q.title} — ${q.note}`} />
                 </div>
               ))}
             </Card>

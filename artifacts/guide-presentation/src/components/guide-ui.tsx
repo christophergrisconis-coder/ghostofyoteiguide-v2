@@ -1,6 +1,7 @@
 import React from 'react';
 import { GOLD, GOLD20, GOLD40, WHITE, DIM, CARD, ACT_COLOR, REGION_COLOR } from '../data/quests';
 import type { Quest } from '../data/quests';
+import { useProgress } from '../hooks/use-progress';
 
 // ── Primitive components ───────────────────────────────────────────────────────
 
@@ -158,6 +159,25 @@ export function CollectibleCheckItem({ id, label, color, checked, onToggle }: {
   );
 }
 
+// ── Interactive step checkbox row ─────────────────────────────────────────────
+
+export function StepCheckRow({ stepId, label }: { stepId: string; label: string }) {
+  const { isChecked, toggle } = useProgress();
+  const checked = isChecked(stepId);
+  return (
+    <div
+      className="check-row"
+      onClick={() => toggle(stepId)}
+      style={{ cursor: 'pointer', opacity: checked ? 0.6 : 1 }}
+    >
+      <div className={`check-box${checked ? ' checked' : ''}`}>
+        {checked && <span style={{ fontSize: 10, color: '#0a0a0f', fontWeight: 700, lineHeight: 1 }}>✓</span>}
+      </div>
+      <span className="check-text" style={{ textDecoration: checked ? 'line-through' : 'none' }}>{label}</span>
+    </div>
+  );
+}
+
 // ── Quest detail panel ─────────────────────────────────────────────────────────
 
 export function QuestDetail({ quest, onPrev, onNext, hasPrev, hasNext, accentColor = GOLD }: {
@@ -198,12 +218,10 @@ export function QuestDetail({ quest, onPrev, onNext, hasPrev, hasNext, accentCol
         <p style={{ fontFamily: 'sans-serif', fontSize: 12, color: DIM, lineHeight: 1.55, marginBottom: 14 }}>{quest.desc}</p>
         {/* Steps */}
         <p style={{ fontFamily: 'sans-serif', fontSize: 10, color: accentColor, fontWeight: 700, letterSpacing: '0.08em', marginBottom: 8, textTransform: 'uppercase' }}>Steps</p>
-        {quest.steps.map((step, i) => (
-          <div key={i} className="check-row">
-            <div className="check-box" />
-            <span className="check-text">{step}</span>
-          </div>
-        ))}
+        {quest.steps.map((step, i) => {
+          const stepId = `${quest.id}:step:${i}`;
+          return <StepCheckRow key={i} stepId={stepId} label={step} />;
+        })}
         {/* Tip */}
         {quest.tip && (
           <div style={{ marginTop: 12, padding: '10px 14px', borderRadius: 8, background: 'rgba(201,168,76,0.08)', border: `1px solid ${GOLD40}` }}>
