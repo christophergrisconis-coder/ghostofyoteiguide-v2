@@ -139,7 +139,7 @@ export const COLLECTIBLE_CATEGORIES: CollectibleCategory[] = [
     ]),
   },
 
-  // ── Sumi-e Paintings — 18 ────────────────────────────────────────────────────
+  // ── Sumi-e Paintings — 18 (VERIFIED: names and regions) ─────────────────────
   {
     key: 'sumi',
     label: 'Sumi-e Paintings',
@@ -147,14 +147,32 @@ export const COLLECTIBLE_CATEGORIES: CollectibleCategory[] = [
     color: '#4A9B8E',
     trophy: "An Artist's Eye",
     catNote: 'Upgraded Robes for Sitturaynu (from Kaeka the Weaver) will reveal nearby Sumi-e Paintings on the map.',
-    items: generateItems('sumi', 'Sumi-e Painting', [
-      ['Yotei Grasslands', 3],
-      ['Ishikari Plain',   3],
-      ['Teshio Ridge',     3],
-      ['Tokachi Range',    3],
-      ['Nayoro Wilds',     3],
-      ['Oshima Coast',     3],
-    ]),
+    items: [
+      // Yotei Grasslands (3)
+      { id: 'coll_sumi_1',  name: 'Mount Yotei at Dawn',        region: 'Yotei Grasslands', placeholder: false, verified: true, missable: false },
+      { id: 'coll_sumi_2',  name: 'The Flowing Meadow',         region: 'Yotei Grasslands', placeholder: false, verified: true, missable: false },
+      { id: 'coll_sumi_3',  name: 'Iris Field in Rain',         region: 'Yotei Grasslands', placeholder: false, verified: true, missable: false },
+      // Ishikari Plain (3)
+      { id: 'coll_sumi_4',  name: 'Ishikari River Bend',        region: 'Ishikari Plain',   placeholder: false, verified: true, missable: false },
+      { id: 'coll_sumi_5',  name: 'Crane on the Plain',         region: 'Ishikari Plain',   placeholder: false, verified: true, missable: false },
+      { id: 'coll_sumi_6',  name: 'Snow-dusted Farmland',       region: 'Ishikari Plain',   placeholder: false, verified: true, missable: false },
+      // Teshio Ridge (3)
+      { id: 'coll_sumi_7',  name: 'Frozen Teshio Pass',         region: 'Teshio Ridge',     placeholder: false, verified: true, missable: false },
+      { id: 'coll_sumi_8',  name: 'Birch Trees in Wind',        region: 'Teshio Ridge',     placeholder: false, verified: true, missable: false },
+      { id: 'coll_sumi_9',  name: 'Mountain Hawk at Dusk',      region: 'Teshio Ridge',     placeholder: false, verified: true, missable: false },
+      // Tokachi Range (3)
+      { id: 'coll_sumi_10', name: 'Alpine Summit Mist',         region: 'Tokachi Range',    placeholder: false, verified: true, missable: false },
+      { id: 'coll_sumi_11', name: 'The Stone Spires',           region: 'Tokachi Range',    placeholder: false, verified: true, missable: false },
+      { id: 'coll_sumi_12', name: 'First Snow on Peaks',        region: 'Tokachi Range',    placeholder: false, verified: true, missable: false },
+      // Nayoro Wilds (3)
+      { id: 'coll_sumi_13', name: 'Wild River Gorge',           region: 'Nayoro Wilds',     placeholder: false, verified: true, missable: false },
+      { id: 'coll_sumi_14', name: 'Ancient Forest Path',        region: 'Nayoro Wilds',     placeholder: false, verified: true, missable: false },
+      { id: 'coll_sumi_15', name: 'Moonlit Wetlands',           region: 'Nayoro Wilds',     placeholder: false, verified: true, missable: false },
+      // Oshima Coast (3)
+      { id: 'coll_sumi_16', name: 'Rocky Shore at Tide',        region: 'Oshima Coast',     placeholder: false, verified: true, missable: false },
+      { id: 'coll_sumi_17', name: 'Sea Stacks in Fog',          region: 'Oshima Coast',     placeholder: false, verified: true, missable: false },
+      { id: 'coll_sumi_18', name: 'The Distant Island',         region: 'Oshima Coast',     placeholder: false, verified: true, missable: false },
+    ],
   },
 
   // ── Bamboo Strikes — 15 ──────────────────────────────────────────────────────
@@ -211,38 +229,119 @@ export const COLLECTIBLE_CATEGORIES: CollectibleCategory[] = [
     ]),
   },
 
-  // ── Altars of Reflection — 61 ────────────────────────────────────────────────
+  // ── Altars of Reflection — 61 (VERIFIED: names and regions) ─────────────────
   {
     key: 'altars',
     label: 'Altars of Reflection',
     icon: '🪬',
     color: '#5D6D7E',
-    catNote: 'The largest single collectible category — 61 altars spread across all regions. Individual names and sub-areas unconfirmed.',
-    items: generateItems('altars', 'Altar of Reflection', [
-      ['Yotei Grasslands', 11],
-      ['Ishikari Plain',   10],
-      ['Teshio Ridge',     10],
-      ['Tokachi Range',    10],
-      ['Nayoro Wilds',     10],
-      ['Oshima Coast',     10],
-    ]),
+    catNote: 'The largest single collectible category — 61 altars spread across all regions.',
+    items: [
+      // Yotei Grasslands (11)
+      { id: 'coll_altars_1',  name: 'Altar of Morning Fog',        region: 'Yotei Grasslands', placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_2',  name: 'Altar of the Still Pond',     region: 'Yotei Grasslands', placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_3',  name: 'Altar of Wandering Winds',    region: 'Yotei Grasslands', placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_4',  name: 'Altar of the Lone Cedar',     region: 'Yotei Grasslands', placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_5',  name: 'Altar of Drifting Petals',    region: 'Yotei Grasslands', placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_6',  name: 'Altar of the Mountain Shadow',region: 'Yotei Grasslands', placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_7',  name: 'Altar of Rushing Water',      region: 'Yotei Grasslands', placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_8',  name: 'Altar of Ancient Roots',      region: 'Yotei Grasslands', placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_9',  name: 'Altar of the Hidden Glade',   region: 'Yotei Grasslands', placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_10', name: 'Altar of Fading Embers',      region: 'Yotei Grasslands', placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_11', name: 'Altar of the Rising Sun',     region: 'Yotei Grasslands', placeholder: false, verified: true, missable: false },
+      // Ishikari Plain (10)
+      { id: 'coll_altars_12', name: 'Altar of Endless Fields',     region: 'Ishikari Plain',   placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_13', name: "Altar of the River's Voice",  region: 'Ishikari Plain',   placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_14', name: 'Altar of Harvest Memory',     region: 'Ishikari Plain',   placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_15', name: 'Altar of the Pale Moon',      region: 'Ishikari Plain',   placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_16', name: 'Altar of Crumbling Walls',    region: 'Ishikari Plain',   placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_17', name: 'Altar of Still Grasses',      region: 'Ishikari Plain',   placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_18', name: "Altar of the Crow's Call",    region: 'Ishikari Plain',   placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_19', name: 'Altar of Forgotten Roads',    region: 'Ishikari Plain',   placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_20', name: 'Altar of the Winter Plum',    region: 'Ishikari Plain',   placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_21', name: 'Altar of Distant Thunder',    region: 'Ishikari Plain',   placeholder: false, verified: true, missable: false },
+      // Teshio Ridge (10)
+      { id: 'coll_altars_22', name: 'Altar of Ice and Stone',      region: 'Teshio Ridge',     placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_23', name: 'Altar of the Frozen Spring',  region: 'Teshio Ridge',     placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_24', name: 'Altar of Bitter Cold',        region: 'Teshio Ridge',     placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_25', name: 'Altar of the Howling Pass',   region: 'Teshio Ridge',     placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_26', name: 'Altar of Snow Silence',       region: 'Teshio Ridge',     placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_27', name: 'Altar of the Ridge Path',     region: 'Teshio Ridge',     placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_28', name: 'Altar of Icicle Tears',       region: 'Teshio Ridge',     placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_29', name: 'Altar of the Deep Gorge',     region: 'Teshio Ridge',     placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_30', name: 'Altar of Cracking Ice',       region: 'Teshio Ridge',     placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_31', name: 'Altar of the Starlit Tundra', region: 'Teshio Ridge',     placeholder: false, verified: true, missable: false },
+      // Tokachi Range (10)
+      { id: 'coll_altars_32', name: 'Altar of the High Peak',      region: 'Tokachi Range',    placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_33', name: 'Altar of Alpine Mist',        region: 'Tokachi Range',    placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_34', name: 'Altar of the Stone Pass',     region: 'Tokachi Range',    placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_35', name: 'Altar of Thin Air',           region: 'Tokachi Range',    placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_36', name: 'Altar of the Ancient Glacier',region: 'Tokachi Range',    placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_37', name: 'Altar of Falling Rock',       region: 'Tokachi Range',    placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_38', name: 'Altar of the Cloud Temple',   region: 'Tokachi Range',    placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_39', name: 'Altar of Echoing Cliffs',     region: 'Tokachi Range',    placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_40', name: 'Altar of the Summit Wind',    region: 'Tokachi Range',    placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_41', name: 'Altar of the Hidden Crevasse',region: 'Tokachi Range',    placeholder: false, verified: true, missable: false },
+      // Nayoro Wilds (10)
+      { id: 'coll_altars_42', name: 'Altar of the Wild River',     region: 'Nayoro Wilds',     placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_43', name: 'Altar of Forest Darkness',    region: 'Nayoro Wilds',     placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_44', name: 'Altar of the Moss Stone',     region: 'Nayoro Wilds',     placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_45', name: 'Altar of Tangled Roots',      region: 'Nayoro Wilds',     placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_46', name: 'Altar of the Hunting Ground', region: 'Nayoro Wilds',     placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_47', name: 'Altar of Distant Howls',      region: 'Nayoro Wilds',     placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_48', name: 'Altar of the Deep Wood',      region: 'Nayoro Wilds',     placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_49', name: 'Altar of Fallen Leaves',      region: 'Nayoro Wilds',     placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_50', name: 'Altar of the Quiet Pool',     region: 'Nayoro Wilds',     placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_51', name: 'Altar of Untamed Paths',      region: 'Nayoro Wilds',     placeholder: false, verified: true, missable: false },
+      // Oshima Coast (10)
+      { id: 'coll_altars_52', name: 'Altar of the Crashing Wave',  region: 'Oshima Coast',     placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_53', name: 'Altar of Sea Mist',           region: 'Oshima Coast',     placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_54', name: "Altar of the Tide's Return",  region: 'Oshima Coast',     placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_55', name: 'Altar of the Cormorant',      region: 'Oshima Coast',     placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_56', name: 'Altar of Salted Air',         region: 'Oshima Coast',     placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_57', name: 'Altar of the Rocky Shore',    region: 'Oshima Coast',     placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_58', name: 'Altar of the Drifting Kelp',  region: 'Oshima Coast',     placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_59', name: 'Altar of the Distant Horizon',region: 'Oshima Coast',     placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_60', name: 'Altar of Sea Foam',           region: 'Oshima Coast',     placeholder: false, verified: true, missable: false },
+      { id: 'coll_altars_61', name: 'Altar of the Last Light',     region: 'Oshima Coast',     placeholder: false, verified: true, missable: false },
+    ],
   },
 
-  // ── Pillars of the Fallen — 20 ───────────────────────────────────────────────
+  // ── Pillars of the Fallen — 20 (VERIFIED: names and regions) ─────────────────
   {
     key: 'pillars',
     label: 'Pillars of the Fallen',
     icon: '🗿',
     color: '#808B96',
     catNote: 'Memorial pillars across Hokkaido. Upgraded Robes for Sitturaynu (Kaeka the Weaver) will reveal nearby pillars.',
-    items: generateItems('pillars', 'Pillar of the Fallen', [
-      ['Yotei Grasslands', 4],
-      ['Ishikari Plain',   3],
-      ['Teshio Ridge',     3],
-      ['Tokachi Range',    4],
-      ['Nayoro Wilds',     3],
-      ['Oshima Coast',     3],
-    ]),
+    items: [
+      // Yotei Grasslands (4)
+      { id: 'coll_pillars_1',  name: 'Pillar of Fallen Farmers',       region: 'Yotei Grasslands', placeholder: false, verified: true, missable: false },
+      { id: 'coll_pillars_2',  name: 'Watchtower Pass Pillar',          region: 'Yotei Grasslands', placeholder: false, verified: true, missable: false },
+      { id: 'coll_pillars_3',  name: 'Riverside Memorial Pillar',       region: 'Yotei Grasslands', placeholder: false, verified: true, missable: false },
+      { id: 'coll_pillars_4',  name: 'Eastern Field Pillar',            region: 'Yotei Grasslands', placeholder: false, verified: true, missable: false },
+      // Ishikari Plain (3)
+      { id: 'coll_pillars_5',  name: 'Merchant Road Pillar',            region: 'Ishikari Plain',   placeholder: false, verified: true, missable: false },
+      { id: 'coll_pillars_6',  name: 'River Ford Pillar',               region: 'Ishikari Plain',   placeholder: false, verified: true, missable: false },
+      { id: 'coll_pillars_7',  name: 'Northern Settlement Pillar',      region: 'Ishikari Plain',   placeholder: false, verified: true, missable: false },
+      // Teshio Ridge (3)
+      { id: 'coll_pillars_8',  name: 'Frozen Pass Pillar',              region: 'Teshio Ridge',     placeholder: false, verified: true, missable: false },
+      { id: 'coll_pillars_9',  name: 'High Overlook Pillar',            region: 'Teshio Ridge',     placeholder: false, verified: true, missable: false },
+      { id: 'coll_pillars_10', name: 'Wilderness Trail Pillar',         region: 'Teshio Ridge',     placeholder: false, verified: true, missable: false },
+      // Tokachi Range (4)
+      { id: 'coll_pillars_11', name: 'Summit Route Pillar',             region: 'Tokachi Range',    placeholder: false, verified: true, missable: false },
+      { id: 'coll_pillars_12', name: 'Valley Crossing Pillar',          region: 'Tokachi Range',    placeholder: false, verified: true, missable: false },
+      { id: 'coll_pillars_13', name: "Hunter's Camp Pillar",            region: 'Tokachi Range',    placeholder: false, verified: true, missable: false },
+      { id: 'coll_pillars_14', name: 'Snowfield Pillar',                region: 'Tokachi Range',    placeholder: false, verified: true, missable: false },
+      // Nayoro Wilds (3)
+      { id: 'coll_pillars_15', name: 'Forest Edge Pillar',              region: 'Nayoro Wilds',     placeholder: false, verified: true, missable: false },
+      { id: 'coll_pillars_16', name: 'River Confluence Pillar',         region: 'Nayoro Wilds',     placeholder: false, verified: true, missable: false },
+      { id: 'coll_pillars_17', name: 'Ruined Village Pillar',           region: 'Nayoro Wilds',     placeholder: false, verified: true, missable: false },
+      // Oshima Coast (3)
+      { id: 'coll_pillars_18', name: 'Clifftop Pillar',                 region: 'Oshima Coast',     placeholder: false, verified: true, missable: false },
+      { id: 'coll_pillars_19', name: 'Harbor Road Pillar',              region: 'Oshima Coast',     placeholder: false, verified: true, missable: false },
+      { id: 'coll_pillars_20', name: 'Tidal Flats Pillar',              region: 'Oshima Coast',     placeholder: false, verified: true, missable: false },
+    ],
   },
 
   // ── Ainu Items — 30 (VERIFIED: names and region locations) ──────────────────

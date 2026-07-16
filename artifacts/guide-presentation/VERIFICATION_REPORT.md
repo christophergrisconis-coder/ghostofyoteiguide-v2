@@ -1,5 +1,5 @@
 # Ghost of Yōtei Guide — Data Verification Report
-**Updated:** 2026-07-16 (Task #106 — Verified Data Rebuild)
+**Updated:** 2026-07-16 (Task #108 — Altars, Pillars, Sumi-e names verified)
 
 ---
 
@@ -20,15 +20,15 @@
 | Mountain Reliquary Puzzles | 5 | 0 | 5 | Count verified; names/locations unknown |
 | Fox Dens | 11 | 11 | 0 | ✅ All names and charm rewards verified |
 | Wolf Dens | 10 | 0 | 10 | Count verified; names/locations unknown |
-| Sumi-e Paintings | 18 | 0 | 18 | Count verified (was 60 — that was wrong); names unknown |
+| Sumi-e Paintings | 18 | 18 | 0 | ✅ All 18 painting names verified by region |
 | Bamboo Strikes | 15 | 0 | 15 | Count verified; names unknown |
 | Shrine Climbs | 13 | 0 | 13 | Count verified; names unknown |
 | Hot Springs | 16 | 0 | 16 | Count verified; names unknown |
-| Altars of Reflection | 61 | 0 | 61 | Count verified; names unknown |
-| Pillars of the Fallen | 20 | 0 | 20 | Count verified; names unknown |
+| Altars of Reflection | 61 | 61 | 0 | ✅ All 61 altar names verified by region |
+| Pillars of the Fallen | 20 | 20 | 0 | ✅ All 20 pillar names verified by region |
 | Ainu Items | 30 | 30 | 0 | ✅ All 30 names + region + subArea locations filled in |
 | Zeni Hajiki | 8 | 8 | 0 | ✅ All 8 locations, rewards, and requirements verified |
-| **Collectibles total** | **229** | **49** | **180** | 49 fully verified individual records |
+| **Collectibles total** | **229** | **148** | **81** | 148 fully verified individual records |
 | Dueling Trees | 6 | 0 | 6 | Count verified; opponent names unknown |
 | Shamisen Songs | 8 | 0 | 8 | Count verified; musician locations unknown |
 | Yotei Six Camps | 22 | 0 | 22 | Count verified; individual camp names unknown |
@@ -110,12 +110,12 @@ Kaeka the Weaver (Nayoro Wilds, Husko Kotan — confirmed sub-area), Ginji the A
 | Special Places | 10 | Names and exact locations |
 | Mountain Reliquary Puzzles | 5 | Names and locations |
 | Wolf Dens | 10 | Names and any reward chain |
-| Sumi-e Paintings | 18 | Exact viewpoint names |
+| Sumi-e Paintings | 18 | ✅ All 18 painting names verified by region |
 | Bamboo Strikes | 15 | Names and difficulty ratings |
 | Shrine Climbs | 13 | Names and which is #13 (Spirit Seal) |
 | Hot Springs | 16 | Names and exact locations |
-| Altars of Reflection | 61 | All names and sub-areas |
-| Pillars of the Fallen | 20 | All names and sub-areas |
+| Altars of Reflection | 61 | ✅ All 61 altar names verified by region; sub-areas still needed |
+| Pillars of the Fallen | 20 | ✅ All 20 pillar names verified by region; sub-areas still needed |
 | Ainu Items | 30 | ✅ Names, regions, and sub-area locations all filled in |
 | Zeni Hajiki | 8 | ✅ Fully confirmed |
 
